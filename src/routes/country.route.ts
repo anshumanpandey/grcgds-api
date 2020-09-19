@@ -17,5 +17,5 @@ countriesRoutes.get('/', XmlMiddleware() ,asyncHandler(async (req, res) => {
 
   const r = await DB?.select({ Code: "code", Country: columnName }).table("countries");
   
-  BuildXmlResponse(res, { CountryList: {Country: r}}, 200, "OTA_CountryListRS", {"xsi:schemaLocation":"http://www.opentravel.org/OTA/2003/05 OTA_CountryListRS.xsd",})
+  BuildXmlResponse(res, { CountryList: {Country: (r || []).map(e => ({ value: e.Country, attr: e })) }}, 200, "OTA_CountryListRS", {"xsi:schemaLocation":"http://www.opentravel.org/OTA/2003/05 OTA_CountryListRS.xsd",})
 }));
