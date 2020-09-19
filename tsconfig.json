@@ -5,9 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "outDir": "/dist",
     "forceConsistentCasingInFileNames": true
-  },
-  "exclude": [
-    "feedback-form"
-  ]
+  }
 }
