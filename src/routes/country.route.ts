@@ -2,6 +2,7 @@ import express from 'express';
 import asyncHandler from "express-async-handler"
 import { DB } from '../utils/DB';
 import { validateFor } from '../utils/JsonValidator';
+import JwtMiddleware from '../utils/JwtMiddleware';
 import { XmlMiddleware, BuildXmlResponse } from '../utils/XmlConfig';
 
 export const countriesRoutes = express();
@@ -68,7 +69,7 @@ const schema = {
   "additionalProperties": true
 }
 
-countriesRoutes.get('/', XmlMiddleware(), asyncHandler(async (req, res) => {
+countriesRoutes.get('/', JwtMiddleware(), XmlMiddleware(), asyncHandler(async (req, res) => {
   const validator = validateFor(schema)
   validator(req.body)
   const { CONTEXT } = req.body;

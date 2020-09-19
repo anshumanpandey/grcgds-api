@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser';
 import sequelize, { initDb } from './utils/DB';
 import { routes } from './routes';
 import { ApiError } from './utils/ApiError';
+import { BuildXmlResponse } from './utils/XmlConfig';
 var morgan = require('morgan')
 var cors = require('cors')
 
@@ -26,24 +27,24 @@ app.use('/api/v1',routes)
 
 app.use((err:any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (err instanceof ApiError) {
-        res.status(err.code).json({
-            statusCode: err.code,
-            message: err.message
-        });
+        BuildXmlResponse(res, { Error: {
+            StatusCode: err.code,
+            Message: err.message
+        } }, 200, "Errors")
         return
     } else if (err.name === 'UnauthorizedError') {
         console.log(err)
-        res.status(401).send({
-            statusCode: 401,
-            message: "Unauthorized"
-        });
+        BuildXmlResponse(res, { Error: {
+            StatusCode: 401,
+            Message: "Unauthorized"
+        } }, 401, "Errors")
       }
     else {
         console.log(err)
-        res.status(500).json({
-            statusCode: 500,
-            message: "UNKWON ERROR"
-        });
+        BuildXmlResponse(res, { Error: {
+            StatusCode: 500,
+            Message: "UNKWON ERROR"
+        } }, 500, "Errors")
         return
     }
 });
