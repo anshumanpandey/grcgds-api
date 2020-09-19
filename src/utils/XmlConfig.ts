@@ -33,11 +33,19 @@ export const bustHeaders = (request: express.Request, response: express.Response
 };
 
 
-export const BuildXmlResponse = (response: any, data:any, statusCode: number = 200,preTag?: any) => {
+export const BuildXmlResponse = (response: any, data:any, statusCode: number = 200,preTag?: any, extraKeys = {}) => {
     response.setHeader('Content-Type', 'application/xml');
     response.format({
         'application/xml': () => {
-            response.status(statusCode).send(builder.buildObject({ [preTag]: data }));
+            const keys = {
+                xmlns: "http://www.opentravel.org/OTA/2003/05",
+                "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                "TimeStamp": new Date().toISOString().slice(0, -5),
+                "Target": "Test",
+                "Version": "1.002",
+                ...extraKeys
+            }
+            response.status(statusCode).send(builder.buildObject({ [preTag]: { $: keys, ...data } }));
         },
         'default': () => {
             // log the request and respond with 406

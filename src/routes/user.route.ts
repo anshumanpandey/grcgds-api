@@ -1,14 +1,12 @@
 import express from 'express';
 import asyncHandler from "express-async-handler"
-import { checkSchema } from "express-validator"
 import { sign } from 'jsonwebtoken'
-import { validateParams } from '../middlewares/routeValidation.middleware';
 import { ApiError } from '../utils/ApiError';
 import { XmlMiddleware, BuildXmlResponse } from '../utils/XmlConfig';
 
 export const userRoutes = express();
 
-userRoutes.post('/login', XmlMiddleware() ,asyncHandler(async (req, res) => {
+userRoutes.post('/', XmlMiddleware() ,asyncHandler(async (req, res) => {
   const { CONTEXT } = req.body;
   const { Username, Password } = CONTEXT;
   

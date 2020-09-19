@@ -1,6 +1,8 @@
 import express from 'express';
 import { userRoutes } from './user.route';
+import { countriesRoutes } from './country.route';
 
 export const routes = express();
 
-routes.use(userRoutes)
+routes.use("/login",userRoutes)
+routes.use("/country",countriesRoutes)

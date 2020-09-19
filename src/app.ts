@@ -50,7 +50,6 @@ app.use((err:any, req: express.Request, res: express.Response, next: express.Nex
 
 const bootstrap = () => {
     return initDb()
-    .then(() => sequelize?.authenticate())    
 }
 
 export {

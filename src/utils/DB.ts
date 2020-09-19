@@ -1,12 +1,17 @@
-import { Sequelize } from "sequelize"
+import knex from "knex"
 
-let sequelize: null | Sequelize = null;
+export let DB: knex<any, unknown[]> | null = null;
 export const initDb = async () => {
-  console.log(`using ${process.env.DB_DIALECT} dialect`)
-  sequelize = new Sequelize(process.env.DB_NAME || '', process.env.DB_USERNAME || '', process.env.DB_PASSWORD, {
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT as "postgres" || 'postgres'
+  DB = knex({
+    client: process.env.DB_DIALECT,
+    connection: {
+      host : process.env.DB_HOST,
+      user : process.env.DB_USERNAME,
+      password : process.env.DB_PASSWORD,
+      database : process.env.DB_NAME
+    }
   });
+  return DB
 }
 
-export default sequelize;
+export default DB;
