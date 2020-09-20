@@ -6,7 +6,6 @@ import xmlparser from 'express-xml-bodyparser';
 const xmlOptions = {
     charkey: 'value',
     trim: false,
-    explicitRoot: false,
     explicitArray: false,
     normalizeTags: false,
     mergeAttrs: true,

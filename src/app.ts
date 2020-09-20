@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({
     extended: true,
 }));*/
 
-app.use('/api/v1',routes)
+app.use('/',routes)
 
 app.use((err:any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (err instanceof ApiError) {

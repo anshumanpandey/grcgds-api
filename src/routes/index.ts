@@ -1,10 +1,19 @@
 import express from 'express';
-import { userRoutes } from './user.route';
-import { countriesRoutes } from './country.route';
-import { locationsRoutes } from './locations.route';
+import expressAsyncHandler from 'express-async-handler';
+import { BuildXmlResponse, XmlMiddleware } from '../utils/XmlConfig';
+import { getLocations } from '../controllers/locations.controller';
+import { getCountries } from '../controllers/country.controller';
 
 export const routes = express();
 
-routes.use("/login",userRoutes)
-routes.use("/country",countriesRoutes)
-routes.use("/location",locationsRoutes)
+routes.get('/', XmlMiddleware() ,expressAsyncHandler(async (req, res) => {
+    if (req.body.OTA_VehLocSearchRQ) {
+      const r = await getLocations(req.body.OTA_VehLocSearchRQ)
+      //@ts-expect-error
+      BuildXmlResponse(res,...r)
+    } else if (req.body.OTA_CountryListRQ) {
+      const r = await getCountries(req.body.OTA_CountryListRQ)
+      //@ts-expect-error
+      BuildXmlResponse(res,...r)
+    }
+  }));
