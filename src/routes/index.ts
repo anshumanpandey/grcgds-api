@@ -16,5 +16,5 @@ routes.get('/', XmlMiddleware() ,expressAsyncHandler(async (req, res) => {
       //@ts-expect-error
       BuildXmlResponse(res,...r)
     } else {
-      BuildXmlResponse(res,{ Response: "Request not supported" }, 200, "OTA_UnsuportedRequest"}
+      BuildXmlResponse(res,{ Response: "Request not supported" }, 200, "OTA_UnsuportedRequest")}
   }));
