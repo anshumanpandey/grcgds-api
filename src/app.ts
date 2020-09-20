@@ -30,14 +30,11 @@ app.use((err:any, req: express.Request, res: express.Response, next: express.Nex
         BuildXmlResponse(res, { Error: {
             StatusCode: err.code,
             Message: err.message
-        } }, 200, "Errors")
+        } }, err.code, "Errors")
         return
     } else if (err.name === 'UnauthorizedError') {
         console.log(err)
-        BuildXmlResponse(res, { Error: {
-            StatusCode: 401,
-            Message: "Unauthorized"
-        } }, 401, "Errors")
+        res.send("You are blocked!")
       }
     else {
         console.log(err)
