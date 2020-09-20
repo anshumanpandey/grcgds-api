@@ -3,10 +3,11 @@ import expressAsyncHandler from 'express-async-handler';
 import { BuildXmlResponse, XmlMiddleware } from '../utils/XmlConfig';
 import { getLocations } from '../controllers/locations.controller';
 import { getCountries } from '../controllers/country.controller';
+import JwtMiddleware from '../utils/JwtMiddleware';
 
 export const routes = express();
 
-routes.get('/', XmlMiddleware() ,expressAsyncHandler(async (req, res) => {
+routes.get('/', JwtMiddleware(),XmlMiddleware() ,expressAsyncHandler(async (req, res) => {
     if (req.body.OTA_VehLocSearchRQ) {
       const r = await getLocations(req.body.OTA_VehLocSearchRQ)
       //@ts-expect-error
