@@ -1,10 +1,10 @@
-var jwt = require('express-jwt');
+const requestIp = require('request-ip');
 import express from 'express';
 import { getDbFor } from '../utils/DB';
 
 export default () => {
     return (req: express.Request, res: express.Response, n: express.NextFunction) => {
-        const ip = req.ip || req.headers['x-real-ip'] || req.connection.remoteAddress
+        const ip = requestIp.getClientIp(req)
         console.log(ip)
         getDbFor("grcgds_hannk")?.select().where('ip', ip).table("whitelist_ip")
         .then((r) => {
