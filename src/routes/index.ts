@@ -15,5 +15,6 @@ routes.get('/', XmlMiddleware() ,expressAsyncHandler(async (req, res) => {
       const r = await getCountries(req.body.OTA_CountryListRQ)
       //@ts-expect-error
       BuildXmlResponse(res,...r)
-    }
+    } else {
+      BuildXmlResponse(res,{ Response: "Request not supported" }, 200, "OTA_UnsuportedRequest"}
   }));
