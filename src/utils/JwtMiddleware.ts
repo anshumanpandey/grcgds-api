@@ -1,12 +1,14 @@
 const requestIp = require('request-ip');
 import express from 'express';
-import { getDbFor } from '../utils/DB';
+import { DB } from '../utils/DB';
+const md5 = require('md5');
 
 export default () => {
     return (req: express.Request, res: express.Response, n: express.NextFunction) => {
         const ip = requestIp.getClientIp(req)
         console.log(ip)
-        getDbFor("grcgds_hannk")?.select().where('ip', ip).table("whitelist_ip")
+        console.log(md5(ip))
+        DB?.select().where('pall', md5(ip)).table("white")
         .then((r) => {
             if (r.length != 0) {
                 n();
