@@ -5,6 +5,7 @@ import { getLocations } from '../controllers/locations.controller';
 import { getCountries } from '../controllers/country.controller';
 import JwtMiddleware from '../utils/JwtMiddleware';
 import { searchCars } from '../controllers/carsearch.controller';
+import { createBooking } from '../controllers/booking.controller';
 
 export const routes = express();
 
@@ -19,6 +20,10 @@ routes.get('/', JwtMiddleware(),XmlMiddleware() ,expressAsyncHandler(async (req,
       BuildXmlResponse(res,...r)
     } else if (req.body.OTA_VehAvailRateRQ) {
       const r = await searchCars(req.body.OTA_VehAvailRateRQ)
+      //@ts-expect-error
+      BuildXmlResponse(res,...r)
+    } else if (req.body.OTA_VehResRQ) {
+      const r = await createBooking(req.body.OTA_VehResRQ)
       //@ts-expect-error
       BuildXmlResponse(res,...r)
     } else {

@@ -15,6 +15,14 @@ const builder = new xml.Builder({
     renderOpts: { 'pretty': false }
 });
 
+export const XmlBuilder = (body: any) => {
+    return builder.buildObject(body)
+}
+
+export const xmlToJson = (str: string) => {
+    return xml.parseStringPromise(str);
+}
+
 export const XmlMiddleware = () => {
     return xmlparser(xmlOptions);
 }

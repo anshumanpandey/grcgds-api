@@ -4,7 +4,8 @@ import * as bodyParser from 'body-parser';
 import sequelize, { initDb } from './utils/DB';
 import { routes } from './routes';
 import { ApiError } from './utils/ApiError';
-import { BuildXmlResponse } from './utils/XmlConfig';
+import { BuildXmlResponse, xmlToJson } from './utils/XmlConfig';
+import { XmlError } from './utils/XmlError';
 var morgan = require('morgan')
 var cors = require('cors')
 
@@ -26,7 +27,14 @@ app.use(bodyParser.urlencoded({
 app.use('/',routes)
 
 app.use((err:any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (err instanceof ApiError) {
+    if (err instanceof XmlError) {
+        xmlToJson(err.message)
+        .then((r) => {
+            const singleError = r.OTA_VehResRS.Errors[0]
+            BuildXmlResponse(res, singleError, err.code, "Errors")  
+        })
+        return
+    } else if (err instanceof ApiError) {
         BuildXmlResponse(res, { Error: {
             StatusCode: err.code,
             Message: err.message
