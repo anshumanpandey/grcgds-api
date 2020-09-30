@@ -93,6 +93,10 @@ export const getLocations = async (body: any) => {
         whereFilters.country = Address.CountryName.Code
     }
 
+    if (CONTEXT && CONTEXT.Filter.content) {
+        whereFilters.clientId = CONTEXT.Filter.content.replace("GRC-", "").slice(0, -4);
+    }
+
     const columns = { Id: "id", InternalCode: "internal_code", Location: "location", Country: "country", GRCGDSlocatincode: "GRCGDSlocatincode", Lat: "Lat", Long: "Long" }
     const r = await DB?.select(columns).where(whereFilters).table("companies_locations");
 

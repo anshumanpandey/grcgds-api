@@ -79,7 +79,7 @@ export const getCountries = async (body: any) => {
     
     let where = {};
     if (content) {
-        where = { 'clients.id': content.replace('GRC-',"").slice(0,2) }
+        where = { 'clients.id': content.replace('GRC-',"").slice(0, -4) }
     }
 
     const r = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
