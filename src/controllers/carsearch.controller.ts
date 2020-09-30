@@ -2,10 +2,10 @@ import { DB } from '../utils/DB';
 import { validateFor } from '../utils/JsonValidator';
 import axios from "axios"
 import { ApiError } from '../utils/ApiError';
+import { xmlToJson } from '../utils/XmlConfig';
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "http://example.com/example.json",
     "type": "object",
     "title": "The root schema",
     "description": "The root schema comprises the entire JSON document.",
@@ -322,34 +322,54 @@ const schema = {
 export const searchCars = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
-    const [PickupDate, PickupTime] = body.VehAvailRQCore.VehRentalCore.PickUpDateTime.split("T")
-    const [DropoffDate, DropoffTime] = body.VehAvailRQCore.VehRentalCore.ReturnDateTime.split("T")
+    const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
+    const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
     const pickLocation = body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode
     const dropLocation = body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode
-    const axiosConfig = {
-        url: 'https://www.grcgds.com/mobiletest/index.php',
-        params: {
-            module_name: "SEARCH_VEHICLE",
+    const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
+    const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
 
-            pickup_date: PickupDate,
-            pickup_time: PickupTime.slice(0, 5),
+    const xml = `<?xml version="1.0"?>
+            <OTA_VehAvailRateRQDeep xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2010-11-12T11:00:00" Target="Test" Version="1.002">
+            <POS>
+                <Source>
+                    <RequestorID Type="5" ID="1000022"/>
+                </Source>
+            </POS>
+            <VehAvailRQCore Status="Available">
+                <Currency Code="EUR"/>
+                <VehRentalCore PickUpDateTime="${PickUpDateTime}" ReturnDateTime="${ReturnDateTime}">
+                
+                <PickUpLocation LocationCode="${pickLocation}"/>
 
-            dropoff_date: DropoffDate,
-            dropoff_time: DropoffTime.slice(0, 5),
+                <ReturnLocation LocationCode="${dropLocation}"/>
+                </VehRentalCore>
+            </VehAvailRQCore>
+            <VehAvailRQInfo>
+                <Customer>
+                <Primary>
+                    <CitizenCountryName Code="${Code || "UK"}"/>
+                    <DriverType Age="${Age || 35}"/>
+                </Primary>
+                </Customer>
+                <TPA_Extensions>
+                <ConsumerIP>192.168.102.14</ConsumerIP>
+                </TPA_Extensions>
+            </VehAvailRQInfo>
+            </OTA_VehAvailRateRQDeep>
+    `;
 
-            pickup_location: pickLocation,
-            dropoff_location: dropLocation || pickLocation,
-        },
-        headers: {
-            Auth: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTE5MiwiZW1haWxhZGRyZXNzIjoidGVzdDI1QHRlc3QuY29tIiwibW9iaWxlbnVtYmVyIjoiNDE2OTk0MzQ2NCIsIm1vYmlsZWNvZGUiOiIrNTgiLCJmaXJzdG5hbWUiOiIiLCJsYXN0bmFtZSI6IiIsImFkZDEiOiIiLCJhZGQyIjoiIiwiY2l0eSI6IiIsInZlbWFpbCI6MCwidnBob25lIjo0ODY4LCJjb3VudHJ5IjoiVVMiLCJwb3N0Y29kZSI6IiIsInBhc3NkYXkiOiIiLCJwYXNzbW9udGgiOiIiLCJwYXNzeWVhciI6IiIsInBhc3NpbWFnZSI6IiIsInBhc3Njb3VudHJ5IjoiIiwicGFzc3BvcnQiOiIiLCJkcmxpYyI6IiIsImRyZGF5IjoiIiwiZHJtb250aCI6IiIsImRyeWVhciI6IiIsImRyaW1hZ2UiOiIiLCJkcmNvdW50cnkiOiIiLCJzZWxmaXVybCI6IiIsImNvbXBhbnkiOiJOT05FIiwidmF0IjoiTk9ORSIsInR3b2F1dGgiOjAsInZkciI6MCwidnBhc3MiOjAsInZzZWxmIjowLCJzb2NpYWxtZWRpYSI6MH0.zhecWWnP9_jH1bRhoMV7Pn8Vw1Xwfp_5BGFk_OcVAtA"
-        }
-    }
-    
     try {
-        const { data } = await axios(axiosConfig)
+        const { data } = await axios.post('https://ota.right-cars.com', xml, {
+            headers: {
+                'Content-Type': 'text/plain; charset=UTF8',
+            }
+        })
+
+        const json = await xmlToJson(data);
 
         return [
-            data,
+            json.OTA_VehAvailRateRS,
             200,
             "OTA_VehAvailRateRS",
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
