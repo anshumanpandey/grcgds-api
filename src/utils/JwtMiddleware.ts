@@ -27,7 +27,7 @@ export default () => {
                 .from("clients")
                 .innerJoin('BackOfficeUsers','BackOfficeUsers.id','clients.BackOfficeUserId')
                 .where({
-                    'clients.id': pos.Source.RequestorID.ID.replace('GRC-',"").slice(0,2),
+                    'clients.id': pos.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4),
                     'BackOfficeUsers.type': "BROKER"
                 })
         })
