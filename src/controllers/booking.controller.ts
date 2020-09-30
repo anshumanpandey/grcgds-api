@@ -325,7 +325,7 @@ export const createBooking = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
     console.log(body)
-    const { VehResRQCore, RentalPaymentPref } = body
+    const { VehResRQCore, RentalPaymentPref, POS } = body
     const { VehPref, Customer } = VehResRQCore
     const { Primary: { Email, PersonName: { GivenName, Surname, NamePrefix } } } = Customer
 
@@ -389,6 +389,20 @@ export const createBooking = async (body: any) => {
         if (data.includes("Error")) {
             throw new XmlError(data)
         }
+
+        const [pickupDate, pickupTime] = VehResRQCore.VehRentalCore.PickUpDateTime.split('T')
+        const [dropoffDate, dropoffTime] = VehResRQCore.VehRentalCore.ReturnDateTime.split('T')
+
+        const toInsert = {
+            pickupDate,
+            pickupTime, 
+            dropoffDate,
+            dropoffTime,
+            pickLocation,
+            dropoffLocation: dropLocation,
+            requestorId: POS.Source.RequestorID.ID
+        }
+        await DB?.insert(toInsert).into('Bookings')
 
         const json = await xmlToJson(data);
 
