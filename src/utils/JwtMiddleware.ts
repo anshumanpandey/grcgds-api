@@ -23,7 +23,7 @@ export default () => {
               } else if (req.body.OTA_VehResRQ) {
                 pos = req.body.OTA_VehResRQ.POS
               }
-            return getDbFor("grcgds_gateway_db")?.select().where('account_code', pos.Source.RequestorID.ID).table("client_broker_locations_accountype")
+            return getDbFor("grcgds_gateway_db")?.select().where('id', pos.Source.RequestorID.ID.replace('GRC-',"").slice(0,2)).table("clients")
         })
         .then((r) => {
             if (r.length != 0) {
