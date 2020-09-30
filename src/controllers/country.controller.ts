@@ -81,7 +81,7 @@ export const getCountries = async (body: any) => {
     return [
         { CountryList: { Country: (r || []).map(e => ({ value: e.Country, attr: e })) } },
         200,
-        "OTA_CountryListRS",
-        { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_CountryListRS.xsd", }
+        "OTA_CountryListRQ",
+        { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 CountryListRQ.xsd", }
     ];
 }

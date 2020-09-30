@@ -23,7 +23,13 @@ export default () => {
               } else if (req.body.OTA_VehResRQ) {
                 pos = req.body.OTA_VehResRQ.POS
               }
-            return getDbFor("grcgds_gateway_db")?.select().where('id', pos.Source.RequestorID.ID.replace('GRC-',"").slice(0,2)).table("clients")
+            return getDbFor("grcgds_gateway_db")?.select()
+                .from("clients")
+                .innerJoin('BackOfficeUsers','BackOfficeUsers.id','clients.BackOfficeUserId')
+                .where({
+                    'clients.id': pos.Source.RequestorID.ID.replace('GRC-',"").slice(0,2),
+                    'BackOfficeUsers.type': "BROKER"
+                })
         })
         .then((r) => {
             if (r.length != 0) {
