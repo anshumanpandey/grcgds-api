@@ -1,6 +1,6 @@
 const requestIp = require('request-ip');
 import express from 'express';
-import { DB } from '../utils/DB';
+import { DB, getDbFor } from '../utils/DB';
 const md5 = require('md5');
 
 export default () => {
@@ -10,10 +10,26 @@ export default () => {
         console.log(md5(ip))
         DB?.select().where('pall', md5(ip)).table("white")
         .then((r) => {
+            if (r.length == 0) {
+                n({name : "UnauthorizedError"});
+            }
+            let pos = null;
+            if (req.body.OTA_VehLocSearchRQ) {
+                pos = req.body.OTA_VehLocSearchRQ.POS
+              } else if (req.body.OTA_CountryListRQ) {
+                pos = req.body.OTA_CountryListRQ.POS
+              } else if (req.body.OTA_VehAvailRateRQ) {
+                pos = req.body.OTA_VehAvailRateRQ.POS
+              } else if (req.body.OTA_VehResRQ) {
+                pos = req.body.OTA_VehResRQ.POS
+              }
+            return getDbFor("grcgds_gateway_db")?.select().where('account_code', pos.Source.RequestorID.ID).table("client_broker_locations_accountype")
+        })
+        .then((r) => {
             if (r.length != 0) {
                 n();
             } else {
-                n({name : "UnauthorizedError"});
+                n({name : "RequestorIDError"});
             }
         })
         .catch((err) => {

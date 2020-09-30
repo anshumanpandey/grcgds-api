@@ -24,32 +24,39 @@ app.use(bodyParser.urlencoded({
     extended: true,
 }));*/
 
-app.use('/',routes)
+app.use('/', routes)
 
-app.use((err:any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (err instanceof XmlError) {
         xmlToJson(err.message)
-        .then((r) => {
-            const singleError = r.OTA_VehResRS.Errors[0]
-            BuildXmlResponse(res, singleError, err.code, "Errors")  
-        })
+            .then((r) => {
+                const singleError = r.OTA_VehResRS.Errors[0]
+                BuildXmlResponse(res, singleError, err.code, "Errors")
+            })
         return
     } else if (err instanceof ApiError) {
-        BuildXmlResponse(res, { Error: {
-            StatusCode: err.code,
-            Message: err.message
-        } }, err.code, "Errors")
+        BuildXmlResponse(res, {
+            Error: {
+                StatusCode: err.code,
+                Message: err.message
+            }
+        }, err.code, "Errors")
         return
     } else if (err.name === 'UnauthorizedError') {
         console.log(err)
         res.send("You are blocked!")
-      }
+    } else if (err.name === 'RequestorIDError') {
+        console.log(err)
+        res.send("Invalid Account Code")
+    }
     else {
         console.log(err)
-        BuildXmlResponse(res, { Error: {
-            StatusCode: 500,
-            Message: "UNKWON ERROR"
-        } }, 500, "Errors")
+        BuildXmlResponse(res, {
+            Error: {
+                StatusCode: 500,
+                Message: "UNKWON ERROR"
+            }
+        }, 500, "Errors")
         return
     }
 });

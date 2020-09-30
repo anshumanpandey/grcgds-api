@@ -9,7 +9,7 @@ import { createBooking } from '../controllers/booking.controller';
 
 export const routes = express();
 
-routes.get('/', JwtMiddleware(),XmlMiddleware() ,expressAsyncHandler(async (req, res) => {
+routes.get('/', XmlMiddleware(), JwtMiddleware(),expressAsyncHandler(async (req, res) => {
     if (req.body.OTA_VehLocSearchRQ) {
       const r = await getLocations(req.body.OTA_VehLocSearchRQ)
       //@ts-expect-error
