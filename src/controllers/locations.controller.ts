@@ -93,6 +93,10 @@ export const getLocations = async (body: any) => {
         whereFilters.country = Address.CountryName.Code
     }
 
+    if (Address && Address.CityName) {
+        whereFilters.GRCGDSlocatincode 	 = Address.CityName.Code
+    }
+
     if (CONTEXT && CONTEXT.Filter.content) {
         whereFilters.clientId = CONTEXT.Filter.content.replace("GRC-", "").slice(0, -4);
     }
