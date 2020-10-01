@@ -1,7 +1,10 @@
 import { getCountriesByClientId } from "../services/country.service";
+import { getBrokersOwners, getDataSuppliers } from "../services/requestor.service";
+import { increaseCounterFor, sortClientsBySearch } from "../services/searchHistory.service";
 import { ApiError } from "../utils/ApiError";
 import { DB } from "../utils/DB";
 import { validateFor } from '../utils/JsonValidator';
+import { SearchHistoryEnum } from "../utils/SearchHistoryEnum";
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -86,20 +89,21 @@ export const getCountries = async (body: any) => {
 
     let r = new Map();
 
-    const requestorDataSuppliers = await DB?.select(["data_suppliers_user.clientId", "clients.clientname"])
-        .from("data_suppliers_user")
-        .innerJoin('clients', 'clients.id', 'data_suppliers_user.clientId')
-        .where({ brokerId: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
-        .where("active", 1)
+    const [requestorDataSuppliers, ownersOfCurrentBroker] = await Promise.all([
+        getDataSuppliers({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) }),
+        getBrokersOwners({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
+    ])
 
-    if (!requestorDataSuppliers || requestorDataSuppliers?.length == 0) {
+    if ((!requestorDataSuppliers || requestorDataSuppliers?.length == 0) && (!ownersOfCurrentBroker || ownersOfCurrentBroker?.length == 0)) {
         throw new ApiError("No suppliers have been setup.")
     }
 
-    for (const supplier of requestorDataSuppliers) {
-        const records = await getCountriesByClientId({ ClientId: supplier.clientId, columns: { Country: `countries.${columnName}` } })
+    if (requestorDataSuppliers) {
+        for (const supplier of requestorDataSuppliers) {
+            const records = await getCountriesByClientId({ ClientId: supplier.clientId, columns: { Country: `countries.${columnName}` } })
 
-        if (records) {
+            if (!records || records.length == 0) continue;
+
             for (const record of records) {
                 if (r.has(record.Code)) {
                     const oldRecord = r.get(record.Code)
@@ -112,35 +116,26 @@ export const getCountries = async (body: any) => {
         }
     }
 
-    const ownersOfCurrentBroker = (await DB?.select(["clients.id", "clients.clientname", "ClientBrokerOwner.searchCounter", "ClientBrokerOwner.id as ClientBrokerOwnerId"])
-        .from("ClientBrokerOwner")
-        .innerJoin('BackOfficeUsers', 'BackOfficeUsers.id', 'ClientBrokerOwner.BackOfficeUserId')
-        .innerJoin('clients', 'clients.BackOfficeUserId', 'BackOfficeUsers.id')
-        .where({ ClientId: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
-        .orderBy('ClientBrokerOwner.createdAt', 'asc'))
-        ?.sort((a,b) => a.searchCounter - b.searchCounter)
-
     if (ownersOfCurrentBroker) {
-        for (const supplier of ownersOfCurrentBroker) {
+        const sortedBrokers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Country })
+        for (const supplier of sortedBrokers) {
             const records = await getCountriesByClientId({ ClientId: supplier.id, columns: { Country: `countries.${columnName}` } })
-            if (records && records.length != 0) {
-                for (const record of records) {
-                    if (r.has(record.Code)) {
-                        const oldRecord = r.get(record.Code)
-                        oldRecord.Suppliers.Supplier.push(supplier.clientname)
-                        r.set(record.Code, oldRecord)
-                    } else {
-                        r.set(record.Code, { ...record, Suppliers: { Supplier: [supplier.clientname] } })
-                    }
+            if (!records || records.length == 0) continue;
+
+            for (const record of records) {
+                if (r.has(record.Code)) {
+                    const oldRecord = r.get(record.Code)
+                    oldRecord.Suppliers.Supplier.push(supplier.clientname)
+                    r.set(record.Code, oldRecord)
+                } else {
+                    r.set(record.Code, { ...record, Suppliers: { Supplier: [supplier.clientname] } })
                 }
-                await DB?.where('id', '=', supplier.ClientBrokerOwnerId)
-                    .increment('searchCounter', 1)
-                    .from("ClientBrokerOwner")
-                break;
             }
+            await increaseCounterFor({ clientId: supplier.id, searchType: SearchHistoryEnum.Country })
+            break;
         }
     }
-    
+
 
     return [
         { CountryList: { Country: Array.from(r.values()) } },

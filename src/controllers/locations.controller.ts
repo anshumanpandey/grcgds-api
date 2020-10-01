@@ -1,6 +1,10 @@
+import { getLocationsByClient } from '../services/locations.service';
+import { getBrokersOwners, getDataSuppliers } from '../services/requestor.service';
+import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { ApiError } from '../utils/ApiError';
 import { DB } from '../utils/DB';
 import { validateFor } from '../utils/JsonValidator';
+import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -103,19 +107,26 @@ export const getLocations = async (body: any) => {
         suppliersId.push(CONTEXT.Filter.content.replace("GRC-", "").slice(0, -4));
     }
 
-    let r = undefined
-    const requestorDataSuppliers = await DB?.select("clientId")
-        .from("data_suppliers_user")
-        .whereIn("clientId", suppliersId)
-        .where("brokerId", POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4))
-        .where("active", 1)
+    let r: any[] = []
+    const [requestorDataSuppliers, ownersOfCurrentBroker] = await Promise.all([
+        getDataSuppliers({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4) }),
+        getBrokersOwners({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
+    ])
 
-    if (requestorDataSuppliers && requestorDataSuppliers.length != 0) {
-
-        const columns = { Id: "id", InternalCode: "internal_code", Location: "location", Country: "country", GRCGDSlocatincode: "GRCGDSlocatincode", Lat: "Lat", Long: "Long" }
-        r = await DB?.select(columns).where(whereFilters).whereIn("clientId", requestorDataSuppliers.map(r => r.clientId)).table("companies_locations");
-    } else {
+    if (requestorDataSuppliers.length == 0 || ownersOfCurrentBroker.length == 0) {
         throw new ApiError("No suppliers have been setup.")
+    }
+
+    r = r.concat(await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId)}))
+
+    const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
+    for (const record of orderedSuppliers) {
+        const results = await getLocationsByClient({ whereFilters ,clientId: [record.id] })
+        if (results.length == 0) continue;   
+
+        r = r.concat(results)
+        await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
+        break;     
     }
 
     return [
