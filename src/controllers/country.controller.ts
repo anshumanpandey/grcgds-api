@@ -66,7 +66,7 @@ const schema = {
 export const getCountries = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
-    const { CONTEXT } = body;
+    const { CONTEXT, POS } = body;
     const { Filter } = CONTEXT;
     const Language = Filter?.Language || null
     const content = Filter?.content || null
@@ -77,17 +77,23 @@ export const getCountries = async (body: any) => {
     if (Language && Language == "IT") columnName = "countryit"
     if (Language && Language == "DE") columnName = "countryde"
     
-    let where = {};
+    let whereIn = []
     if (content) {
-        where = { 'clients.id': content.replace('GRC-',"").slice(0, -4) }
+        whereIn?.push(content.replace('GRC-',"").slice(0, -4))
     }
 
-    const r = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
+    let r = undefined
+
+    const requestorDataSuppliers = await DB?.select("clientId").from("data_suppliers_user").where({ brokerId: POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4) });
+    if (requestorDataSuppliers && requestorDataSuppliers.length != 0) {
+        whereIn.push(...requestorDataSuppliers);
+        r = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
         .from("countries")
         .leftJoin('companies_locations','companies_locations.country','countries.code')
         .leftJoin('clients','companies_locations.clientId','clients.id')
-        .where(where)
-        .groupBy('countries.code')
+        .whereIn("clients.id", whereIn)
+        .groupBy('countries.code')   
+    }
 
     return [
         { CountryList: { Country: (r || []).map(e => ({ value: e.Country, attr: e })) } },
