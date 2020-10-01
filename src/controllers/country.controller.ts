@@ -112,12 +112,13 @@ export const getCountries = async (body: any) => {
         }
     }
 
-    const ownersOfCurrentBroker = await DB?.select(["clients.id", "clients.clientname"])
+    const ownersOfCurrentBroker = (await DB?.select(["clients.id", "clients.clientname", "ClientBrokerOwner.searchCounter", "ClientBrokerOwner.id as ClientBrokerOwnerId"])
         .from("ClientBrokerOwner")
         .innerJoin('BackOfficeUsers', 'BackOfficeUsers.id', 'ClientBrokerOwner.BackOfficeUserId')
         .innerJoin('clients', 'clients.BackOfficeUserId', 'BackOfficeUsers.id')
         .where({ ClientId: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
-        .orderBy('ClientBrokerOwner.createdAt', 'asc')
+        .orderBy('ClientBrokerOwner.createdAt', 'asc'))
+        ?.sort((a,b) => a.searchCounter - b.searchCounter)
 
     if (ownersOfCurrentBroker) {
         for (const supplier of ownersOfCurrentBroker) {
@@ -132,6 +133,9 @@ export const getCountries = async (body: any) => {
                         r.set(record.Code, { ...record, Suppliers: { Supplier: [supplier.clientname] } })
                     }
                 }
+                await DB?.where('id', '=', supplier.ClientBrokerOwnerId)
+                    .increment('searchCounter', 1)
+                    .from("ClientBrokerOwner")
                 break;
             }
         }
