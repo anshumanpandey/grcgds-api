@@ -1,3 +1,4 @@
+import { ApiError } from "../utils/ApiError";
 import { DB } from "../utils/DB";
 import { validateFor } from '../utils/JsonValidator';
 
@@ -84,25 +85,26 @@ export const getCountries = async (body: any) => {
 
     let r = undefined
 
-    const requestorDataSuppliers = await DB?.select("clientId").from("data_suppliers_user").where({ brokerId: POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4) });
+    const requestorDataSuppliers = await DB?.select(["data_suppliers_user.clientId", "clients.clientname"])
+        .from("data_suppliers_user")
+        .innerJoin('clients','clients.id','data_suppliers_user.clientId')
+        .where({ brokerId: POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4) })
+        .where("active", 1)
+
     if (requestorDataSuppliers && requestorDataSuppliers.length != 0) {
         whereIn.push(...requestorDataSuppliers.map(r => r.clientId));
-        console.log(DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
-        .from("countries")
-        .leftJoin('companies_locations','companies_locations.country','countries.code')
-        .leftJoin('clients','companies_locations.clientId','clients.id')
-        .whereIn("clients.id", whereIn)
-        .groupBy('countries.code')   .toSQL())
         r = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
         .from("countries")
         .leftJoin('companies_locations','companies_locations.country','countries.code')
         .leftJoin('clients','companies_locations.clientId','clients.id')
         .whereIn("clients.id", whereIn)
         .groupBy('countries.code')   
+    } else {
+        throw new ApiError("No suppliers have been setup.")
     }
 
     return [
-        { CountryList: { Country: (r || []).map(e => ({ value: e.Country, attr: e })) } },
+        { CountryList: { Country: (r || []).map(e => ({ value: e.Country, attr: e, Suppliers: { Supplier: requestorDataSuppliers?.map(r => r.clientname) } || [] })) } },
         200,
         "OTA_CountryListRQ",
         { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 CountryListRQ.xsd", }

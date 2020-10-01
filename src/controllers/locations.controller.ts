@@ -1,3 +1,4 @@
+import { ApiError } from '../utils/ApiError';
 import { DB } from '../utils/DB';
 import { validateFor } from '../utils/JsonValidator';
 
@@ -86,7 +87,7 @@ const schema = {
 export const getLocations = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
-    const { VehLocSearchCriterion: { CONTEXT, Address } } = body;
+    const { POS, VehLocSearchCriterion: { CONTEXT, Address } } = body;
 
     const whereFilters: any = {}
     if (Address && Address.CountryName) {
@@ -97,15 +98,28 @@ export const getLocations = async (body: any) => {
         whereFilters.GRCGDSlocatincode 	 = Address.CityName.Code
     }
 
-    if (CONTEXT && CONTEXT.Filter.content) {
-        whereFilters.clientId = CONTEXT.Filter.content.replace("GRC-", "").slice(0, -4);
+    const suppliersId = [ ]
+    if (CONTEXT && CONTEXT?.Filter?.content) {
+        suppliersId.push(CONTEXT.Filter.content.replace("GRC-", "").slice(0, -4));
     }
 
-    const columns = { Id: "id", InternalCode: "internal_code", Location: "location", Country: "country", GRCGDSlocatincode: "GRCGDSlocatincode", Lat: "Lat", Long: "Long" }
-    const r = await DB?.select(columns).where(whereFilters).table("companies_locations");
+    let r = undefined
+    const requestorDataSuppliers = await DB?.select("clientId")
+        .from("data_suppliers_user")
+        .whereIn("clientId", suppliersId)
+        .where("brokerId", POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4))
+        .where("active", 1)
+
+    if (requestorDataSuppliers && requestorDataSuppliers.length != 0) {
+
+        const columns = { Id: "id", InternalCode: "internal_code", Location: "location", Country: "country", GRCGDSlocatincode: "GRCGDSlocatincode", Lat: "Lat", Long: "Long" }
+        r = await DB?.select(columns).where(whereFilters).whereIn("clientId", requestorDataSuppliers.map(r => r.clientId)).table("companies_locations");
+    } else {
+        throw new ApiError("No suppliers have been setup.")
+    }
 
     return [
-        { VehMatchedLocs: { VehMatchedLoc: { LocationDetail: r } } },
+        { VehMatchedLocs: { VehMatchedLoc: { LocationDetail: r || [] } } },
         200,
         "OTA_CountryListRS",
         { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_CountryListRS.xsd" }
