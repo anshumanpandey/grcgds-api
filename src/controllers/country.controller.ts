@@ -1,3 +1,4 @@
+import { getCountriesByClientId } from "../services/country.service";
 import { ApiError } from "../utils/ApiError";
 import { DB } from "../utils/DB";
 import { validateFor } from '../utils/JsonValidator';
@@ -77,47 +78,68 @@ export const getCountries = async (body: any) => {
     if (Language && Language == "FR") columnName = "countryfr"
     if (Language && Language == "IT") columnName = "countryit"
     if (Language && Language == "DE") columnName = "countryde"
-    
+
     let whereIn = []
     if (content) {
-        whereIn?.push(content.replace('GRC-',"").slice(0, -4))
+        whereIn?.push(content.replace('GRC-', "").slice(0, -4))
     }
 
     let r = new Map();
 
     const requestorDataSuppliers = await DB?.select(["data_suppliers_user.clientId", "clients.clientname"])
         .from("data_suppliers_user")
-        .innerJoin('clients','clients.id','data_suppliers_user.clientId')
-        .where({ brokerId: POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4) })
+        .innerJoin('clients', 'clients.id', 'data_suppliers_user.clientId')
+        .where({ brokerId: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
         .where("active", 1)
 
-    if (requestorDataSuppliers && requestorDataSuppliers.length != 0) {
-        for (const supplier of requestorDataSuppliers) {
-            const records = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
-            .from("countries")
-            .leftJoin('companies_locations','companies_locations.country','countries.code')
-            .leftJoin('clients','companies_locations.clientId','clients.id')
-            .where("clients.id", supplier.clientId)
-            .groupBy('countries.code');
-            
-            if (records) {
+    if (!requestorDataSuppliers || requestorDataSuppliers?.length == 0) {
+        throw new ApiError("No suppliers have been setup.")
+    }
+
+    for (const supplier of requestorDataSuppliers) {
+        const records = await getCountriesByClientId({ ClientId: supplier.clientId, columns: { Country: `countries.${columnName}` } })
+
+        if (records) {
+            for (const record of records) {
+                if (r.has(record.Code)) {
+                    const oldRecord = r.get(record.Code)
+                    oldRecord.Suppliers.Supplier.push(supplier.clientname)
+                    r.set(record.Code, oldRecord)
+                } else {
+                    r.set(record.Code, { ...record, Suppliers: { Supplier: [supplier.clientname] } })
+                }
+            }
+        }
+    }
+
+    const ownersOfCurrentBroker = await DB?.select(["clients.id", "clients.clientname"])
+        .from("ClientBrokerOwner")
+        .innerJoin('BackOfficeUsers', 'BackOfficeUsers.id', 'ClientBrokerOwner.BackOfficeUserId')
+        .innerJoin('clients', 'clients.BackOfficeUserId', 'BackOfficeUsers.id')
+        .where({ ClientId: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
+        .orderBy('ClientBrokerOwner.createdAt', 'asc')
+
+    if (ownersOfCurrentBroker) {
+        for (const supplier of ownersOfCurrentBroker) {
+            const records = await getCountriesByClientId({ ClientId: supplier.id, columns: { Country: `countries.${columnName}` } })
+            if (records && records.length != 0) {
                 for (const record of records) {
                     if (r.has(record.Code)) {
                         const oldRecord = r.get(record.Code)
                         oldRecord.Suppliers.Supplier.push(supplier.clientname)
                         r.set(record.Code, oldRecord)
                     } else {
-                        r.set(record.Code, { ...record, Suppliers: { Supplier: [supplier.clientname]} })
+                        r.set(record.Code, { ...record, Suppliers: { Supplier: [supplier.clientname] } })
                     }
-                }          
+                }
+                break;
             }
         }
-    } else {
-        throw new ApiError("No suppliers have been setup.")
     }
+    
 
     return [
-        { CountryList: { Country: Array.from(r.values()) }},
+        { CountryList: { Country: Array.from(r.values()) } },
         200,
         "OTA_CountryListRQ",
         { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 CountryListRQ.xsd", }
