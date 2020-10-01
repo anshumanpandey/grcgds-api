@@ -83,7 +83,7 @@ export const getCountries = async (body: any) => {
         whereIn?.push(content.replace('GRC-',"").slice(0, -4))
     }
 
-    let r = undefined
+    let r = new Map();
 
     const requestorDataSuppliers = await DB?.select(["data_suppliers_user.clientId", "clients.clientname"])
         .from("data_suppliers_user")
@@ -92,19 +92,32 @@ export const getCountries = async (body: any) => {
         .where("active", 1)
 
     if (requestorDataSuppliers && requestorDataSuppliers.length != 0) {
-        whereIn.push(...requestorDataSuppliers.map(r => r.clientId));
-        r = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
-        .from("countries")
-        .leftJoin('companies_locations','companies_locations.country','countries.code')
-        .leftJoin('clients','companies_locations.clientId','clients.id')
-        .whereIn("clients.id", whereIn)
-        .groupBy('countries.code')   
+        for (const supplier of requestorDataSuppliers) {
+            const records = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
+            .from("countries")
+            .leftJoin('companies_locations','companies_locations.country','countries.code')
+            .leftJoin('clients','companies_locations.clientId','clients.id')
+            .where("clients.id", supplier.clientId)
+            .groupBy('countries.code');
+            
+            if (records) {
+                for (const record of records) {
+                    if (r.has(record.Code)) {
+                        const oldRecord = r.get(record.Code)
+                        oldRecord.Suppliers.Supplier.push(supplier.clientname)
+                        r.set(record.Code, oldRecord)
+                    } else {
+                        r.set(record.Code, { ...record, Suppliers: { Supplier: [supplier.clientname]} })
+                    }
+                }          
+            }
+        }
     } else {
         throw new ApiError("No suppliers have been setup.")
     }
 
     return [
-        { CountryList: { Country: (r || []).map(e => ({ value: e.Country, attr: e, Suppliers: { Supplier: requestorDataSuppliers?.map(r => r.clientname) } || [] })) } },
+        { CountryList: { Country: Array.from(r.values()) }},
         200,
         "OTA_CountryListRQ",
         { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 CountryListRQ.xsd", }
