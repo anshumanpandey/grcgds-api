@@ -86,7 +86,13 @@ export const getCountries = async (body: any) => {
 
     const requestorDataSuppliers = await DB?.select("clientId").from("data_suppliers_user").where({ brokerId: POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4) });
     if (requestorDataSuppliers && requestorDataSuppliers.length != 0) {
-        whereIn.push(...requestorDataSuppliers);
+        whereIn.push(...requestorDataSuppliers.map(r => r.clientId));
+        console.log(DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
+        .from("countries")
+        .leftJoin('companies_locations','companies_locations.country','countries.code')
+        .leftJoin('clients','companies_locations.clientId','clients.id')
+        .whereIn("clients.id", whereIn)
+        .groupBy('countries.code')   .toSQL())
         r = await DB?.select({ Code: "countries.code", Country: `countries.${columnName}` })
         .from("countries")
         .leftJoin('companies_locations','companies_locations.country','countries.code')
