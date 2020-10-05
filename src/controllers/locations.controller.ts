@@ -95,11 +95,11 @@ export const getLocations = async (body: any) => {
 
     const whereFilters: any = {}
     if (Address && Address.CountryName) {
-        whereFilters.country = Address.CountryName.Code
+        whereFilters[`companies_locations.country`] = `${Address.CountryName.Code}`
     }
 
     if (Address && Address.CityName) {
-        whereFilters.GRCGDSlocatincode 	 = Address.CityName.Code
+        whereFilters[`companies_locations.GRCGDSlocatincode`] = Address.CityName.Code
     }
 
     const suppliersId = [ ]

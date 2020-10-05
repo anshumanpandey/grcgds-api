@@ -7,6 +7,11 @@ const formatDate = (fullDate: string) => {
     return `${date.split('-').reverse().join(".")}T${time.slice(0, -3)}`
 }
 
+const getDiscoverCarsUser = async () => {
+    const r = await DB?.select().from("clients").where("id", 17)
+    return r && r.length != 0 ? r[0] : null
+}
+
 const getCodeForGrcCode = async (grcCode: string) => {
     const r = await DB?.select().from("companies_locations")
         .where("GRCGDSlocatincode", grcCode)
@@ -40,8 +45,11 @@ export default async (params: any) => {
         }
     })
 
+    const u = await getDiscoverCarsUser()
+
     return data.map(($VehAvail: any) => {
         return {
+            "Supplier": u.clientname,
             "VehID": $VehAvail["CarUID"],
             "Deeplink": $VehAvail["BookingPageUrl"],
             "Vehicle": [{

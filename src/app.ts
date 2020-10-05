@@ -13,7 +13,7 @@ const app = express();
 
 app.use(cors())
 app.use(morgan("tiny"))
-/*app.use(bodyParser.json({
+app.use(bodyParser.json({
     limit: '50mb',
     verify(req: any, res, buf, encoding) {
         req.rawBody = buf;
@@ -22,7 +22,7 @@ app.use(morgan("tiny"))
 app.use(bodyParser.urlencoded({
     limit: '50mb',
     extended: true,
-}));*/
+}));
 
 app.use('/', routes)
 

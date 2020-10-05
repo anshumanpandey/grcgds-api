@@ -41,7 +41,6 @@ export const bustHeaders = (request: express.Request, response: express.Response
 
 
 export const BuildXmlResponse = (response: any, data:any, statusCode: number = 200,preTag?: any, extraKeys = {}) => {
-    response.setHeader('Content-Type', 'application/xml');
     response.format({
         'application/xml': () => {
             const keys = {
@@ -53,6 +52,9 @@ export const BuildXmlResponse = (response: any, data:any, statusCode: number = 2
                 ...extraKeys
             }
             response.status(statusCode).send(builder.buildObject({ [preTag]: { $: keys, ...data } }));
+        },
+        'application/json': () => {
+            response.status(statusCode).json(data);
         },
         'default': () => {
             // log the request and respond with 406

@@ -1,5 +1,11 @@
 import axios from "axios"
+import { DB } from "../utils/DB";
 import { xmlToJson } from '../utils/XmlConfig';
+
+const getRightCars = async () => {
+    const r = await DB?.select().from("clients").where("id", 1)
+    return r && r.length != 0 ? r[0] : null
+}
 
 export default async (body: any) => {
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
@@ -45,5 +51,9 @@ export default async (body: any) => {
             }
         })
 
-    return xmlToJson(data);
+    const rc = await getRightCars();
+
+    const json = await xmlToJson(data);
+    json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map((r: any) => ({ ...r, Supplier: rc.clientname }))
+    return json
 }

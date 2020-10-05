@@ -139,4 +139,4 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array (
 
 $result = curl_exec($ch); // run the whole process
 $resultarray = xml2array($result,1); //contains response from server
-var_dump($result);
+var_dump($resultarray);

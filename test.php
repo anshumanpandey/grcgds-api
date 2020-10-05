@@ -119,6 +119,7 @@ $url = '<OTA_CountryListRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:x
 </Source>
 </POS>
 <CONTEXT>
+<Filter content="" Language="EN"/>
 </CONTEXT>
 </OTA_CountryListRQ>';
 
@@ -140,7 +141,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array (
 
 $result = curl_exec($ch); // run the whole process
 $resultarray = xml2array($result,1); //contains response from server
-var_dump($result);
+var_dump($resultarray);
 //print_r($result);
 
 ?>

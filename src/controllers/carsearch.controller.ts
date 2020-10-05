@@ -327,8 +327,10 @@ export const searchCars = async (body: any) => {
     validator(body)
 
     try {
-        const json = await RightCarsSearchUtils(body)
-        const r = await DiscoverCarsSearchUtil(body)
+        const [ json, ...r] = await Promise.all([
+            await RightCarsSearchUtils(body),
+            await DiscoverCarsSearchUtil(body)
+        ])
 
         const response = MergeResults(json, r);
 
