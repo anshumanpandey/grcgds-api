@@ -11,7 +11,7 @@ const getCodeForGrcCode = async (grcCode: string) => {
     const r = await DB?.select().from("companies_locations")
         .where("GRCGDSlocatincode", grcCode)
         .where("clientId", 17)
-    return r ? r[0].internal_code : null
+    return r && r.length != 0 ? r[0].internal_code : null
 }
 
 export default async (params: any) => {

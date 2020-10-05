@@ -1,5 +1,5 @@
 <?php
-
+/*
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
@@ -23,10 +23,10 @@ curl_close($curl);
 header('Content-type: text/xml');
 echo $response;
 
+*/
 
 
-/*
-LEGACY IMPLEMENTATION
+//LEGACY IMPLEMENTATION
 //include("nusoap.php");
 function xml2array($contents, $get_attributes=1) {
     if(!$contents) return array();
