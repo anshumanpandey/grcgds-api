@@ -1,4 +1,4 @@
-import { getLocationsByClient } from '../services/locations.service';
+import { getLocationsByClient, mergeSupplierLocations } from '../services/locations.service';
 import { getBrokersOwners, getDataSuppliers } from '../services/requestor.service';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { ApiError } from '../utils/ApiError';
@@ -117,17 +117,19 @@ export const getLocations = async (body: any) => {
         throw new ApiError("No suppliers have been setup.")
     }
 
-    r = r.concat(await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId)}))
+    const firstResult = await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId)})
+    let secondResult = []
 
     const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
     for (const record of orderedSuppliers) {
         const results = await getLocationsByClient({ whereFilters ,clientId: [record.id] })
         if (results.length == 0) continue;   
-
-        r = r.concat(results)
+        secondResult = results
         await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
         break;     
     }
+
+    r = mergeSupplierLocations([ firstResult, secondResult])
 
     return [
         { VehMatchedLocs: { VehMatchedLoc: { LocationDetail: r || [] } } },
