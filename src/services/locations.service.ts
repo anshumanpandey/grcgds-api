@@ -28,7 +28,7 @@ export const mergeSupplierLocations = (locations: any[][]) => {
     const r = locations.reduce((array, next) => {
         next.forEach(element => {
             if (element.GRCGDSlocatincode) {
-                const foundIndex = array.findIndex(el => el.GRCGDSlocatincode == element.GRCGDSlocatincode)
+                const foundIndex = array.findIndex(el => el.GRCGDSlocatincode == element.GRCGDSlocatincode && el.Suppliers.Supplier.find((v: any) => v == element.Suppliers.Supplier[0]) == null)
                 if (foundIndex != -1) {
                     const found = array[foundIndex]
                     found.Suppliers.Supplier.push(element.Suppliers.Supplier[0])
