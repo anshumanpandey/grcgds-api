@@ -3,7 +3,11 @@ import { DB } from "../utils/DB";
 import { xmlToJson } from '../utils/XmlConfig';
 
 const getRightCars = async () => {
-    const r = await DB?.select().from("clients").where("id", 1)
+    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code"})
+    .from("clients")
+    .leftJoin('data_suppliers_user','data_suppliers_user.clientId','clients.id')
+    .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
+    .where("clients.id", 1)
     return r && r.length != 0 ? r[0] : null
 }
 
@@ -54,6 +58,11 @@ export default async (body: any) => {
     const rc = await getRightCars();
 
     const json = await xmlToJson(data);
-    json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map((r: any) => ({ SupplierID: `GRC-${rc.id}0000`, SupplierName: rc.clientname, ...r }))
+    json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
+        .map((r: any) => ({
+            "SupplierID": rc.clientAccountCode ? `GRC-${rc.clientAccountCode}` : `GRC-${rc.clientId}0001`,
+            SupplierName: rc.clientname,
+            ...r
+        }))
     return json
 }
