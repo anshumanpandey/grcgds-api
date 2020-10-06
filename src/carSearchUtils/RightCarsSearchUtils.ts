@@ -54,6 +54,6 @@ export default async (body: any) => {
     const rc = await getRightCars();
 
     const json = await xmlToJson(data);
-    json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map((r: any) => ({ ...r, Supplier: rc.clientname }))
+    json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map((r: any) => ({ SupplierID: `GRC-${rc.id}0000`, SupplierName: rc.clientname, ...r }))
     return json
 }
