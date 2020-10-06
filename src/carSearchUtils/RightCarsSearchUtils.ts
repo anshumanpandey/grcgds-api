@@ -60,8 +60,10 @@ export default async (body: any) => {
     const json = await xmlToJson(data);
     json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
         .map((r: any) => ({
-            "SupplierID": rc.clientAccountCode ? `GRC-${rc.clientAccountCode}` : `GRC-${rc.clientId}0001`,
-            SupplierName: rc.clientname,
+            "Supplier": {
+                "ID": rc.clientAccountCode ? `GRC-${rc.clientAccountCode}` : `GRC-${rc.clientId}0001`,
+                "Name": rc.clientname,
+            },
             ...r
         }))
     return json
