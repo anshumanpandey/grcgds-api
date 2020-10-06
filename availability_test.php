@@ -119,7 +119,33 @@ function xml2array($contents, $get_attributes=1) {
 
 
 
-$url = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<OTA_VehAvailRateRQ xmlns=\"http://www.opentravel.org/OTA/2003/05\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRQ.xsd\" TimeStamp=\"2020-06-04T19:32:01\" Target=\"Production\" Version=\"1.002\">\n  <POS>\n    <Source>\n      <RequestorID Type=\"5\" ID=\"GRC-300000\" ID_NAME=\"Acme Rent A Car\"/>\n    </Source>\n  </POS>\n  <CONTEXT>\n    <Filter content=\"\" Language=\"EN\" contactless=\"No\"/>\n  </CONTEXT>\n  <VehAvailRQCore Status=\"Available\">\n    <VehRentalCore PickUpDateTime=\"2020-10-15T12:00:00\" ReturnDateTime=\"2020-10-20T10:00:00\">\n      <PickUpLocation LocationCode=\"MIAA01\"/>\n      <ReturnLocation LocationCode=\"MIAA01\"/>\n    </VehRentalCore>\n  </VehAvailRQCore>\n  <VehAvailRQInfo>\n    <Customer>\n      <Primary>\n        <DriverType Age=\"\"/>\n        <CitizenCountryName Code=\"\"/>\n      </Primary>\n    </Customer>\n  </VehAvailRQInfo>\n</OTA_VehAvailRateRQ>\n";
+$url = '
+<?xml version="1.0" encoding="UTF-8"?>
+<OTA_VehAvailRateRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRQ.xsd" TimeStamp="2020-06-04T19:32:01" Target="Production" Version="1.002">
+  <POS>
+    <Source>
+      <RequestorID Type="5" ID="GRC-300000" ID_NAME="Acme Rent A Car"/>
+    </Source>
+  </POS>
+  <CONTEXT>
+    <Filter content="" Language="EN" contactless="No"/>
+  </CONTEXT>
+  <VehAvailRQCore Status="Available">
+    <VehRentalCore PickUpDateTime="2020-10-15T12:00:00" ReturnDateTime="2020-10-20T10:00:00">
+      <PickUpLocation LocationCode="LCAA02"/>
+      <ReturnLocation LocationCode="LCAA02"/>
+    </VehRentalCore>
+  </VehAvailRQCore>
+  <VehAvailRQInfo>
+    <Customer>
+      <Primary>
+        <DriverType Age=""/>
+        <CitizenCountryName Code=""/>
+      </Primary>
+    </Customer>
+  </VehAvailRQInfo>
+</OTA_VehAvailRateRQ>
+';
 
 //$gg="http://www.right-cars.com/OTATEST/";
 
