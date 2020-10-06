@@ -5,7 +5,7 @@ import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
 import RightCarsSearchUtils from '../carSearchUtils/RightCarsSearchUtils';
 import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
-import MergeResults from '../carSearchUtils/MergeResults';
+import MergeResults, { getUserOfResults } from '../carSearchUtils/MergeResults';
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -333,6 +333,10 @@ export const searchCars = async (body: any) => {
         ])
 
         const response = MergeResults(json, r);
+        response.OTA_VehAvailRateRS.VehAvailRSCore[0] = {
+            Suppliers: getUserOfResults(response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail),
+            ...response.OTA_VehAvailRateRS.VehAvailRSCore[0]
+        }
 
         return [
             response.OTA_VehAvailRateRS,

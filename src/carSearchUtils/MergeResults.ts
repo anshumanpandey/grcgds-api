@@ -7,3 +7,14 @@ export default (RcResults: any, rest: any[][]) => {
 
     return RcResults
 }
+
+export const getUserOfResults = (results: any[]) => {
+    const map = results.reduce((map, next) => {
+        if (!map.has(next.Supplier.ID)) {
+            map.set(next.Supplier.ID, next.Supplier)
+        }
+        return map
+    }, new Map())
+
+    return { Supplier: Array.from(map.values()) }
+}
