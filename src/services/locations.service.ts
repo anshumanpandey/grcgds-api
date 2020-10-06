@@ -31,7 +31,9 @@ export const mergeSupplierLocations = (locations: any[][]) => {
                 const foundIndex = array.findIndex(el => el.GRCGDSlocatincode == element.GRCGDSlocatincode)
                 if (foundIndex != -1) {
                     const found = array[foundIndex]
-                    found.Suppliers.Supplier.push(element.Suppliers.Supplier[0])
+                    if (!found.Suppliers.Supplier.includes(element.Suppliers.Supplier[0])) {
+                        found.Suppliers.Supplier.push(element.Suppliers.Supplier[0])
+                    }
                     array[foundIndex] = found;
                 } else {
                     array.push(element)

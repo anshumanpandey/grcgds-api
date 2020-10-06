@@ -117,7 +117,10 @@ function xml2array($contents, $get_attributes=1) {
 }
 
 
-$url = '<?xml version="1.0"?><OTA_VehLocSearchRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05    VehLocSearchRQ.xsd" TimeStamp="2010-10-12T11:00:00" Target="Test" Version="1.002">  <POS>    <Source>      <RequestorID Type="5" ID="GRC-300000" ID_NAME="Acme Rent A Car"/>    </Source>  </POS>  <VehLocSearchCriterion>    <CONTEXT>      <Filter content="" Language="EN"/>    </CONTEXT>    <Address>      <CountryName Code="RO"/>    </Address>  </VehLocSearchCriterion></OTA_VehLocSearchRQ>';
+$url = '<?xml version="1.0"?><OTA_VehLocSearchRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05    VehLocSearchRQ.xsd" TimeStamp="2010-10-12T11:00:00" Target="Test" Version="1.002">  <POS>    
+<Source>      <RequestorID Type="5" ID="GRC-300000" ID_NAME="Acme Rent A Car"/>    </Source>  </POS>  <VehLocSearchCriterion>    <CONTEXT>      
+<Filter content="" Language="EN"/>    </CONTEXT>    <Address>      <CountryName Code="HR"/>    </Address>  </VehLocSearchCriterion></OTA_VehLocSearchRQ>';
 
 //$gg="http://www.right-cars.com/OTATEST/";
 
