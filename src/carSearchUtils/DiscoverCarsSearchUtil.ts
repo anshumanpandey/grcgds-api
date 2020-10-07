@@ -53,10 +53,8 @@ export default async (params: any) => {
 
     return data.map(($VehAvail: any) => {
         return {
-            "Supplier": {
-                "ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
-                "Name": u.clientname,
-            },
+            "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
+            "Supplier_Name": u.clientname,
             "VehID": $VehAvail["CarUID"],
             "Deeplink": $VehAvail["BookingPageUrl"],
             "Vehicle": [{

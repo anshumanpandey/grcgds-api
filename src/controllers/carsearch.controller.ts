@@ -333,10 +333,6 @@ export const searchCars = async (body: any) => {
         ])
 
         const response = MergeResults(json, r);
-        response.OTA_VehAvailRateRS.VehAvailRSCore[0] = {
-            Suppliers: getUserOfResults(response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail),
-            ...response.OTA_VehAvailRateRS.VehAvailRSCore[0]
-        }
 
         return [
             response.OTA_VehAvailRateRS,
