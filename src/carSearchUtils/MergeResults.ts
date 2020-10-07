@@ -10,8 +10,8 @@ export default (RcResults: any, rest: any[][]) => {
 
 export const getUserOfResults = (results: any[]) => {
     const map = results.reduce((map, next) => {
-        if (!map.has(next.Supplier.ID)) {
-            map.set(next.Supplier.ID, next.Supplier)
+        if (!map.has(next.VehAvailCore[0].$.Supplier_ID)) {
+            map.set(next.VehAvailCore[0].$.Supplier_ID, { Supplier_ID: next.VehAvailCore[0].$.Supplier_ID ,Supplier_Name:next.VehAvailCore[0].$.Supplier_Name})
         }
         return map
     }, new Map())
