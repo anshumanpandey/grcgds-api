@@ -8,11 +8,11 @@ const formatDate = (fullDate: string) => {
 }
 
 const getDiscoverCarsUser = async () => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code"})
-    .from("clients")
-    .leftJoin('data_suppliers_user','data_suppliers_user.clientId','clients.id')
-    .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-    .where("clients.id", 17)
+    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
+        .from("clients")
+        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
+        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
+        .where("clients.id", 17)
     return r && r.length != 0 ? r[0] : null
 }
 
@@ -53,44 +53,48 @@ export default async (params: any) => {
 
     return data.map(($VehAvail: any) => {
         return {
-            "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
-            "Supplier_Name": u.clientname,
-            "VehID": $VehAvail["CarUID"],
-            "Deeplink": $VehAvail["BookingPageUrl"],
-            "Vehicle": [{
+            VehAvailCore: [{
                 $: {
-                    "AirConditionInd": $VehAvail["AirCon"] == true ? "Yes" : "No",
-                    "TransmissionType": $VehAvail["TransmissionType"] == 1 ? "Automatic" : "Manual",
+                    "VehID": $VehAvail["CarUID"],
+                    "Deeplink": $VehAvail["BookingPageUrl"],
+                    "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
+                    "Supplier_Name": u.clientname,
                 },
-                "VehMakeModel": [{
+                "Vehicle": [{
                     $: {
-                        "Name": $VehAvail["Name"],
-                        "PictureURL": $VehAvail["VehicleImageUrl"],
-                    }
+                        "AirConditionInd": $VehAvail["AirCon"] == true ? "Yes" : "No",
+                        "TransmissionType": $VehAvail["TransmissionType"] == 1 ? "Automatic" : "Manual",
+                    },
+                    "VehMakeModel": [{
+                        $: {
+                            "Name": $VehAvail["Name"],
+                            "PictureURL": $VehAvail["VehicleImageUrl"],
+                        }
+                    }],
+                    "VehType": [{
+                        $: {
+                            "VehicleCategory": $VehAvail["SIPP"],
+                            "DoorCount": parseInt($VehAvail["Doors"]),
+                            "Baggage": parseInt($VehAvail["Bags"]),
+                        }
+                    }],
+                    "VehClass": [{
+                        $: { "Size": parseInt($VehAvail["PasengerCount"]) }
+                    }],
+                    "VehTerms": []
                 }],
-                "VehType": [{
-                    $: {
-                        "VehicleCategory": $VehAvail["SIPP"],
-                        "DoorCount": parseInt($VehAvail["Doors"]),
-                        "Baggage": parseInt($VehAvail["Bags"]),
-                    }
-                }],
-                "VehClass": [{
-                    $: { "Size": parseInt($VehAvail["PasengerCount"]) }
-                }],
-                "VehTerms": []
-            }],
-            "RentalRate": [],
-            "VehicleCharge": {
-                "CurrencyCode": $VehAvail["Currency"],
-            },
-            "TotalCharge": [{
-                $: {
-                    "RateTotalAmount": Number($VehAvail["Price"]).toFixed(2),
+                "RentalRate": [],
+                "VehicleCharge": {
                     "CurrencyCode": $VehAvail["Currency"],
-                }
-            }],
-            "PricedEquips": []
+                },
+                "TotalCharge": [{
+                    $: {
+                        "RateTotalAmount": Number($VehAvail["Price"]).toFixed(2),
+                        "CurrencyCode": $VehAvail["Currency"],
+                    }
+                }],
+                "PricedEquips": []
+            }]
         }
     })
 }
