@@ -1,7 +1,7 @@
 import { DB } from "../utils/DB"
 
-export const getDataSuppliers = ({ RequestorID }: { RequestorID: string }) => {
-    const r = DB?.select(["data_suppliers_user.clientId", "clients.clientname"])
+export const getDataSuppliers = async ({ RequestorID }: { RequestorID: string }) => {
+    const r = await DB?.select(["data_suppliers_user.clientId", "clients.clientname", "data_suppliers_user.account_code"])
         .from("data_suppliers_user")
         .innerJoin('clients', 'clients.id', 'data_suppliers_user.clientId')
         .where({ brokerId: RequestorID })
@@ -9,8 +9,8 @@ export const getDataSuppliers = ({ RequestorID }: { RequestorID: string }) => {
     return r || []
 }
 
-export const getBrokersOwners = ({ RequestorID }: { RequestorID: string }) => {
-    const r = DB?.select(["clients.id", "clients.clientname", "ClientBrokerOwner.id as ClientBrokerOwnerId"])
+export const getBrokersOwners = async ({ RequestorID }: { RequestorID: string }) => {
+    const r = await DB?.select(["clients.id", "clients.clientname", "ClientBrokerOwner.id as ClientBrokerOwnerId"])
         .from("ClientBrokerOwner")
         .innerJoin('BackOfficeUsers', 'BackOfficeUsers.id', 'ClientBrokerOwner.BackOfficeUserId')
         .innerJoin('clients', 'clients.BackOfficeUserId', 'BackOfficeUsers.id')

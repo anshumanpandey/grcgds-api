@@ -1,4 +1,5 @@
 export enum SearchHistoryEnum {
     Country = "Country",
-    Locations = "Locations"
+    Locations = "Locations",
+    Availability = "Availability"
 }

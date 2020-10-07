@@ -1,11 +1,10 @@
-import { DB } from '../utils/DB';
 import { validateFor } from '../utils/JsonValidator';
-import axios from "axios"
 import { ApiError } from '../utils/ApiError';
-import { xmlToJson } from '../utils/XmlConfig';
 import RightCarsSearchUtils from '../carSearchUtils/RightCarsSearchUtils';
 import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
 import MergeResults, { getUserOfResults } from '../carSearchUtils/MergeResults';
+import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
+import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -321,18 +320,24 @@ const schema = {
     "additionalProperties": true
 }
 
+const DATA_POPULATORS = new Map();
+DATA_POPULATORS.set(17, (body: any) => DiscoverCarsSearchUtil(body))
 
 export const searchCars = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
 
     try {
-        const [ json, ...r] = await Promise.all([
-            await RightCarsSearchUtils(body),
-            await DiscoverCarsSearchUtil(body)
+        const sorted = await sortClientsBySearch({ clients: [{id:17}], searchType: SearchHistoryEnum.Availability })
+
+        const [ json, ...r ] = await Promise.all([
+            RightCarsSearchUtils(body),
+            DATA_POPULATORS.get(sorted[0].id)(body)
         ])
 
-        const response = MergeResults(json, r);
+        await increaseCounterFor({ clientId: sorted[0].id, searchType: SearchHistoryEnum.Availability })
+
+        const response = MergeResults(json[0], [ ...json.slice(1).map((a: any) => a.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail) ,...r]);
         response.OTA_VehAvailRateRS.VehAvailRSCore[0] = {
             Suppliers: getUserOfResults(response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail),
             ...response.OTA_VehAvailRateRS.VehAvailRSCore[0]
