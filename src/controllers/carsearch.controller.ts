@@ -343,7 +343,7 @@ export const searchCars = async (body: any) => {
         const filteredResponse = { ...response }
         filteredResponse.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
             .filter((r: any) => {
-                if (!CONTEXT || !CONTEXT?.Filter || !CONTEXT?.Filter?.content) return true
+                if (!CONTEXT || !CONTEXT?.Filter || !CONTEXT?.Filter?.content || CONTEXT?.Filter?.content == "") return true
                 const id = r.VehAvailCore[0].$.Supplier_ID
                 const idsToSearch = CONTEXT?.Filter?.content?.split(",")
                 return idsToSearch && idsToSearch.length != 0 ? idsToSearch.includes(id) : true
