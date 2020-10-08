@@ -1,3 +1,5 @@
+import { AvailabilityResponse } from "../types/AvailabilityResponse"
+
 export default (RcResults: any, rest: any[][]) => {
     rest.forEach(r => {
         if (r.length > 0) {

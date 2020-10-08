@@ -327,6 +327,8 @@ export const searchCars = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
 
+    const { CONTEXT } = body
+
     try {
         const sorted = await sortClientsBySearch({ clients: [{id:17}], searchType: SearchHistoryEnum.Availability })
 
@@ -338,7 +340,15 @@ export const searchCars = async (body: any) => {
         await increaseCounterFor({ clientId: sorted[0].id, searchType: SearchHistoryEnum.Availability })
 
         const response = MergeResults(json[0], [ ...json.slice(1).map((a: any) => a.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail) ,...r]);
-        response.OTA_VehAvailRateRS.VehAvailRSCore[0] = {
+        const filteredResponse = { ...response }
+        filteredResponse.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
+            .filter((r: any) => {
+                if (!CONTEXT || !CONTEXT?.Filter || !CONTEXT?.Filter?.content) return true
+                const id = r.VehAvailCore[0].$.Supplier_ID
+                const idsToSearch = CONTEXT?.Filter?.content?.split(",")
+                return idsToSearch && idsToSearch.length != 0 ? idsToSearch.includes(id) : true
+            })
+        filteredResponse.OTA_VehAvailRateRS.VehAvailRSCore[0] = {
             Suppliers: getUserOfResults(response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail),
             ...response.OTA_VehAvailRateRS.VehAvailRSCore[0]
         }
