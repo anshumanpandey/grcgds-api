@@ -118,11 +118,57 @@ function xml2array($contents, $get_attributes=1) {
 
 
 
-$url = "<?xml version=\"1.0\"?>\n<OTA_VehResRQ xmlns=\"http://www.opentravel.org/OTA/2003/05\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd\">\n  <POS>\n    <Source>\n      <RequestorID Type=\"5\" ID=\"GRC-300000\" ID_NAME=\"Acme Rent A Car\"/>\n    </Source>\n  </POS>\n  <VehResRQCore>\n    <VehRentalCore PickUpDateTime=\"2020-09-25T12:00:00\" ReturnDateTime=\"2020-09-30T10:00:00\">\n      <PickUpLocation LocationCode=\"DBVA01\"/>\n      <ReturnLocation LocationCode=\"DBVA01\"/>\n    </VehRentalCore>\n    <Customer>\n      <Primary>\n        <PersonName>\n          <NamePrefix>Sr</NamePrefix>\n          <GivenName>Rick</GivenName>\n          <Surname>Little</Surname>\n        </PersonName>\n        <Telephone/>\n        <Email>test25@test.com</Email>\n        <Address>\n          <StreetNmbr/>\n          <CityName/>\n          <PostalCode/>\n        </Address>\n        <CustLoyalty ProgramID=\"\" MembershipID=\"\"/>\n      </Primary>\n    </Customer>\n    <VendorPref/>\n    <VehPref Code=\"SWMR-8-23412\" Acriss=\"SWMR\" price=\"\"/>\n    <SpecialEquipPrefs/>\n    <PromoDesc/>\n  </VehResRQCore>\n  <VehResRQInfo/>\n  <ArrivalDetails FlightNo=\"IB3154\"/>\n  <RentalPaymentPref>\n    <Voucher Identifier=\"5464srsdsdasd\">\n      <PaymentCard CardType=\"Paypal\" CardCode=\"\" CardNumber=\"1111111111111111111111111\" ExpireDate=\"MM/YY\">\n        <CardHolderName/>\n        <AmountPaid/>\n        <CurrencyUsed/>\n      </PaymentCard>\n    </Voucher>\n  </RentalPaymentPref>\n  <CONTEXT>\n    <Filter content=\"SupplierAccountnumber\" Language=\"EN\" contactless=\"Yes\"/>\n  </CONTEXT>\n</OTA_VehResRQ>\n";
+$url='<OTA_VehResRQ
+xmlns="http://www.opentravel.org/OTA/2003/05"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation = "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd" >
+<POS>
+    <Source>
+        <RequestorID Type="5" ID="GRC-300000" RATEID="GRC-880001"/>
+    </Source>
+</POS>
+<VehResRQCore>
+    <VehRentalCore PickUpDateTime="2020-11-17T09:00" ReturnDateTime="2020-11-18T09:00">
+        <PickUpLocation LocationCode="LWNA01" />
+        <ReturnLocation LocationCode="LWNA01" />
+    </VehRentalCore>
+    <Customer>
+        <Primary>
+            <PersonName>
+                <NamePrefix>Sr</NamePrefix>
+                <GivenName>Rick</GivenName>
+                <Surname>Little</Surname>
+            </PersonName>
+            <Telephone />
+            <email>lgw33118@bcaoo.com</email>
+            <Address>
+                <StreetNmbr />
+                <CityName />
+                <PostalCode />
+            </Address>
+            <CustLoyalty ProgramID="" MembershipID="" />
+        </Primary>
+    </Customer>
+    <VendorPref></VendorPref>
+    <VehPref Code="FVMR-8-8486" Acriss="FVMR" price="59.99"/>
+    <SpecialEquipPrefs></SpecialEquipPrefs>
+    <PromoDesc></PromoDesc>
+</VehResRQCore>
+<VehResRQInfo/>
+<ArrivalDetails FlightNo="IB3154"/>
+<RentalPaymentPref>
+    <Voucher Identifier="">
+        <PaymentCard CardType="Paypal" CardCode="" CardNumber="1111111111111111111111111" ExpireDate="MM/YY" >
+            <CardHolderName>leo last</CardHolderName>
+            <AmountPaid>93.66</AmountPaid>
+            <CurrencyUsed>USD</CurrencyUsed>
+        </PaymentCard>
+    </Voucher>
+</RentalPaymentPref>
+</OTA_VehResRQ>';
 
 //$gg="http://www.right-cars.com/OTATEST/";
 
-$gg="https://www.grcgds.com/ota/";
+$gg="https://www.grcgds.com/XML/";
 
 $ch = curl_init();    // initialize curl handle
 curl_setopt($ch, CURLOPT_URL,$gg); // set url to post to
