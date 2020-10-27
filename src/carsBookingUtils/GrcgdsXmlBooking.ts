@@ -3,6 +3,7 @@ import { xmlToJson } from "../utils/XmlConfig"
 import { XmlError } from "../utils/XmlError"
 import { DB } from '../utils/DB';
 import { ApiError } from "../utils/ApiError";
+import LogBookingToDb from "../utils/LogBookingToDb";
 
 export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
@@ -76,21 +77,23 @@ export default async (body: any) => {
         const [pickupDate, pickupTime] = VehResRQCore.VehRentalCore.PickUpDateTime.split('T')
         const [dropoffDate, dropoffTime] = VehResRQCore.VehRentalCore.ReturnDateTime.split('T')
 
+        const reservation = await xmlToJson(data);
+
         const toInsert = {
             pickupDate,
             pickupTime,
             dropoffDate,
             dropoffTime,
             pickLocation,
-            dropoffLocation: dropLocation,
-            requestorId: POS.Source.RequestorID.ID,
-            requestBody: xml,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            dropLocation,
+            POS,
+            xml,
+            grcgdsClient: "36",
+            resNumber: reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
         }
-        await DB?.insert(toInsert).into('Bookings')
+        await LogBookingToDb(toInsert)
 
-        return await xmlToJson(data);
+        return reservation
     } catch (error) {
         if (error.response) {
             throw new ApiError(error.response.data.error)
