@@ -77,7 +77,11 @@ export default async (body: any) => {
         })
 
         const json = await xmlToJson(data);
-        json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
+        if (json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0] == "") {
+            json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails = [{ VehAvail: [] }]
+            return json
+        } else {
+            json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
             .map((r: any) => ({
                 VehAvailCore: [{
                     ...r.VehAvailCore[0],
@@ -88,9 +92,13 @@ export default async (body: any) => {
                     },
                 }],
             }))
-        return json
+            return json
+        }
+        
     })
 
     return allSettled(promises)
-        .then((promises: any) => promises.filter((p: any) => p.status == "fulfilled").map((r: any) => r.value))
+        .then((promises: any) => {
+            return promises.filter((p: any) => p.status == "fulfilled").map((r: any) => r.value)
+        })
 }

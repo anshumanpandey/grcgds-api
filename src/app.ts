@@ -44,7 +44,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
         return
     } else if (err.name === 'UnauthorizedError') {
         console.log(err)
-        res.send("You are blocked!")
+        res.status(401).send("You are blocked!")
     } else if (err.name === 'RequestorIDError') {
         console.log(err)
         res.send("Invalid Account Code")
