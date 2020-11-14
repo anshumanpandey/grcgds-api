@@ -3,9 +3,9 @@ import { validateFor } from '../utils/JsonValidator';
 import axios from "axios"
 import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
-import { XmlError } from '../utils/XmlError';
 import RightCarsBooking from '../carsBookingUtils/RightCarsBooking';
 import GrcgdsXmlBooking from '../carsBookingUtils/GrcgdsXmlBooking';
+import { createBookingsXmlResponse, getBookings } from '../services/bookings.service';
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -343,6 +343,31 @@ export const createBooking = async (body: any) => {
             json,
             200,
             "OTA_VehAvailRateRS",
+            { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
+        ]
+    } catch (error) {
+        if (error.response) {
+            throw new ApiError(error.response.data.error)
+        } else {
+            throw error
+        }
+    }
+}
+
+export const searchBookings = async (body: any) => {
+    //const validator = validateFor(schema)
+    //validator(body)
+    const { POS: { Source: { RequestorID } } } = body
+    
+    try {
+
+        const xml = createBookingsXmlResponse(await getBookings())
+        const response = await xmlToJson(xml)
+
+        return [
+            response.OTA_VehRetResRS,
+            200,
+            "OTA_VehRetResRS",
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
         ]
     } catch (error) {

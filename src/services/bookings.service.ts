@@ -1,0 +1,145 @@
+import { DB, getDbFor } from "../utils/DB";
+
+export const getBookings = async () => {
+    const [r, extras ] = await Promise.all([
+        DB?.select().from("Bookings").whereNot('customerId', null),
+        DB?.select().from("BookingsExtras")
+    ]);
+
+    if (!r) return [];
+    if (r.length == 0) return [];
+
+    const customers = await getDbFor("grcgds_hannk").select().from("users")
+
+    return r.map((r) => {
+        return {
+            ...r,
+            customer: customers.find(c => c.id == r.customerId ),
+            extras: (extras || []).filter(e => e.bookingId == r.id)
+        }
+    })
+}
+
+export const createBookingsXmlResponse = (bookings: any[]) => {
+    return `
+    <?xml version="1.0"?>
+    <OTA_VehRetResRS xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehRetResRS.xsd" Version="2.001">
+    <Success/>
+    <VehRetResRSCore>
+        ${bookings.filter(b => b.customer).map((b) => {
+        return `
+            <VehReservation>
+            <Customer>
+                <Primary>
+                <PersonName>
+                    <GivenName>${b.customer.firstname}</GivenName>
+                    <Surname>${b.customer.lastname}</Surname>
+                </PersonName>
+                <Email/>
+                <Address>
+                    <AddressLine/>
+                    <CityName/>
+                    <PostalCode/>
+                </Address>
+                </Primary>
+            </Customer>
+            <VehSegmentCore>
+                <ConfID>
+                <ResNumber>${b.resNumber}</ResNumber>
+                </ConfID>
+                <VehRentalCore>
+                <PickUpLocation>
+                    <Name/>
+                    <LocationCode>${b.pickLocation}</LocationCode>
+                    <Pickupdate>${b.pickupDate}T${b.pickupTime.slice(0, 5)}</Pickupdate>
+                </PickUpLocation>
+                <ReturnLocation>
+                    <Name/>
+                    <LocationCode>${b.dropoffLocation}</LocationCode>
+                    <Pickupdate>${b.dropoffDate}T${b.dropoffTime.slice(0, 5)}</Pickupdate>
+                </ReturnLocation>
+                </VehRentalCore>
+                <Vehicle>
+                    <Code>FVMR</Code>
+                </Vehicle>
+                <Extras>
+                    ${b.extras.map((e: any) => {
+                        return `<${e.vendorEquipId}>${e.quantity}</${e.vendorEquipId}>`;
+                    }).join("\n")}
+                </Extras>
+                <RentalRate>
+                <RateDistance>
+                    <Unlimited>true</Unlimited>
+                    <DistUnitName>km</DistUnitName>
+                    <VehiclePeriodUnitName>RentalPeriod</VehiclePeriodUnitName>
+                </RateDistance>
+                <VehicleCharges>
+                    <VehicleCharge>
+                    <TaxAmounts>
+                        <TaxAmount>
+                        <Total/>
+                        <CurrencyCode/>
+                        <Percentage/>
+                        <Description>Tax</Description>
+                        </TaxAmount>
+                    </TaxAmounts>
+                    <Calculation>
+                        <UnitCharge/>
+                        <UnitName>Day</UnitName>
+                        <Quantity>1</Quantity>
+                    </Calculation>
+                    </VehicleCharge>
+                </VehicleCharges>
+                <RateQualifier>
+                    <RateCategory/>
+                    <RateQualifier/>
+                    <RatePeriod/>
+                    <VendorRateID/>
+                </RateQualifier>
+                </RentalRate>
+                <TotalCharge>
+                <RateTotalAmount>${b.carPrice}</RateTotalAmount>
+                <EstimatedTotalAmount>${b.carPrice}</EstimatedTotalAmount>
+                </TotalCharge>
+            </VehSegmentCore>
+            <VehSegmentInfo>
+                <LocationDetails>
+                <Address>
+                    <AddressLine/>
+                    <CityName/>
+                    <PostalCode/>
+                    <CountryName>
+                    <Name/>
+                    <Code/>
+                    </CountryName>
+                </Address>
+                <Telephone>
+                    <PhoneNumber/>
+                </Telephone>
+                <Code>${b.pickLocation}</Code>
+                <Name/>
+                <CodeContext>Pickup Location</CodeContext>
+                </LocationDetails>
+                <LocationDetails>
+                <Address>
+                    <AddressLine/>
+                    <CityName/>
+                    <PostalCode/>
+                    <CountryName>
+                        <Name/>
+                        <Code/>
+                    </CountryName>
+                </Address>
+                <Telephone>
+                    <PhoneNumber/>
+                </Telephone>
+                <Code>${b.dropoffLocation}</Code>
+                <Name/>
+                <CodeContext>Return Location</CodeContext>
+                </LocationDetails>
+            </VehSegmentInfo>
+            </VehReservation>`;
+        }).join("\n")}
+    </VehRetResRSCore>
+    </OTA_VehRetResRS>`
+}

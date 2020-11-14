@@ -92,3 +92,42 @@ export default async (body: any) => {
 
     return res
 }
+
+export const getRightCarsBookings = async (body: any) => {
+    const { VehRetResRQCore, POS } = body
+
+    const xml = `<OTA_VehListRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation = "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd" >
+    <POS>
+    <Source>
+    <RequestorID Type="5" ID="MOBILE001" />
+    </Source>
+    </POS>
+    <Customer>
+    <Primary>
+    <Email>${VehRetResRQCore.Email}</Email>
+    </Primary>
+    </Customer>
+    </OTA_OTA_VehListRQ>`;
+
+    try {
+        const { data } = await axios.post('https://OTA.right-cars.com/', xml, {
+            headers: {
+                "Content-Type": "application/soap+xml;charset=utf-8"
+            }
+        })
+
+        if (data.includes("Error")) {
+            throw new XmlError(data)
+        }
+
+        const reservation = await xmlToJson(data);
+
+        return reservation
+    } catch (error) {
+        if (error.response) {
+            throw new ApiError(error.response.data.error)
+        } else {
+            throw error
+        }
+    }
+}

@@ -22,6 +22,8 @@ export default () => {
                 pos = req.body.OTA_VehAvailRateRQ.POS
               } else if (req.body.OTA_VehResRQ) {
                 pos = req.body.OTA_VehResRQ.POS
+            } else if (req.body.OTA_VehRetResRQ) {
+                pos = req.body.OTA_VehRetResRQ.POS
               }
             return getDbFor("grcgds_gateway_db")?.select()
                 .from("clients")
