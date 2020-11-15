@@ -19,8 +19,8 @@ export const XmlBuilder = (body: any) => {
     return builder.buildObject(body)
 }
 
-export const xmlToJson = (str: string) => {
-    return xml.parseStringPromise(str);
+export const xmlToJson = (str: string, options?: xml.OptionsV2) => {
+    return xml.parseStringPromise(str, options);
 }
 
 export const XmlMiddleware = () => {

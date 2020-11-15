@@ -59,7 +59,7 @@ export default async (body: any) => {
         }
     })
 
-    const json = await xmlToJson(data);
+    const json = await xmlToJson(data, { charkey: "" });
     if (json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0] == "") {
         return []
     } else {
