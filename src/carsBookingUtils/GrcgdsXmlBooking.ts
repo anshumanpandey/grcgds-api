@@ -102,3 +102,42 @@ export default async (body: any) => {
         }
     }
 }
+
+export const cancelGrcBooking = async (body: any) => {
+    const { VehCancelRQCore, POS } = body
+
+    const xml = `<OTA_VehCancelRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 VehCancelRQ.xsd">
+    <POS>
+    <Source>
+        <RequestorID Type="${POS.Source.RequestorID.Type}" ID="${POS.Source.RequestorID.ID}" RATEID="${POS.Source.RequestorID.RATEID}"/>
+    </Source>
+    </POS>
+    <VehCancelCore>
+        <ResNumber Number="${VehCancelRQCore.ResNumber.Number}"/>
+    </VehCancelCore>
+    <VehCancelRQInfo>
+    </VehCancelRQInfo>
+    </OTA_VehCancelRQ>`;
+
+    try {
+        const { data } = await axios.post('https://www.grcgds.com/XML/', xml, {
+            headers: {
+                "Content-Type": "application/soap+xml;charset=utf-8"
+            }
+        })
+
+        if (data.includes("Error")) {
+            throw new XmlError(data)
+        }
+
+        const reservation = await xmlToJson(data);
+
+        return reservation
+    } catch (error) {
+        if (error.response) {
+            throw new ApiError(error.response.data.error)
+        } else {
+            throw error
+        }
+    }
+}

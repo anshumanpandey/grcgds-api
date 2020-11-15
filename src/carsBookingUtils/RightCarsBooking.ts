@@ -4,6 +4,7 @@ import { XmlError } from "../utils/XmlError"
 import { DB } from '../utils/DB';
 import { ApiError } from "../utils/ApiError";
 import LogBookingToDb from "../utils/LogBookingToDb";
+import { logger } from "../utils/Logger";
 
 export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
@@ -117,6 +118,49 @@ export const getRightCarsBookings = async (body: any) => {
         })
 
         if (data.includes("Error")) {
+            throw new XmlError(data)
+        }
+
+        const reservation = await xmlToJson(data);
+
+        return reservation
+    } catch (error) {
+        if (error.response) {
+            throw new ApiError(error.response.data.error)
+        } else {
+            throw error
+        }
+    }
+}
+
+export const cancelRightCarsBooking = async (body: any) => {
+    const { VehCancelRQCore, POS } = body
+
+    const xml = `<OTA_VehCancelRQ xmlns="http://www.opentravel.org/OTA/2003/05"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05
+    VehCancelRQ.xsd">
+    <POS>
+    <Source>
+    <RequestorID Type="5" ID="MOBILE001" />
+    </Source>
+    </POS>
+    <VehCancelRQCore>
+    <ResNumber Number="${VehCancelRQCore.ResNumber.Number}"/>
+    </VehCancelCore>
+    <VehCancelRQInfo>
+    </VehCancelRQInfo>
+    </OTA_VehCancelRQ>`;
+
+    try {
+        const { data } = await axios.post('https://OTA.right-cars.com/', xml, {
+            headers: {
+                "Content-Type": "application/soap+xml;charset=utf-8"
+            }
+        })
+
+        if (data.includes("Error")) {
+            console.log(`RC cancel failed with ${data}`)
             throw new XmlError(data)
         }
 

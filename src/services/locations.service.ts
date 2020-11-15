@@ -47,3 +47,14 @@ export const mergeSupplierLocations = (locations: any[][]) => {
 
     return r
 }
+
+export const isGrcgdsLocations = async (code: string) => {
+    const r = await DB?.select()
+    .from("grcgds_locations")
+    .where("internalcode", code)
+
+    if (!r) return false
+    if (r.length == 0) return false
+
+    return true
+}

@@ -51,7 +51,8 @@ export const BuildXmlResponse = (response: any, data:any, statusCode: number = 2
                 "Version": "1.002",
                 ...extraKeys
             }
-            response.status(statusCode).send(builder.buildObject({ [preTag]: { $: keys, ...data } }));
+            const r = builder.buildObject({ [preTag]: { $: keys, ...data } })
+            response.status(statusCode).send(r);
         },
         'application/json': () => {
             response.status(statusCode).json(data);

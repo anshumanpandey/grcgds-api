@@ -9,6 +9,15 @@ export const getDataSuppliers = async ({ RequestorID }: { RequestorID: string })
     return r || []
 }
 
+export const getDataUsersForUserId = async (id: { id: string }) => {
+    const r = await DB?.select()
+        .from("client_broker_locations_accountype")
+        .where("client_broker_locations_accountype.clientId", id)
+        .whereRaw("client_broker_locations_accountype.account_code <> '' ")
+        .groupBy("client_broker_locations_accountype.internal_code");
+    return r || []
+}
+
 export const getBrokersOwners = async ({ RequestorID }: { RequestorID: string }) => {
     const r = await DB?.select(["clients.id", "clients.clientname", "ClientBrokerOwner.id as ClientBrokerOwnerId"])
         .from("ClientBrokerOwner")

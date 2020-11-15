@@ -23,10 +23,13 @@ export const getBookings = async () => {
 export const createBookingsXmlResponse = (bookings: any[]) => {
     return `
     <?xml version="1.0"?>
-    <OTA_VehRetResRS xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehRetResRS.xsd" Version="2.001">
+    <OTA_VehRetResRS>
     <Success/>
     <VehRetResRSCore>
         ${bookings.filter(b => b.customer).map((b) => {
+            const extras = b.extras.length != 0 ? b.extras.map((e: any) => {
+                return `<${e.vendorEquipId}>${e.quantity}</${e.vendorEquipId}>`;
+            }).join("\n"): ""
         return `
             <VehReservation>
             <Customer>
@@ -62,11 +65,7 @@ export const createBookingsXmlResponse = (bookings: any[]) => {
                 <Vehicle>
                     <Code>FVMR</Code>
                 </Vehicle>
-                <Extras>
-                    ${b.extras.map((e: any) => {
-                        return `<${e.vendorEquipId}>${e.quantity}</${e.vendorEquipId}>`;
-                    }).join("\n")}
-                </Extras>
+                <Extras>${extras}</Extras>
                 <RentalRate>
                 <RateDistance>
                     <Unlimited>true</Unlimited>

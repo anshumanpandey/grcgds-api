@@ -9,6 +9,7 @@
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceRoot}",
+            "outputCapture": "std",
             "runtimeArgs": ["-r", "ts-node/register"],
             "args": ["${workspaceRoot}/src/index.ts"]
         }

@@ -3,9 +3,11 @@ import { validateFor } from '../utils/JsonValidator';
 import axios from "axios"
 import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
-import RightCarsBooking from '../carsBookingUtils/RightCarsBooking';
-import GrcgdsXmlBooking from '../carsBookingUtils/GrcgdsXmlBooking';
+import RightCarsBooking, { cancelRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
+import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
 import { createBookingsXmlResponse, getBookings } from '../services/bookings.service';
+import { isGrcgdsLocations } from '../services/locations.service';
+const allSettled = require('promise.allsettled');
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -328,15 +330,18 @@ export const createBooking = async (body: any) => {
     //validator(body)
     console.log(body)
     const { POS: { Source: { RequestorID } } } = body
-    
+
     try {
 
         let json = null
 
         if (RequestorID.RATEID) {
-            json = await GrcgdsXmlBooking(body)
+            //json = await GrcgdsXmlBooking(body)
         } else {
-            json = await RightCarsBooking(body)
+            const isGrcCode = await isGrcgdsLocations(body.VehResRQCore.VehRentalCore.PickUpLocation.LocationCode)
+            if (isGrcCode) {
+                json = await RightCarsBooking(body)
+            }
         }
 
         return [
@@ -358,7 +363,7 @@ export const searchBookings = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
     const { POS: { Source: { RequestorID } } } = body
-    
+
     try {
 
         const xml = createBookingsXmlResponse(await getBookings())
@@ -368,8 +373,53 @@ export const searchBookings = async (body: any) => {
             response.OTA_VehRetResRS,
             200,
             "OTA_VehRetResRS",
+            { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehRetResRS.xsd" }
+        ]
+    } catch (error) {
+        if (error.response) {
+            throw new ApiError(error.response.data.error)
+        } else {
+            throw error
+        }
+    }
+}
+
+export const cancelBooking = async (body: any) => {
+    //const validator = validateFor(schema)
+    //validator(body)
+    const { VehCancelRQCore, POS: { Source: { RequestorID } } } = body
+
+    const supportedServices = [
+        cancelRightCarsBooking,
+        cancelGrcBooking
+    ];
+
+    try {
+
+        let xml = null;
+
+        await allSettled(supportedServices.map(s => s(body)))
+            .then((promises: any) => {
+                const successfullCalls = promises.filter((p: any) => p.status == "fulfilled")
+                if (successfullCalls.length == 0) throw new ApiError("Could not cancell the booking")
+
+                xml = `<OTA_VehCancelRS xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehCancelRS.xsd" Version="2.001">
+                    <VehRetResRSCore>
+                    <VehReservation>
+                        <Status>Cancelled</Status>
+                        <Resnumber>${VehCancelRQCore.ResNumber.Number}</Resnumber>
+                    </VehReservation>
+                    </VehRetResRSCore>
+                </OTA_VehCancelRS>`
+            })
+
+        return [
+            xml,
+            200,
+            "OTA_VehCancelRS",
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
         ]
+
     } catch (error) {
         if (error.response) {
             throw new ApiError(error.response.data.error)

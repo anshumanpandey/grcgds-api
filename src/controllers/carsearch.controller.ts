@@ -1,8 +1,8 @@
 import { validateFor } from '../utils/JsonValidator';
 import { ApiError } from '../utils/ApiError';
-import RightCarsSearchUtils from '../carSearchUtils/RightCarsSearchUtils';
+import GrcgdsSearchUtils from '../carSearchUtils/GrcgdsSearchUtils';
 import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
-import MergeResults, { getUserOfResults } from '../carSearchUtils/MergeResults';
+import MergeResults, { getUserOfResults, wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 
@@ -332,29 +332,26 @@ export const searchCars = async (body: any) => {
     try {
         const sorted = await sortClientsBySearch({ clients: [{id:17}], searchType: SearchHistoryEnum.Availability })
 
-        const [ json, ...r ] = await Promise.all([
-            RightCarsSearchUtils(body),
-            DATA_POPULATORS.get(sorted[0].id)(body)
+        const [ fromGrcgds, ...r ] = await Promise.all([
+            GrcgdsSearchUtils(body),
+            //DATA_POPULATORS.get(sorted[0].id)(body)
         ])
 
         await increaseCounterFor({ clientId: sorted[0].id, searchType: SearchHistoryEnum.Availability })
 
-        const response = MergeResults(json[0], [ ...json.slice(1).map((a: any) => a.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail) ,...r]);
-        const filteredResponse = { ...response }
-        filteredResponse.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
+        let filteredResponse = fromGrcgds
+        filteredResponse = fromGrcgds
             .filter((r: any) => {
                 if (!CONTEXT || !CONTEXT?.Filter || !CONTEXT?.Filter?.content || CONTEXT?.Filter?.content == "") return true
                 const id = r.VehAvailCore[0].$.Supplier_ID
                 const idsToSearch = CONTEXT?.Filter?.content?.split(",")
                 return idsToSearch && idsToSearch.length != 0 ? idsToSearch.includes(id) : true
             })
-        filteredResponse.OTA_VehAvailRateRS.VehAvailRSCore[0] = {
-            Suppliers: getUserOfResults(response.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail),
-            ...response.OTA_VehAvailRateRS.VehAvailRSCore[0]
-        }
+
+        const response = wrapCarsResponseIntoXml(filteredResponse, body)
 
         return [
-            response.OTA_VehAvailRateRS,
+            response,
             200,
             "OTA_VehAvailRateRS",
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
