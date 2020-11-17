@@ -333,16 +333,15 @@ export const createBooking = async (body: any) => {
 
     try {
 
-        let json = null
+        let json = await GrcgdsXmlBooking(body)
 
-        if (RequestorID.RATEID) {
-            //json = await GrcgdsXmlBooking(body)
+        /*if (RequestorID.RATEID) {
         } else {
             const isGrcCode = await isGrcgdsLocations(body.VehResRQCore.VehRentalCore.PickUpLocation.LocationCode)
             if (isGrcCode) {
-                json = await RightCarsBooking(body)
+                //json = await RightCarsBooking(body)
             }
-        }
+        }*/
 
         return [
             json,
