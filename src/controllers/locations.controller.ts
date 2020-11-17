@@ -94,42 +94,44 @@ export const getLocations = async (body: any) => {
     const { POS, VehLocSearchCriterion: { CONTEXT, Address } } = body;
 
     const whereFilters: any = {}
-    if (Address && Address.CountryName) {
+    if (Address && Address.CountryName && Address.CountryName.Code) {
         whereFilters[`companies_locations.country`] = `%${Address.CountryName.Code}%`
     }
 
-    if (Address && Address.CityName) {
+    if (Address && Address.CityName && Address.CityName.Code) {
         whereFilters[`companies_locations.GRCGDSlocatincode`] = `%${Address.CityName.Code}%`
     }
 
-    const suppliersId = [ ]
+    const suppliersId = []
     if (CONTEXT && CONTEXT?.Filter?.content) {
         suppliersId.push(CONTEXT.Filter.content.replace("GRC-", "").slice(0, -4));
     }
 
     let r: any[] = []
     const [requestorDataSuppliers, ownersOfCurrentBroker] = await Promise.all([
-        getDataSuppliers({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-',"").slice(0, -4) }),
+        getDataSuppliers({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) }),
         getBrokersOwners({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
     ])
 
-    if (requestorDataSuppliers.length == 0 || ownersOfCurrentBroker.length == 0) {
+    if (requestorDataSuppliers.length == 0 && ownersOfCurrentBroker.length == 0) {
         throw new ApiError("No suppliers have been setup.")
     }
 
-    const firstResult = await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId)})
+    const firstResult = await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId) })
     let secondResult = []
 
-    const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
-    for (const record of orderedSuppliers) {
-        const results = await getLocationsByClient({ whereFilters ,clientId: [record.id] })
-        if (results.length == 0) continue;   
-        secondResult = results
-        await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
-        break;     
+    if (ownersOfCurrentBroker.length != 0) {
+        const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
+        for (const record of orderedSuppliers) {
+            const results = await getLocationsByClient({ whereFilters, clientId: [record.id] })
+            if (results.length == 0) continue;
+            secondResult = results
+            await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
+            break;
+        }
     }
 
-    r = mergeSupplierLocations([ firstResult, secondResult])
+    r = mergeSupplierLocations([firstResult, secondResult])
 
     return [
         { VehMatchedLocs: { VehMatchedLoc: { LocationDetail: r || [] } } },
