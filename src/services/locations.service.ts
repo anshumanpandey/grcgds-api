@@ -1,6 +1,7 @@
 import { DB } from "../utils/DB"
 
-export const getLocationsByClient = async ({ clientId, whereFilters }: { clientId: string[], whereFilters?: any[] }) => {
+export type whereFilter = {'columnName': string, op: string, val: string}
+export const getLocationsByClient = async ({ clientId, whereFilters }: { clientId: string[], whereFilters?: whereFilter[] }) => {
     const columns = {
         Supplier: "clients.clientname",
         Id: "companies_locations.id",
@@ -11,11 +12,16 @@ export const getLocationsByClient = async ({ clientId, whereFilters }: { clientI
         Lat: "companies_locations.Lat",
         Long: "companies_locations.Long"
     };
-    const r = await DB?.select(columns)
+    const query = DB?.select(columns)
         .from("companies_locations")
         .innerJoin('clients','clients.id','companies_locations.clientId')
-        .where(whereFilters || [])
         .whereIn("companies_locations.clientId", clientId)
+
+        whereFilters?.forEach(w => {
+            query?.where(w.columnName, w.op, w.val);
+        })
+
+    const r = await query;
 
     return r ? r.map(a => {
         const { Supplier, ...json } = a 

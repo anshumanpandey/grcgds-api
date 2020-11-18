@@ -1,4 +1,4 @@
-import { getLocationsByClient, mergeSupplierLocations } from '../services/locations.service';
+import { getLocationsByClient, mergeSupplierLocations, whereFilter } from '../services/locations.service';
 import { getBrokersOwners, getDataSuppliers } from '../services/requestor.service';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { ApiError } from '../utils/ApiError';
@@ -93,13 +93,13 @@ export const getLocations = async (body: any) => {
     validator(body)
     const { POS, VehLocSearchCriterion: { CONTEXT, Address } } = body;
 
-    const whereFilters: any = {}
+    const whereFilters: whereFilter[] = []
     if (Address && Address.CountryName && Address.CountryName.Code) {
-        whereFilters[`companies_locations.country`] = `%${Address.CountryName.Code}%`
+        whereFilters.push({'columnName': `companies_locations.country`, op: 'like', val: `%${Address.CountryName.Code}%`});
     }
 
     if (Address && Address.CityName && Address.CityName.Code) {
-        whereFilters[`companies_locations.GRCGDSlocatincode`] = `%${Address.CityName.Code}%`
+        whereFilters.push({'columnName': `companies_locations.GRCGDSlocatincode`, op: 'like', val: `%${Address.CityName.Code}%`});
     }
 
     const suppliersId = []
