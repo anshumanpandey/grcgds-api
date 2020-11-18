@@ -5,7 +5,7 @@ import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
 import RightCarsBooking, { cancelRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
 import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
-import { createBookingsXmlResponse, getBookings } from '../services/bookings.service';
+import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
 const allSettled = require('promise.allsettled');
 
@@ -389,7 +389,6 @@ export const cancelBooking = async (body: any) => {
     const { VehCancelRQCore, POS: { Source: { RequestorID } } } = body
 
     const supportedServices = [
-        cancelRightCarsBooking,
         cancelGrcBooking
     ];
 
@@ -402,6 +401,9 @@ export const cancelBooking = async (body: any) => {
                 const successfullCalls = promises.filter((p: any) => p.status == "fulfilled")
                 if (successfullCalls.length == 0) throw new ApiError("Could not cancell the booking")
 
+                return cancelBookingByResNumber(VehCancelRQCore.ResNumber.Number)
+            })
+            .then(() => {
                 xml = `<OTA_VehCancelRS xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehCancelRS.xsd" Version="2.001">
                     <VehRetResRSCore>
                     <VehReservation>

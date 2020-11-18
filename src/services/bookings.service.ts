@@ -20,6 +20,14 @@ export const getBookings = async () => {
     })
 }
 
+export const cancelBookingByResNumber = async (resNumber: string) => {
+    return DB?.select().from("Bookings")
+    .where('resNumber', resNumber)
+    .update({
+        reservationStatus: 'Cancelled',
+    })
+}
+
 export const createBookingsXmlResponse = (bookings: any[]) => {
     return `
     <?xml version="1.0"?>
