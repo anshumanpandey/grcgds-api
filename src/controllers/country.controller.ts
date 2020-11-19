@@ -22,9 +22,7 @@ const schema = {
             }
         }
     ],
-    "required": [
-        "CONTEXT"
-    ],
+    "required": [],
     "properties": {
         "CONTEXT": {
             "default": {},
@@ -71,7 +69,7 @@ const schema = {
 export const getCountries = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
-    const { CONTEXT, POS } = body;
+    const { CONTEXT = {}, POS } = body;
     const { Filter } = CONTEXT;
     const Language = Filter?.Language || null
     const content = Filter?.content || null

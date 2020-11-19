@@ -97,7 +97,7 @@ $url='<OTA_VehCancelRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="
 </Source>
 </POS>
 <VehCancelRQCore>
-<ResNumber Number="LWNA000047"/> Firstname=”” Lastname=””/>
+<ResNumber Number="LWNA000079"/> Firstname=”” Lastname=””/>
 </VehCancelCore>
 <VehCancelRQInfo>
 </VehCancelRQInfo>

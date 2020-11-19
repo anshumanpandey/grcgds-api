@@ -100,7 +100,7 @@ VehRetResRQ.xsd">
 </Source>
 </POS>
 <VehRetResRQCore>
-<ResNumber Number="LWNA000072"/>
+<ResNumber Number="LWNA000079"/>
 <PersonName>
 <GivenName>Rick</GivenName>
 <Surname>Little</Surname>
