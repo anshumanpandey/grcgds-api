@@ -1,8 +1,7 @@
-import { getLocationsByClient, mergeSupplierLocations, whereFilter } from '../services/locations.service';
+import { getAllLocations, getLocationsByClient, mergeSupplierLocations, whereFilter } from '../services/locations.service';
 import { getBrokersOwners, getDataSuppliers } from '../services/requestor.service';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { ApiError } from '../utils/ApiError';
-import { DB } from '../utils/DB';
 import { validateFor } from '../utils/JsonValidator';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 
@@ -95,11 +94,11 @@ export const getLocations = async (body: any) => {
 
     const whereFilters: whereFilter[] = []
     if (Address && Address.CountryName && Address.CountryName.Code) {
-        whereFilters.push({'columnName': `companies_locations.country`, op: 'like', val: `%${Address.CountryName.Code}%`});
+        whereFilters.push({ 'columnName': `companies_locations.country`, op: 'like', val: `%${Address.CountryName.Code}%` });
     }
 
     if (Address && Address.CityName && Address.CityName.Code) {
-        whereFilters.push({'columnName': `companies_locations.GRCGDSlocatincode`, op: 'like', val: `%${Address.CityName.Code}%`});
+        whereFilters.push({ 'columnName': `companies_locations.GRCGDSlocatincode`, op: 'like', val: `%${Address.CityName.Code}%` });
     }
 
     const suppliersId = []
@@ -108,30 +107,35 @@ export const getLocations = async (body: any) => {
     }
 
     let r: any[] = []
-    const [requestorDataSuppliers, ownersOfCurrentBroker] = await Promise.all([
-        getDataSuppliers({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) }),
-        getBrokersOwners({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
-    ])
+    if (!POS.Source.RequestorID.All || POS.Source.RequestorID.All != "Yes") {
+        const [requestorDataSuppliers, ownersOfCurrentBroker] = await Promise.all([
+            getDataSuppliers({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) }),
+            getBrokersOwners({ RequestorID: POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) })
+        ])
 
-    if (requestorDataSuppliers.length == 0 && ownersOfCurrentBroker.length == 0) {
-        throw new ApiError("No suppliers have been setup.")
-    }
-
-    const firstResult = await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId) })
-    let secondResult = []
-
-    if (ownersOfCurrentBroker.length != 0) {
-        const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
-        for (const record of orderedSuppliers) {
-            const results = await getLocationsByClient({ whereFilters, clientId: [record.id] })
-            if (results.length == 0) continue;
-            secondResult = results
-            await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
-            break;
+        if (requestorDataSuppliers.length == 0 && ownersOfCurrentBroker.length == 0) {
+            throw new ApiError("No suppliers have been setup.")
         }
-    }
 
-    r = mergeSupplierLocations([firstResult, secondResult])
+        const firstResult = await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId) })
+
+        let secondResult = []
+
+        if (ownersOfCurrentBroker.length != 0) {
+            const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
+            for (const record of orderedSuppliers) {
+                const results = await getLocationsByClient({ whereFilters, clientId: [record.id] })
+                if (results.length == 0) continue;
+                secondResult = results
+                await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
+                break;
+            }
+        }
+
+        r = mergeSupplierLocations([firstResult, secondResult])
+    } else {
+        r = await getAllLocations({});
+    }
 
     return [
         { VehMatchedLocs: { VehMatchedLoc: { LocationDetail: r || [] } } },
