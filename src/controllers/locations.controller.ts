@@ -134,7 +134,7 @@ export const getLocations = async (body: any) => {
 
         r = mergeSupplierLocations([firstResult, secondResult])
     } else {
-        r = await getAllLocations({});
+        r = await getAllLocations({ whereFilters });
     }
 
     return [
