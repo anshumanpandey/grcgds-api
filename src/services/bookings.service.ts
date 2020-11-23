@@ -9,11 +9,15 @@ export const getBookings = async () => {
     if (!r) return [];
     if (r.length == 0) return [];
 
-    const customers = await getDbFor("grcgds_hannk").select().from("users")
+    const [customers, grcClients] = await Promise.all([
+        getDbFor("grcgds_hannk").select().from("users"),
+        getDbFor("grcgds_gateway_db").select().from("clients"),
+    ])
 
     return r.map((r) => {
         return {
             ...r,
+            supplier: grcClients.find((s) => s.id == r.grcgdsClient),
             customer: customers.find(c => c.id == r.customerId ),
             extras: (extras || []).filter(e => e.bookingId == r.id)
         }
@@ -121,7 +125,7 @@ export const createBookingsXmlResponse = (bookings: any[]) => {
                     </CountryName>
                 </Address>
                 <Telephone>
-                    <PhoneNumber/>
+                    <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.pickLocation}</Code>
                 <Name/>
@@ -138,7 +142,7 @@ export const createBookingsXmlResponse = (bookings: any[]) => {
                     </CountryName>
                 </Address>
                 <Telephone>
-                    <PhoneNumber/>
+                    <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.dropoffLocation}</Code>
                 <Name/>
