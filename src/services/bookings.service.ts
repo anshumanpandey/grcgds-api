@@ -1,4 +1,5 @@
 import { DB, getDbFor } from "../utils/DB";
+import { getCompanyLocations, getGrcgsCode, getGrcgsCodes } from "./locations.service";
 
 export const getBookings = async () => {
     const [r, extras ] = await Promise.all([
@@ -32,7 +33,8 @@ export const cancelBookingByResNumber = async (resNumber: string) => {
     })
 }
 
-export const createBookingsXmlResponse = (bookings: any[]) => {
+export const createBookingsXmlResponse = async (bookings: any[]) => {
+    const codes = await getCompanyLocations()
     return `
     <?xml version="1.0"?>
     <OTA_VehRetResRS>
@@ -122,13 +124,14 @@ export const createBookingsXmlResponse = (bookings: any[]) => {
                     <CountryName>
                     <Name/>
                     <Code/>
+                    <CountryCode>${codes.find(c => c.internal_code == b.pickLocation).country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.pickLocation}</Code>
-                <Name/>
+                <Name>${codes.find(c => c.internal_code == b.pickLocation).location}</Name>
                 <CodeContext>Pickup Location</CodeContext>
                 </LocationDetails>
                 <LocationDetails>
@@ -139,13 +142,14 @@ export const createBookingsXmlResponse = (bookings: any[]) => {
                     <CountryName>
                         <Name/>
                         <Code/>
+                        <CountryCode>${codes.find(c => c.internal_code == b.dropoffLocation).country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.dropoffLocation}</Code>
-                <Name/>
+                <Name>${codes.find(c => c.internal_code == b.dropoffLocation).location}</Name>
                 <CodeContext>Return Location</CodeContext>
                 </LocationDetails>
             </VehSegmentInfo>

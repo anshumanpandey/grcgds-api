@@ -365,7 +365,7 @@ export const searchBookings = async (body: any) => {
 
     try {
 
-        const xml = createBookingsXmlResponse(await getBookings())
+        const xml = await createBookingsXmlResponse(await getBookings())
         const response = await xmlToJson(xml)
 
         return [

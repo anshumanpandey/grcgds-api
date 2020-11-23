@@ -72,3 +72,21 @@ export const getAllLocations = async ({ clientId, whereFilters }: Params) => {
         return { ...json, Suppliers: { Supplier: [Supplier] }}
     }) : []
 }
+
+export const getGrcgsCode = async ({ grcgdsInternalCode }: { grcgdsInternalCode: string }) => {
+    const c = await DB?.select().from("grcgds_locations").where("internalcode", grcgdsInternalCode)
+
+    return c ? c[0] : null
+}
+
+export const getGrcgsCodes = async () => {
+    const c = await DB?.select().from("grcgds_locations")
+
+    return c || []
+}
+
+export const getCompanyLocations = async () => {
+    const c = await DB?.select().from("companies_locations")
+
+    return c || []
+}
