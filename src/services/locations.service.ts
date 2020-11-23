@@ -62,7 +62,7 @@ export const getAllLocations = async ({ clientId, whereFilters }: Params) => {
         })
 
         if (clientId) {
-            query?.where("companies_locations.clientId", clientId);
+            query?.where("companies_locations.clientId", "in",clientId);
         }
 
     const r = await query;
