@@ -11,6 +11,8 @@ type Params = {
     xml: string
     grcgdsClient: string,
     resNumber: string,
+    extras: any[],
+    hannkUser: any
 }
 
 export default async ({
@@ -24,6 +26,8 @@ export default async ({
     xml,
     grcgdsClient,
     resNumber,
+    extras,
+    hannkUser
 }: Params) => {
     const toInsert = {
         pickupDate,
@@ -38,6 +42,20 @@ export default async ({
         resNumber,
         createdAt: new Date(),
         updatedAt: new Date(),
+        customerId : hannkUser?.id
     }
-    return DB?.insert(toInsert).into('Bookings')
+
+    await DB?.insert(toInsert).into('Bookings')
+    const bookings = await DB?.select(DB?.raw('LAST_INSERT_ID()'))
+    if (!bookings) return Promise.resolve()
+
+    const extrasToInsert = extras.map(e => {
+        return {
+            'vendorEquipId': e["vendorEquipID"],
+            'quantity': e["Quantity"],
+            'bookingId': bookings[0]["LAST_INSERT_ID()"],
+        }
+    })
+
+    return DB?.insert(extrasToInsert).into('BookingsExtras')
 }

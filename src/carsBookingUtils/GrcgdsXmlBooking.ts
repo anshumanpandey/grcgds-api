@@ -4,6 +4,7 @@ import { XmlError } from "../utils/XmlError"
 import { DB } from '../utils/DB';
 import { ApiError } from "../utils/ApiError";
 import LogBookingToDb from "../utils/LogBookingToDb";
+import { getHannkUserByEmail } from "../services/requestor.service";
 
 export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
@@ -88,8 +89,10 @@ export default async (body: any) => {
             dropLocation,
             POS,
             xml,
+            hannkUser: await getHannkUserByEmail({ email: Email }),
             grcgdsClient: "36",
-            resNumber: reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
+            resNumber: reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0],
+            extras: VehResRQCore.SpecialEquipPrefs.SpecialEquipPref
         }
         await LogBookingToDb(toInsert)
 

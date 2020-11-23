@@ -45,3 +45,11 @@ export const getUsersByName = async (params: { firstname?: string, lastname?: st
 
     return query || []
 }
+
+export const getHannkUserByEmail = async ({ email }: { email: string }) => {
+    const r = await getDbFor("grcgds_hannk")
+        .from("users")
+        .where({ username: email })
+
+    return r.length != 0 ? r[0] : null
+}
