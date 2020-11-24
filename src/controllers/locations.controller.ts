@@ -93,13 +93,14 @@ export const getLocations = async (body: any) => {
     const { POS, VehLocSearchCriterion: { CONTEXT, Address } } = body;
 
     const whereFilters: whereFilter[] = []
+    const orWhereFilters: whereFilter[] = []
     if (Address && Address.CountryName && Address.CountryName.Code) {
         whereFilters.push({ 'columnName': `companies_locations.country`, op: 'like', val: `%${Address.CountryName.Code}%` });
     }
 
     if (Address && Address.CityName && Address.CityName.Code) {
         whereFilters.push({ 'columnName': `companies_locations.GRCGDSlocatincode`, op: 'like', val: `%${Address.CityName.Code}%` });
-        whereFilters.push({ 'columnName': `companies_locations.location`, op: 'like', val: `%${Address.CityName.Code}%` });
+        orWhereFilters.push({ 'columnName': `companies_locations.location`, op: 'like', val: `%${Address.CityName.Code}%` });
     }
 
     const suppliersId = []
@@ -135,7 +136,7 @@ export const getLocations = async (body: any) => {
 
         r = mergeSupplierLocations([firstResult, secondResult])
     } else {
-        r = await getAllLocations({ whereFilters });
+        r = await getAllLocations({ whereFilters, orWhereFilters });
     }
 
     return [

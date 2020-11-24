@@ -41,8 +41,8 @@ export const isGrcgdsLocations = async (code: string) => {
     return true
 }
 
-type Params = { clientId?: string[], whereFilters?: whereFilter[] }
-export const getAllLocations = async ({ clientId, whereFilters }: Params) => {
+type Params = { clientId?: string[], whereFilters?: whereFilter[], orWhereFilters?: whereFilter[] }
+export const getAllLocations = async ({ clientId, whereFilters, orWhereFilters }: Params) => {
     const columns = {
         Supplier: "clients.clientname",
         Id: "companies_locations.id",
@@ -60,6 +60,9 @@ export const getAllLocations = async ({ clientId, whereFilters }: Params) => {
         whereFilters?.forEach(w => {
             query?.where(w.columnName, w.op, w.val);
         })
+        orWhereFilters?.forEach(w => {
+            query?.orWhere(w.columnName, w.op, w.val);
+        })        
 
         if (clientId) {
             query?.where("companies_locations.clientId", "in",clientId);
