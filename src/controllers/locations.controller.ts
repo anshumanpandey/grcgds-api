@@ -1,4 +1,4 @@
-import { getAllLocations, getLocationsByClient, mergeSupplierLocations, whereFilter } from '../services/locations.service';
+import { getAllLocations, getGrcgdsLocations, getLocationsByClient, mergeSupplierLocations, whereFilter } from '../services/locations.service';
 import { getBrokersOwners, getDataSuppliers } from '../services/requestor.service';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { ApiError } from '../utils/ApiError';
@@ -136,7 +136,10 @@ export const getLocations = async (body: any) => {
 
         r = mergeSupplierLocations([firstResult, secondResult])
     } else {
-        r = await getAllLocations({ whereFilters, orWhereFilters });
+        r = await getGrcgdsLocations({
+            whereFilters: [{ 'columnName': `grcgds_locations.internalcode`, op: 'like', val: `%${Address.CityName.Code}%` }],
+            orWhereFilters: [{ 'columnName': `grcgds_locations.locationname`, op: 'like', val: `%${Address.CityName.Code}%` }]
+        });
     }
 
     return [

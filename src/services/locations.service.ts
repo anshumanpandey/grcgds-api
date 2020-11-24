@@ -93,3 +93,28 @@ export const getCompanyLocations = async () => {
 
     return c || []
 }
+
+export const getGrcgdsLocations = async ({ whereFilters, orWhereFilters  }: Params) => {
+    const columns = {
+        Id: "grcgds_locations.id",
+        InternalCode: "grcgds_locations.internalcode",
+        Location: "grcgds_locations.locationname",
+        Country: "grcgds_locations.country",
+        GRCGDSlocatincode: "grcgds_locations.internalcode",
+    };
+    const query = DB?.select(columns)
+        .from("grcgds_locations")
+
+        whereFilters?.forEach(w => {
+            query?.where(w.columnName, w.op, w.val);
+        })
+        orWhereFilters?.forEach(w => {
+            query?.orWhere(w.columnName, w.op, w.val);
+        })        
+
+    const r = await query;
+
+    return r ? r.map(a => {
+        return { ...a , Suppliers: { Supplier: ["GRCGDS"] }}
+    }) : []
+}
