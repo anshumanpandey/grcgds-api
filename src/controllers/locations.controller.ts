@@ -99,6 +99,7 @@ export const getLocations = async (body: any) => {
 
     if (Address && Address.CityName && Address.CityName.Code) {
         whereFilters.push({ 'columnName': `companies_locations.GRCGDSlocatincode`, op: 'like', val: `%${Address.CityName.Code}%` });
+        whereFilters.push({ 'columnName': `companies_locations.location`, op: 'like', val: `%${Address.CityName.Code}%` });
     }
 
     const suppliersId = []
