@@ -6,6 +6,9 @@ import MergeResults, { getUserOfResults, wrapCarsResponseIntoXml } from '../carS
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 import RentitCarsSearchUtil from '../carSearchUtils/RentitCarsSearchUtil';
+import SurpriceCarsSearchUtil from '../carSearchUtils/SurpriceCarsSearchUtil';
+import { GetSerchForClients } from '../utils/GetSerchForClients';
+import { getDataSuppliers } from '../services/requestor.service';
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -331,11 +334,12 @@ export const searchCars = async (body: any) => {
     const { CONTEXT } = body
 
     try {
+        const suppliers = await getDataSuppliers({ RequestorID: body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) });
         const sorted = await sortClientsBySearch({ clients: [{id:17}], searchType: SearchHistoryEnum.Availability })
 
         const [ fromGrcgds, ...r ] = await Promise.all([
             GrcgdsSearchUtils(body),
-            RentitCarsSearchUtil(body)
+            ...GetSerchForClients(suppliers.map(s => s.clientId)).map(f => f(body))
             //DATA_POPULATORS.get(sorted[0].id)(body)
         ])
 
