@@ -2,7 +2,6 @@ import axios from "axios"
 import { getDataUsersForUserId } from "../services/requestor.service";
 import { DB } from "../utils/DB";
 import { xmlToJson } from '../utils/XmlConfig';
-const allSettled = require('promise.allsettled');
 
 const getGrcgds = async () => {
     const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
