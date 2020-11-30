@@ -5,6 +5,7 @@ import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
 import MergeResults, { getUserOfResults, wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
+import RentitCarsSearchUtil from '../carSearchUtils/RentitCarsSearchUtil';
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
@@ -334,6 +335,7 @@ export const searchCars = async (body: any) => {
 
         const [ fromGrcgds, ...r ] = await Promise.all([
             GrcgdsSearchUtils(body),
+            RentitCarsSearchUtil(body)
             //DATA_POPULATORS.get(sorted[0].id)(body)
         ])
 
@@ -348,7 +350,7 @@ export const searchCars = async (body: any) => {
                 return idsToSearch && idsToSearch.length != 0 ? idsToSearch.includes(id) : true
             })
 
-        const response = wrapCarsResponseIntoXml(filteredResponse, body)
+        const response = wrapCarsResponseIntoXml(filteredResponse.concat(...r), body)
 
         return [
             response,

@@ -4,7 +4,11 @@ export default (RcResults: any, rest: any[][]) => {
     const all = 
     rest.forEach((r = []) => {
         if (r.length > 0) {
+          if (RcResults.OTA_VehAvailRateRS) {
             RcResults.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = RcResults.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.concat(r)
+          } else {
+
+          }
         }
     })
 
