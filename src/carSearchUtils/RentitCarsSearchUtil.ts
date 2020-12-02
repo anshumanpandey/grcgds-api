@@ -49,8 +49,9 @@ export default async (params: any) => {
                 },
                 "Vehicle": [{
                     $: {
-                        "AirConditionInd": rate.AC == true ? "Yes" : "No",
-                        "TransmissionType": rate.Automatic == true ? "Automatic" : "Manual",
+                        "brand": rate.BookingEngine,
+                        "AirConditionInd": rate.Vehicle.AC == true ? "Yes" : "No",
+                        "TransmissionType": rate.Vehicle.Automatic == true ? "Automatic" : "Manual",
                     },
                     "VehMakeModel": [{
                         $: {
@@ -60,7 +61,7 @@ export default async (params: any) => {
                     }],
                     "VehType": [{
                         $: {
-                            "VehicleCategory": rate.Acriss,
+                            "VehicleCategory": rate.Vehicle.Acriss,
                             "DoorCount": 0, // we cannot getr the door number from API response
                             "Baggage": parseInt(rate.Vehicle.Luggages),
                         }
@@ -72,12 +73,12 @@ export default async (params: any) => {
                 }],
                 "RentalRate": [],
                 "VehicleCharge": {
-                    "CurrencyCode": rate.TotalRate.Currency,
+                    "CurrencyCode": rate.TotalRate.TotalAmount.Currency,
                 },
                 "TotalCharge": [{
                     $: {
-                        "RateTotalAmount": Number(rate.TotalRate.Amount).toFixed(2),
-                        "CurrencyCode": rate.TotalRate.Currency,
+                        "RateTotalAmount": Number(rate.TotalRate.TotalAmount.Amount).toFixed(2),
+                        "CurrencyCode": rate.TotalRate.TotalAmount.Currency,
                     }
                 }],
                 "PricedEquips": []
