@@ -16,7 +16,7 @@ const formatDate = (fullDate: string) => {
 }
 
 const getDiscoverCarsUser = async () => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
+    const r = await DB?.select({ brandUrl: "clients.logo_name",clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
         .from("clients")
         .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
         .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
@@ -49,6 +49,7 @@ export default async (params: any) => {
                 },
                 "Vehicle": [{
                     $: {
+                        "BrandPicURL": u.brandUrl,
                         "brand": rate.BookingEngine,
                         "AirConditionInd": rate.Vehicle.AC == true ? "Yes" : "No",
                         "TransmissionType": rate.Vehicle.Automatic == true ? "Automatic" : "Manual",
