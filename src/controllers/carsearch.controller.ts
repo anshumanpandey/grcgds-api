@@ -7,6 +7,7 @@ import { increaseCounterFor, sortClientsBySearch } from '../services/searchHisto
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 import { GetSerchForClients } from '../utils/GetSerchForClients';
 import { getDataSuppliers } from '../services/requestor.service';
+import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -330,7 +331,7 @@ export const searchCars = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
 
-    const { CONTEXT } = body
+    const { CONTEXT, POS } = body
 
     try {
         const suppliers = await getDataSuppliers({ RequestorID: body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) });
@@ -354,8 +355,11 @@ export const searchCars = async (body: any) => {
                 const idsToSearch = CONTEXT?.Filter?.content?.split(",")
                 return idsToSearch && idsToSearch.length != 0 ? idsToSearch.includes(id) : true
             })
+        const filterBrands = await FilterBrandsForClient(body.POS.Source.RequestorID.ID)
+        filteredResponse = filteredResponse.concat(...r)
+            .filter(filterBrands)
 
-        const response = wrapCarsResponseIntoXml(filteredResponse.concat(...r), body)
+        const response = wrapCarsResponseIntoXml(filteredResponse, body)
 
         return [
             response,
