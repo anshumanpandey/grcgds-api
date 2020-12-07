@@ -49,8 +49,9 @@ export default async (params: any) => {
                 },
                 "Vehicle": [{
                     $: {
-                        "BrandPicURL": u.brandUrl,
-                        "brand": rate.BookingEngine,
+                        "BrandPicURL": rate.Supplier.LogoUrl,
+                        "CarClass": rate.Vehicle.AcrissGroup[0].Name,
+                        "Brand": rate.Supplier.Name,
                         "AirConditionInd": rate.Vehicle.AC == true ? "Yes" : "No",
                         "TransmissionType": rate.Vehicle.Automatic == true ? "Automatic" : "Manual",
                     },
@@ -63,7 +64,7 @@ export default async (params: any) => {
                     "VehType": [{
                         $: {
                             "VehicleCategory": rate.Vehicle.Acriss,
-                            "DoorCount": 0, // we cannot getr the door number from API response
+                            "DoorCount": rate.Vehicle.Type.split(" ").slice(1).join(" "),
                             "Baggage": parseInt(rate.Vehicle.Luggages),
                         }
                     }],
