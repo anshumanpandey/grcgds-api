@@ -8,6 +8,7 @@ import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 import { GetSerchForClients } from '../utils/GetSerchForClients';
 import { getDataSuppliers } from '../services/requestor.service';
 import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
+import { GetSearchServices } from '../utils/GetSearchServices';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -335,12 +336,13 @@ export const searchCars = async (body: any) => {
 
     try {
         const suppliers = await getDataSuppliers({ RequestorID: body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) });
-        const sorted = await sortClientsBySearch({ clients: [{id:17}], searchType: SearchHistoryEnum.Availability })
+        const searchServices = await GetSearchServices(body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4))
+        const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
 
         const [ fromGrcgds, ...r ] = await allSettled([
             GrcgdsSearchUtils(body),
-            ...GetSerchForClients(suppliers.map(s => s.clientId)).map(f => f(body))
-            //DATA_POPULATORS.get(sorted[0].id)(body)
+            ...GetSerchForClients(suppliers.map(s => s.clientId)).map(f => f(body)),
+            DATA_POPULATORS.get(sorted[0].clientId)(body)
         ])
         .then((promises: any) => promises.filter((p: any) => p.status == "fulfilled"))
         .then((promises: any) => promises.map((p: any) => p.value))

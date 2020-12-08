@@ -7,6 +7,7 @@ import RightCarsBooking, { cancelRightCarsBooking } from '../carsBookingUtils/Ri
 import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
 import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
+import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -18,170 +19,228 @@ const schema = {
     "default": {},
     "examples": [
         {
-            "VehAvailRQCore": {
-                "Status": "Available",
-                "VehRentalCore": {
-                    "PickUpDateTime": "2020-08-05T12:00:00",
-                    "ReturnDateTime": "2020-08-06T10:00:00",
-                    "PickUpLocation": {
-                        "LocationCode": "MIAA01"
-                    },
-                    "ReturnLocation": {
-                        "LocationCode": "MIAA01"
+            "xmlns": "http://www.opentravel.org/OTA/2003/05",
+            "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+            "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd",
+            "POS": {
+                "Source": {
+                    "RequestorID": {
+                        "Type": "5",
+                        "ID": "GRC-300000",
+                        "RATEID": "GRC-880001"
                     }
                 }
             },
-            "VehAvailRQInfo": {
+            "VehResRQCore": {
+                "VehRentalCore": {
+                    "PickUpDateTime": "2020-11-20T12:00:00",
+                    "ReturnDateTime": "2020-11-18T10:00:00",
+                    "PickUpLocation": {
+                        "LocationCode": "LWNA01"
+                    },
+                    "ReturnLocation": {
+                        "LocationCode": "LWNA01"
+                    }
+                },
                 "Customer": {
                     "Primary": {
-                        "DriverType": {
-                            "Age": ""
+                        "PersonName": {
+                            "NamePrefix": "Sr",
+                            "GivenName": "Rick",
+                            "Surname": "Little"
                         },
-                        "CitizenCountryName": {
-                            "Code": ""
+                        "Telephone": {
+                            "PhoneNumber": "+1 8006471058"
+                        },
+                        "Email": "test25@test.com",
+                        "Address": {
+                            "StreetNmbr": "",
+                            "CityName": "",
+                            "PostalCode": ""
+                        },
+                        "CustLoyalty": {
+                            "ProgramID": "",
+                            "MembershipID": ""
                         }
                     }
+                },
+                "VendorPref": "",
+                "VehPref": {
+                    "SearchId": "",
+                    "Code": "SWMR-8-23412",
+                    "Acriss": "SWMR",
+                    "price": ""
+                },
+                "SpecialEquipPrefs": {
+                    "SpecialEquipPref": [
+                        {
+                            "vendorEquipID": "BSIT",
+                            "Quantity": "2"
+                        },
+                        {
+                            "vendorEquipID": "GPS",
+                            "Quantity": "1"
+                        }
+                    ]
+                },
+                "PromoDesc": ""
+            },
+            "VehResRQInfo": "",
+            "ArrivalDetails": {
+                "FlightNo": "IB3154"
+            },
+            "RentalPaymentPref": {
+                "Voucher": {
+                    "Identifier": "5464srsdrdasu1",
+                    "PaymentCard": {
+                        "CardType": "Paypal",
+                        "CardCode": "",
+                        "CardNumber": "1111111111111111111111111",
+                        "ExpireDate": "MM/YY",
+                        "CardHolderName": "",
+                        "AmountPaid": "",
+                        "CurrencyUsed": ""
+                    }
+                }
+            },
+            "CONTEXT": {
+                "Filter": {
+                    "content": "SupplierAccountnumber",
+                    "Language": "EN",
+                    "contactless": "Yes"
                 }
             }
         }
     ],
     "required": [
-        "VehAvailRQCore",
-        "VehAvailRQInfo"
+        "xmlns",
+        "xmlns:xsi",
+        "xsi:schemaLocation",
+        "POS",
+        "VehResRQCore",
+        "VehResRQInfo",
+        "ArrivalDetails",
+        "RentalPaymentPref",
+        "CONTEXT"
     ],
     "properties": {
-        "VehAvailRQCore": {
-            "$id": "#/properties/VehAvailRQCore",
+        "xmlns": {
+            "$id": "#/properties/xmlns",
+            "type": "string",
+            "title": "The xmlns schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "http://www.opentravel.org/OTA/2003/05"
+            ]
+        },
+        "xmlns:xsi": {
+            "$id": "#/properties/xmlns%3Axsi",
+            "type": "string",
+            "title": "The xmlns:xsi schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "http://www.w3.org/2001/XMLSchema-instance"
+            ]
+        },
+        "xsi:schemaLocation": {
+            "$id": "#/properties/xsi%3AschemaLocation",
+            "type": "string",
+            "title": "The xsi:schemaLocation schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd"
+            ]
+        },
+        "POS": {
+            "$id": "#/properties/POS",
             "type": "object",
-            "title": "The VehAvailRQCore schema",
+            "title": "The POS schema",
             "description": "An explanation about the purpose of this instance.",
             "default": {},
             "examples": [
                 {
-                    "Status": "Available",
-                    "VehRentalCore": {
-                        "PickUpDateTime": "2020-08-05T12:00:00",
-                        "ReturnDateTime": "2020-08-06T10:00:00",
-                        "PickUpLocation": {
-                            "LocationCode": "MIAA01"
-                        },
-                        "ReturnLocation": {
-                            "LocationCode": "MIAA01"
+                    "Source": {
+                        "RequestorID": {
+                            "Type": "5",
+                            "ID": "GRC-300000",
+                            "RATEID": "GRC-880001"
                         }
                     }
                 }
             ],
             "required": [
-                "Status",
-                "VehRentalCore"
+                "Source"
             ],
             "properties": {
-                "Status": {
-                    "$id": "#/properties/VehAvailRQCore/properties/Status",
-                    "type": "string",
-                    "title": "The Status schema",
-                    "description": "An explanation about the purpose of this instance.",
-                    "default": "",
-                    "examples": [
-                        "Available"
-                    ]
-                },
-                "VehRentalCore": {
-                    "$id": "#/properties/VehAvailRQCore/properties/VehRentalCore",
+                "Source": {
+                    "$id": "#/properties/POS/properties/Source",
                     "type": "object",
-                    "title": "The VehRentalCore schema",
+                    "title": "The Source schema",
                     "description": "An explanation about the purpose of this instance.",
                     "default": {},
                     "examples": [
                         {
-                            "PickUpDateTime": "2020-08-05T12:00:00",
-                            "ReturnDateTime": "2020-08-06T10:00:00",
-                            "PickUpLocation": {
-                                "LocationCode": "MIAA01"
-                            },
-                            "ReturnLocation": {
-                                "LocationCode": "MIAA01"
+                            "RequestorID": {
+                                "Type": "5",
+                                "ID": "GRC-300000",
+                                "RATEID": "GRC-880001"
                             }
                         }
                     ],
                     "required": [
-                        "PickUpDateTime",
-                        "ReturnDateTime",
-                        "PickUpLocation",
-                        "ReturnLocation"
+                        "RequestorID"
                     ],
                     "properties": {
-                        "PickUpDateTime": {
-                            "$id": "#/properties/VehAvailRQCore/properties/VehRentalCore/properties/PickUpDateTime",
-                            "type": "string",
-                            "title": "The PickUpDateTime schema",
-                            "description": "An explanation about the purpose of this instance.",
-                            "default": "",
-                            "examples": [
-                                "2020-08-05T12:00:00"
-                            ]
-                        },
-                        "ReturnDateTime": {
-                            "$id": "#/properties/VehAvailRQCore/properties/VehRentalCore/properties/ReturnDateTime",
-                            "type": "string",
-                            "title": "The ReturnDateTime schema",
-                            "description": "An explanation about the purpose of this instance.",
-                            "default": "",
-                            "examples": [
-                                "2020-08-06T10:00:00"
-                            ]
-                        },
-                        "PickUpLocation": {
-                            "$id": "#/properties/VehAvailRQCore/properties/VehRentalCore/properties/PickUpLocation",
+                        "RequestorID": {
+                            "$id": "#/properties/POS/properties/Source/properties/RequestorID",
                             "type": "object",
-                            "title": "The PickUpLocation schema",
+                            "title": "The RequestorID schema",
                             "description": "An explanation about the purpose of this instance.",
                             "default": {},
                             "examples": [
                                 {
-                                    "LocationCode": "MIAA01"
+                                    "Type": "5",
+                                    "ID": "GRC-300000",
+                                    "RATEID": "GRC-880001"
                                 }
                             ],
                             "required": [
-                                "LocationCode"
+                                "Type",
+                                "ID",
+                                "RATEID"
                             ],
                             "properties": {
-                                "LocationCode": {
-                                    "$id": "#/properties/VehAvailRQCore/properties/VehRentalCore/properties/PickUpLocation/properties/LocationCode",
+                                "Type": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/Type",
                                     "type": "string",
-                                    "title": "The LocationCode schema",
+                                    "title": "The Type schema",
                                     "description": "An explanation about the purpose of this instance.",
                                     "default": "",
                                     "examples": [
-                                        "MIAA01"
+                                        "5"
                                     ]
-                                }
-                            },
-                            "additionalProperties": true
-                        },
-                        "ReturnLocation": {
-                            "$id": "#/properties/VehAvailRQCore/properties/VehRentalCore/properties/ReturnLocation",
-                            "type": "object",
-                            "title": "The ReturnLocation schema",
-                            "description": "An explanation about the purpose of this instance.",
-                            "default": {},
-                            "examples": [
-                                {
-                                    "LocationCode": "MIAA01"
-                                }
-                            ],
-                            "required": [
-                                "LocationCode"
-                            ],
-                            "properties": {
-                                "LocationCode": {
-                                    "$id": "#/properties/VehAvailRQCore/properties/VehRentalCore/properties/ReturnLocation/properties/LocationCode",
+                                },
+                                "ID": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/ID",
                                     "type": "string",
-                                    "title": "The LocationCode schema",
+                                    "title": "The ID schema",
                                     "description": "An explanation about the purpose of this instance.",
                                     "default": "",
                                     "examples": [
-                                        "MIAA01"
+                                        "GRC-300000"
+                                    ]
+                                },
+                                "RATEID": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/RATEID",
+                                    "type": "string",
+                                    "title": "The RATEID schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "GRC-880001"
                                     ]
                                 }
                             },
@@ -193,27 +252,183 @@ const schema = {
             },
             "additionalProperties": true
         },
-        "VehAvailRQInfo": {
-            "default": {},
+        "VehResRQCore": {
+            "$id": "#/properties/VehResRQCore",
+            "type": "object",
+            "title": "The VehResRQCore schema",
             "description": "An explanation about the purpose of this instance.",
+            "default": {},
             "examples": [
                 {
+                    "VehRentalCore": {
+                        "PickUpDateTime": "2020-11-20T12:00:00",
+                        "ReturnDateTime": "2020-11-18T10:00:00",
+                        "PickUpLocation": {
+                            "LocationCode": "LWNA01"
+                        },
+                        "ReturnLocation": {
+                            "LocationCode": "LWNA01"
+                        }
+                    },
                     "Customer": {
                         "Primary": {
-                            "DriverType": {
-                                "Age": ""
+                            "PersonName": {
+                                "NamePrefix": "Sr",
+                                "GivenName": "Rick",
+                                "Surname": "Little"
                             },
-                            "CitizenCountryName": {
-                                "Code": ""
+                            "Telephone": {
+                                "PhoneNumber": "+1 8006471058"
+                            },
+                            "Email": "test25@test.com",
+                            "Address": {
+                                "StreetNmbr": "",
+                                "CityName": "",
+                                "PostalCode": ""
+                            },
+                            "CustLoyalty": {
+                                "ProgramID": "",
+                                "MembershipID": ""
                             }
                         }
-                    }
+                    },
+                    "VendorPref": "",
+                    "VehPref": {
+                        "SearchId": "",
+                        "Code": "SWMR-8-23412",
+                        "Acriss": "SWMR",
+                        "price": ""
+                    },
+                    "SpecialEquipPrefs": {
+                        "SpecialEquipPref": [
+                            {
+                                "vendorEquipID": "BSIT",
+                                "Quantity": "2"
+                            },
+                            {
+                                "vendorEquipID": "GPS",
+                                "Quantity": "1"
+                            }
+                        ]
+                    },
+                    "PromoDesc": ""
                 }
             ],
-            "title": "The VehAvailRQInfo schema",
+            "required": [
+                "VehRentalCore",
+                "Customer",
+                "VendorPref",
+                "VehPref",
+                "SpecialEquipPrefs",
+                "PromoDesc"
+            ],
             "properties": {
+                "VehRentalCore": {
+                    "$id": "#/properties/VehResRQCore/properties/VehRentalCore",
+                    "type": "object",
+                    "title": "The VehRentalCore schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "PickUpDateTime": "2020-11-20T12:00:00",
+                            "ReturnDateTime": "2020-11-18T10:00:00",
+                            "PickUpLocation": {
+                                "LocationCode": "LWNA01"
+                            },
+                            "ReturnLocation": {
+                                "LocationCode": "LWNA01"
+                            }
+                        }
+                    ],
+                    "required": [
+                        "PickUpDateTime",
+                        "ReturnDateTime",
+                        "PickUpLocation",
+                        "ReturnLocation"
+                    ],
+                    "properties": {
+                        "PickUpDateTime": {
+                            "$id": "#/properties/VehResRQCore/properties/VehRentalCore/properties/PickUpDateTime",
+                            "type": "string",
+                            "title": "The PickUpDateTime schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "2020-11-20T12:00:00"
+                            ]
+                        },
+                        "ReturnDateTime": {
+                            "$id": "#/properties/VehResRQCore/properties/VehRentalCore/properties/ReturnDateTime",
+                            "type": "string",
+                            "title": "The ReturnDateTime schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "2020-11-18T10:00:00"
+                            ]
+                        },
+                        "PickUpLocation": {
+                            "$id": "#/properties/VehResRQCore/properties/VehRentalCore/properties/PickUpLocation",
+                            "type": "object",
+                            "title": "The PickUpLocation schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "examples": [
+                                {
+                                    "LocationCode": "LWNA01"
+                                }
+                            ],
+                            "required": [
+                                "LocationCode"
+                            ],
+                            "properties": {
+                                "LocationCode": {
+                                    "$id": "#/properties/VehResRQCore/properties/VehRentalCore/properties/PickUpLocation/properties/LocationCode",
+                                    "type": "string",
+                                    "title": "The LocationCode schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "LWNA01"
+                                    ]
+                                }
+                            },
+                            "additionalProperties": true
+                        },
+                        "ReturnLocation": {
+                            "$id": "#/properties/VehResRQCore/properties/VehRentalCore/properties/ReturnLocation",
+                            "type": "object",
+                            "title": "The ReturnLocation schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "examples": [
+                                {
+                                    "LocationCode": "LWNA01"
+                                }
+                            ],
+                            "required": [
+                                "LocationCode"
+                            ],
+                            "properties": {
+                                "LocationCode": {
+                                    "$id": "#/properties/VehResRQCore/properties/VehRentalCore/properties/ReturnLocation/properties/LocationCode",
+                                    "type": "string",
+                                    "title": "The LocationCode schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "LWNA01"
+                                    ]
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                },
                 "Customer": {
-                    "$id": "#/properties/VehAvailRQInfo/properties/Customer",
+                    "$id": "#/properties/VehResRQCore/properties/Customer",
                     "type": "object",
                     "title": "The Customer schema",
                     "description": "An explanation about the purpose of this instance.",
@@ -221,11 +436,23 @@ const schema = {
                     "examples": [
                         {
                             "Primary": {
-                                "DriverType": {
-                                    "Age": ""
+                                "PersonName": {
+                                    "NamePrefix": "Sr",
+                                    "GivenName": "Rick",
+                                    "Surname": "Little"
                                 },
-                                "CitizenCountryName": {
-                                    "Code": ""
+                                "Telephone": {
+                                    "PhoneNumber": "+1 8006471058"
+                                },
+                                "Email": "test25@test.com",
+                                "Address": {
+                                    "StreetNmbr": "",
+                                    "CityName": "",
+                                    "PostalCode": ""
+                                },
+                                "CustLoyalty": {
+                                    "ProgramID": "",
+                                    "MembershipID": ""
                                 }
                             }
                         }
@@ -235,45 +462,174 @@ const schema = {
                     ],
                     "properties": {
                         "Primary": {
-                            "$id": "#/properties/VehAvailRQInfo/properties/Customer/properties/Primary",
+                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary",
                             "type": "object",
                             "title": "The Primary schema",
                             "description": "An explanation about the purpose of this instance.",
                             "default": {},
                             "examples": [
                                 {
-                                    "DriverType": {
-                                        "Age": ""
+                                    "PersonName": {
+                                        "NamePrefix": "Sr",
+                                        "GivenName": "Rick",
+                                        "Surname": "Little"
                                     },
-                                    "CitizenCountryName": {
-                                        "Code": ""
+                                    "Telephone": {
+                                        "PhoneNumber": "+1 8006471058"
+                                    },
+                                    "Email": "test25@test.com",
+                                    "Address": {
+                                        "StreetNmbr": "",
+                                        "CityName": "",
+                                        "PostalCode": ""
+                                    },
+                                    "CustLoyalty": {
+                                        "ProgramID": "",
+                                        "MembershipID": ""
                                     }
                                 }
                             ],
                             "required": [
-                                "DriverType",
-                                "CitizenCountryName"
+                                "PersonName",
+                                "Telephone",
+                                "Email",
+                                "Address",
+                                "CustLoyalty"
                             ],
                             "properties": {
-                                "DriverType": {
-                                    "$id": "#/properties/VehAvailRQInfo/properties/Customer/properties/Primary/properties/DriverType",
+                                "PersonName": {
+                                    "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/PersonName",
                                     "type": "object",
-                                    "title": "The DriverType schema",
+                                    "title": "The PersonName schema",
                                     "description": "An explanation about the purpose of this instance.",
                                     "default": {},
                                     "examples": [
                                         {
-                                            "Age": ""
+                                            "NamePrefix": "Sr",
+                                            "GivenName": "Rick",
+                                            "Surname": "Little"
                                         }
                                     ],
                                     "required": [
-                                        "Age"
+                                        "NamePrefix",
+                                        "GivenName",
+                                        "Surname"
                                     ],
                                     "properties": {
-                                        "Age": {
-                                            "$id": "#/properties/VehAvailRQInfo/properties/Customer/properties/Primary/properties/DriverType/properties/Age",
+                                        "NamePrefix": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/PersonName/properties/NamePrefix",
                                             "type": "string",
-                                            "title": "The Age schema",
+                                            "title": "The NamePrefix schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "Sr"
+                                            ]
+                                        },
+                                        "GivenName": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/PersonName/properties/GivenName",
+                                            "type": "string",
+                                            "title": "The GivenName schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "Rick"
+                                            ]
+                                        },
+                                        "Surname": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/PersonName/properties/Surname",
+                                            "type": "string",
+                                            "title": "The Surname schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "Little"
+                                            ]
+                                        }
+                                    },
+                                    "additionalProperties": true
+                                },
+                                "Telephone": {
+                                    "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Telephone",
+                                    "type": "object",
+                                    "title": "The Telephone schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": {},
+                                    "examples": [
+                                        {
+                                            "PhoneNumber": "+1 8006471058"
+                                        }
+                                    ],
+                                    "required": [
+                                        "PhoneNumber"
+                                    ],
+                                    "properties": {
+                                        "PhoneNumber": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Telephone/properties/PhoneNumber",
+                                            "type": "string",
+                                            "title": "The PhoneNumber schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "+1 8006471058"
+                                            ]
+                                        }
+                                    },
+                                    "additionalProperties": true
+                                },
+                                "Email": {
+                                    "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Email",
+                                    "type": "string",
+                                    "title": "The Email schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "test25@test.com"
+                                    ]
+                                },
+                                "Address": {
+                                    "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Address",
+                                    "type": "object",
+                                    "title": "The Address schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": {},
+                                    "examples": [
+                                        {
+                                            "StreetNmbr": "",
+                                            "CityName": "",
+                                            "PostalCode": ""
+                                        }
+                                    ],
+                                    "required": [
+                                        "StreetNmbr",
+                                        "CityName",
+                                        "PostalCode"
+                                    ],
+                                    "properties": {
+                                        "StreetNmbr": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Address/properties/StreetNmbr",
+                                            "type": "string",
+                                            "title": "The StreetNmbr schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        },
+                                        "CityName": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Address/properties/CityName",
+                                            "type": "string",
+                                            "title": "The CityName schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        },
+                                        "PostalCode": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Address/properties/PostalCode",
+                                            "type": "string",
+                                            "title": "The PostalCode schema",
                                             "description": "An explanation about the purpose of this instance.",
                                             "default": "",
                                             "examples": [
@@ -283,25 +639,37 @@ const schema = {
                                     },
                                     "additionalProperties": true
                                 },
-                                "CitizenCountryName": {
-                                    "$id": "#/properties/VehAvailRQInfo/properties/Customer/properties/Primary/properties/CitizenCountryName",
+                                "CustLoyalty": {
+                                    "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/CustLoyalty",
                                     "type": "object",
-                                    "title": "The CitizenCountryName schema",
+                                    "title": "The CustLoyalty schema",
                                     "description": "An explanation about the purpose of this instance.",
                                     "default": {},
                                     "examples": [
                                         {
-                                            "Code": ""
+                                            "ProgramID": "",
+                                            "MembershipID": ""
                                         }
                                     ],
                                     "required": [
-                                        "Code"
+                                        "ProgramID",
+                                        "MembershipID"
                                     ],
                                     "properties": {
-                                        "Code": {
-                                            "$id": "#/properties/VehAvailRQInfo/properties/Customer/properties/Primary/properties/CitizenCountryName/properties/Code",
+                                        "ProgramID": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/CustLoyalty/properties/ProgramID",
                                             "type": "string",
-                                            "title": "The Code schema",
+                                            "title": "The ProgramID schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        },
+                                        "MembershipID": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/CustLoyalty/properties/MembershipID",
+                                            "type": "string",
+                                            "title": "The MembershipID schema",
                                             "description": "An explanation about the purpose of this instance.",
                                             "default": "",
                                             "examples": [
@@ -313,6 +681,463 @@ const schema = {
                                 }
                             },
                             "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "VendorPref": {
+                    "$id": "#/properties/VehResRQCore/properties/VendorPref",
+                    "type": "string",
+                    "title": "The VendorPref schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "VehPref": {
+                    "$id": "#/properties/VehResRQCore/properties/VehPref",
+                    "type": "object",
+                    "title": "The VehPref schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "SearchId": "",
+                            "Code": "SWMR-8-23412",
+                            "Acriss": "SWMR",
+                            "price": ""
+                        }
+                    ],
+                    "required": [
+                        "SearchId",
+                        "Code",
+                        "Acriss",
+                        "price"
+                    ],
+                    "properties": {
+                        "SearchId": {
+                            "$id": "#/properties/VehResRQCore/properties/VehPref/properties/SearchId",
+                            "type": "string",
+                            "title": "The SearchId schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                ""
+                            ]
+                        },
+                        "Code": {
+                            "$id": "#/properties/VehResRQCore/properties/VehPref/properties/Code",
+                            "type": "string",
+                            "title": "The Code schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "SWMR-8-23412"
+                            ]
+                        },
+                        "Acriss": {
+                            "$id": "#/properties/VehResRQCore/properties/VehPref/properties/Acriss",
+                            "type": "string",
+                            "title": "The Acriss schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "SWMR"
+                            ]
+                        },
+                        "price": {
+                            "$id": "#/properties/VehResRQCore/properties/VehPref/properties/price",
+                            "type": "string",
+                            "title": "The price schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                ""
+                            ]
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "SpecialEquipPrefs": {
+                    "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs",
+                    "type": "object",
+                    "title": "The SpecialEquipPrefs schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "SpecialEquipPref": [
+                                {
+                                    "vendorEquipID": "BSIT",
+                                    "Quantity": "2"
+                                },
+                                {
+                                    "vendorEquipID": "GPS",
+                                    "Quantity": "1"
+                                }
+                            ]
+                        }
+                    ],
+                    "required": [
+                        "SpecialEquipPref"
+                    ],
+                    "properties": {
+                        "SpecialEquipPref": {
+                            "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref",
+                            "type": "array",
+                            "title": "The SpecialEquipPref schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": [],
+                            "examples": [
+                                [
+                                    {
+                                        "vendorEquipID": "BSIT",
+                                        "Quantity": "2"
+                                    },
+                                    {
+                                        "vendorEquipID": "GPS",
+                                        "Quantity": "1"
+                                    }
+                                ]
+                            ],
+                            "additionalItems": true,
+                            "items": {
+                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items",
+                                "anyOf": [
+                                    {
+                                        "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0",
+                                        "type": "object",
+                                        "title": "The first anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "vendorEquipID": "BSIT",
+                                                "Quantity": "2"
+                                            }
+                                        ],
+                                        "required": [
+                                            "vendorEquipID",
+                                            "Quantity"
+                                        ],
+                                        "properties": {
+                                            "vendorEquipID": {
+                                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0/properties/vendorEquipID",
+                                                "type": "string",
+                                                "title": "The vendorEquipID schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "BSIT"
+                                                ]
+                                            },
+                                            "Quantity": {
+                                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0/properties/Quantity",
+                                                "type": "string",
+                                                "title": "The Quantity schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "2"
+                                                ]
+                                            }
+                                        },
+                                        "additionalProperties": true
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "PromoDesc": {
+                    "$id": "#/properties/VehResRQCore/properties/PromoDesc",
+                    "type": "string",
+                    "title": "The PromoDesc schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        ""
+                    ]
+                }
+            },
+            "additionalProperties": true
+        },
+        "VehResRQInfo": {
+            "$id": "#/properties/VehResRQInfo",
+            "type": "string",
+            "title": "The VehResRQInfo schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                ""
+            ]
+        },
+        "ArrivalDetails": {
+            "$id": "#/properties/ArrivalDetails",
+            "type": "object",
+            "title": "The ArrivalDetails schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "FlightNo": "IB3154"
+                }
+            ],
+            "required": [
+                "FlightNo"
+            ],
+            "properties": {
+                "FlightNo": {
+                    "$id": "#/properties/ArrivalDetails/properties/FlightNo",
+                    "type": "string",
+                    "title": "The FlightNo schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "IB3154"
+                    ]
+                }
+            },
+            "additionalProperties": true
+        },
+        "RentalPaymentPref": {
+            "$id": "#/properties/RentalPaymentPref",
+            "type": "object",
+            "title": "The RentalPaymentPref schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "Voucher": {
+                        "Identifier": "5464srsdrdasu1",
+                        "PaymentCard": {
+                            "CardType": "Paypal",
+                            "CardCode": "",
+                            "CardNumber": "1111111111111111111111111",
+                            "ExpireDate": "MM/YY",
+                            "CardHolderName": "",
+                            "AmountPaid": "",
+                            "CurrencyUsed": ""
+                        }
+                    }
+                }
+            ],
+            "required": [
+                "Voucher"
+            ],
+            "properties": {
+                "Voucher": {
+                    "$id": "#/properties/RentalPaymentPref/properties/Voucher",
+                    "type": "object",
+                    "title": "The Voucher schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "Identifier": "5464srsdrdasu1",
+                            "PaymentCard": {
+                                "CardType": "Paypal",
+                                "CardCode": "",
+                                "CardNumber": "1111111111111111111111111",
+                                "ExpireDate": "MM/YY",
+                                "CardHolderName": "",
+                                "AmountPaid": "",
+                                "CurrencyUsed": ""
+                            }
+                        }
+                    ],
+                    "required": [
+                        "Identifier",
+                        "PaymentCard"
+                    ],
+                    "properties": {
+                        "Identifier": {
+                            "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/Identifier",
+                            "type": "string",
+                            "title": "The Identifier schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "5464srsdrdasu1"
+                            ]
+                        },
+                        "PaymentCard": {
+                            "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard",
+                            "type": "object",
+                            "title": "The PaymentCard schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "examples": [
+                                {
+                                    "CardType": "Paypal",
+                                    "CardCode": "",
+                                    "CardNumber": "1111111111111111111111111",
+                                    "ExpireDate": "MM/YY",
+                                    "CardHolderName": "",
+                                    "AmountPaid": "",
+                                    "CurrencyUsed": ""
+                                }
+                            ],
+                            "required": [
+                                "CardType",
+                                "CardCode",
+                                "CardNumber",
+                                "ExpireDate",
+                                "CardHolderName",
+                                "AmountPaid",
+                                "CurrencyUsed"
+                            ],
+                            "properties": {
+                                "CardType": {
+                                    "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/CardType",
+                                    "type": "string",
+                                    "title": "The CardType schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "Paypal"
+                                    ]
+                                },
+                                "CardCode": {
+                                    "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/CardCode",
+                                    "type": "string",
+                                    "title": "The CardCode schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        ""
+                                    ]
+                                },
+                                "CardNumber": {
+                                    "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/CardNumber",
+                                    "type": "string",
+                                    "title": "The CardNumber schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "1111111111111111111111111"
+                                    ]
+                                },
+                                "ExpireDate": {
+                                    "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/ExpireDate",
+                                    "type": "string",
+                                    "title": "The ExpireDate schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "MM/YY"
+                                    ]
+                                },
+                                "CardHolderName": {
+                                    "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/CardHolderName",
+                                    "type": "string",
+                                    "title": "The CardHolderName schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        ""
+                                    ]
+                                },
+                                "AmountPaid": {
+                                    "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/AmountPaid",
+                                    "default": "",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "examples": [
+                                        ""
+                                    ],
+                                    "title": "The AmountPaid schema",
+                                    "minLength": 1,
+                                    "type": "string"
+                                },
+                                "CurrencyUsed": {
+                                    "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/CurrencyUsed",
+                                    "default": "",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "examples": [
+                                        ""
+                                    ],
+                                    "title": "The CurrencyUsed schema",
+                                    "minLength": 1,
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "CONTEXT": {
+            "$id": "#/properties/CONTEXT",
+            "type": "object",
+            "title": "The CONTEXT schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "Filter": {
+                        "content": "SupplierAccountnumber",
+                        "Language": "EN",
+                        "contactless": "Yes"
+                    }
+                }
+            ],
+            "required": [
+                "Filter"
+            ],
+            "properties": {
+                "Filter": {
+                    "$id": "#/properties/CONTEXT/properties/Filter",
+                    "type": "object",
+                    "title": "The Filter schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "content": "SupplierAccountnumber",
+                            "Language": "EN",
+                            "contactless": "Yes"
+                        }
+                    ],
+                    "required": [
+                        "content",
+                        "Language",
+                        "contactless"
+                    ],
+                    "properties": {
+                        "content": {
+                            "$id": "#/properties/CONTEXT/properties/Filter/properties/content",
+                            "type": "string",
+                            "title": "The content schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "SupplierAccountnumber"
+                            ]
+                        },
+                        "Language": {
+                            "$id": "#/properties/CONTEXT/properties/Filter/properties/Language",
+                            "type": "string",
+                            "title": "The Language schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "EN"
+                            ]
+                        },
+                        "contactless": {
+                            "$id": "#/properties/CONTEXT/properties/Filter/properties/contactless",
+                            "type": "string",
+                            "title": "The contactless schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "Yes"
+                            ]
                         }
                     },
                     "additionalProperties": true
@@ -326,22 +1151,20 @@ const schema = {
 
 
 export const createBooking = async (body: any) => {
-    //const validator = validateFor(schema)
-    //validator(body)
+    const validator = validateFor(schema)
+    validator(body)
     console.log(body)
-    const { POS: { Source: { RequestorID } } } = body
+    const { CONTEXT, POS: { Source: { RequestorID } } } = body
 
     try {
 
-        let json = await GrcgdsXmlBooking(body)
+        let json = ""
 
-        /*if (RequestorID.RATEID) {
+        if (CONTEXT.Filter.content == "GRC-170000") {
+            json = await DiscoverCarsBooking(body)
         } else {
-            const isGrcCode = await isGrcgdsLocations(body.VehResRQCore.VehRentalCore.PickUpLocation.LocationCode)
-            if (isGrcCode) {
-                //json = await RightCarsBooking(body)
-            }
-        }*/
+            json = await GrcgdsXmlBooking(body)
+        }
 
         return [
             json,
