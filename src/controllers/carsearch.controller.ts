@@ -371,6 +371,7 @@ export const searchCars = async (body: any) => {
         ]
     } catch (error) {
         if (error.response) {
+            console.log(error.response.data)
             throw new ApiError(error.response.data.error)
         } else {
             throw error
