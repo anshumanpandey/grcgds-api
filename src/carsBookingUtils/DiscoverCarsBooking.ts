@@ -29,7 +29,8 @@ export default async (body: any) => {
         "FlightNumber": "123",
         "CustomerComment": "",
         "ReferenceNumber": uuidv4(),
-        "CoverageOfferID": 10
+        "CoverageOfferID": 10,
+        "PaypalTransactionNo": RentalPaymentPref.Voucher.Identifier
     };
 
 
