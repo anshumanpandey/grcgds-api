@@ -171,14 +171,13 @@ const wrapDiscoverResponse = ({ body, hannkUser, response, pickLocation, dropLoc
                 <VehSegmentInfo>
                     <LocationDetails>
                         <Address>
-                            <AddressLine>3960 NW 26th St 
+                            <AddressLine>3960 NW 26th St </AddressLine>
                                 <CityName>Miami</CityName>
                                 <PostalCode>33142</PostalCode>
                                 <CountryName>
                                     <Name>UNITED STATES</Name>
                                     <Code>US</Code>
                                 </CountryName>
-                            </AddressLine>
                         </Address>
                         <Telephone>
                             <PhoneNumber>+1 8006471058</PhoneNumber>
@@ -190,15 +189,13 @@ const wrapDiscoverResponse = ({ body, hannkUser, response, pickLocation, dropLoc
                     </LocationDetails>
                     <LocationDetails>
                         <Address>
-                            <AddressLine>3960 NW 26th St 
-                                <CityName>Miami
-                                    <CityName>
+                            <AddressLine>3960 NW 26th St</AddressLine>
+                                <CityName>Miami</CityName>
                                         <PostalCode>33142</PostalCode>
                                         <CountryName>
                                             <Name>UNITED STATES</Name>
                                             <Code>US</Code>
                                         </CountryName>
-                                    </AddressLine>
                                 </Address>
                                 <Telephone>
                                     <PhoneNumber>+1 8006471058</PhoneNumber>
