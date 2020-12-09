@@ -93,7 +93,17 @@ export default async (params: any) => {
                         "CurrencyCode": $VehAvail["Currency"],
                     }
                 }],
-                "PricedEquips": []
+                "PricedEquips": $VehAvail.OptionalEquipmentList.map((equip: any) => {
+                    return {
+                        "PricedEquip": {
+                            "Equipment": [{ $: {Description: equip.Name, EquipType: equip.EquipmentId, vendorEquipID: equip.EquipmentId, MaxQuantity: equip.MaxQuantity } }],
+                            "Charge": [{
+                                "Amount": equip.Price,
+                                "IncludedRate": equip.IsMandatory,
+                            }],
+                        }
+                    }
+                })
             }]
         }
     })
