@@ -18,7 +18,7 @@ export default async (body: any) => {
     const axiosBody = {
         "SearchUID": VehPref.SearchId,
         "CarUID": VehPref.Code,
-        "Title": NamePrefix.includes('.') ? `${NamePrefix}.` : NamePrefix,
+        "Title": NamePrefix.includes('.') ? NamePrefix : `${NamePrefix}.`,
         "Name": GivenName,
         "Surname": Surname,
         "PhoneCountryCode": Telephone?.PhoneNumber?.split(' ')[0],
