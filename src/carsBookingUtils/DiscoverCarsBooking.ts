@@ -67,6 +67,7 @@ export default async (body: any) => {
         await LogBookingToDb(toInsert)
 
         const xml = wrapDiscoverResponse({ body, hannkUser, response: data, pickLocation: pickLocationObj, dropLocation: dropLocationObj})
+        console.log("xml to conver", xml)
         return xmlToJson(xml)
     } catch (error) {
         console.log(error)
