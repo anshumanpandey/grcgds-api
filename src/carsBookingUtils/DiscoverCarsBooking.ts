@@ -68,6 +68,7 @@ export default async (body: any) => {
         const xml = wrapDiscoverResponse({ body, hannkUser, response: data, pickLocation: pickLocationObj, dropLocation: dropLocationObj})
         return xmlToJson(xml)
     } catch (error) {
+        console.log(error)
         if (error.response) {
             throw new ApiError(error.response.data.error)
         } else {

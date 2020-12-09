@@ -1173,7 +1173,6 @@ export const createBooking = async (body: any) => {
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
         ]
     } catch (error) {
-        console.log(error)
         if (error.response) {
             throw new ApiError(error.response.data.error)
         } else {
