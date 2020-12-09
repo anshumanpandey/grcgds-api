@@ -122,8 +122,8 @@ const wrapDiscoverResponse = ({ body, hannkUser, response, pickLocation, dropLoc
                             <LocationCode>${body.VehResRQCore.VehRentalCore.ReturnLocation.LocationCode}</LocationCode>
                             <CodeContext/>
                         </ReturnLocation>
-                        <PickUpDateTime>${body.VehAvailRQCore.VehRentalCore.PickUpDateTime}</PickUpDateTime>
-                        <ReturnDateTime>${body.VehAvailRQCore.VehRentalCore.ReturnDateTime}</ReturnDateTime>
+                        <PickUpDateTime>${body.VehResRQCore.VehRentalCore.PickUpDateTime}</PickUpDateTime>
+                        <ReturnDateTime>${body.VehResRQCore.VehRentalCore.ReturnDateTime}</ReturnDateTime>
                     </VehRentalCore>
                     <Vehicle>
                         <Code>${body.VehResRQCore.VehPref.Code}</Code>
