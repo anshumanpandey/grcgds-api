@@ -47,6 +47,20 @@ export default async (body: any) => {
             }
         })
 
+        const bindReqBody = {
+            "PaymentGateway": 2,
+            "TransactionID": RentalPaymentPref.Voucher.Identifier,
+            "Amount": body.RentalPaymentPref.Voucher.PaymentCard.AmountPaid,
+            "CurrencyCode": body.RentalPaymentPref.Voucher.PaymentCard.CurrencyUsed,
+            "ReservationNumber": data.ReservationNumber
+        }
+        await axios.post('https://booking.discovercarhire.com/api/Payment/BindTransaction?accessToken=yHjjy7XZVTsVTb4zP3HLc3uQP3ZJEvBkKBuwWhSwNCkafCXx5ykRmhJdnqW2UJT3', bindReqBody, {
+            auth: {
+                username: 'mqTqzF7a42zk',
+                password: 'xks8pgd2QMqAS2qN'
+            }
+        })
+
         const [pickupDate, pickupTime] = VehResRQCore.VehRentalCore.PickUpDateTime.split('T')
         const [dropoffDate, dropoffTime] = VehResRQCore.VehRentalCore.ReturnDateTime.split('T')
 
