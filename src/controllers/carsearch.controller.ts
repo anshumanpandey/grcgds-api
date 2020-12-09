@@ -339,15 +339,20 @@ export const searchCars = async (body: any) => {
         const searchServices = await GetSearchServices(body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4))
         const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
 
-        const [ fromGrcgds, ...r ] = await allSettled([
+        const services = [
             GrcgdsSearchUtils(body),
             ...GetSerchForClients(suppliers.map(s => s.clientId)).map(f => f(body)),
-            DATA_POPULATORS.get(sorted[0].clientId)(body)
-        ])
+        ]
+
+        if (sorted[0]?.clientId) {
+            services.push(DATA_POPULATORS.get(sorted[0].clientId)(body))
+        }
+
+        const [ fromGrcgds, ...r ] = await allSettled(services)
         .then((promises: any) => promises.filter((p: any) => p.status == "fulfilled"))
         .then((promises: any) => promises.map((p: any) => p.value))
 
-        await increaseCounterFor({ clientId: sorted[0].id, searchType: SearchHistoryEnum.Availability })
+        if (sorted[0]?.id) await increaseCounterFor({ clientId: sorted[0].id, searchType: SearchHistoryEnum.Availability })
 
         let filteredResponse = fromGrcgds
         filteredResponse = fromGrcgds
