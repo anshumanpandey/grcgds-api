@@ -47,6 +47,10 @@ export default async (body: any) => {
             }
         })
 
+        if (!data.IsSuccessful || data.IsSuccessful == false) {
+            throw new ApiError("We fail to call service")
+        }
+
         const bindReqBody = {
             "PaymentGateway": 2,
             "TransactionID": RentalPaymentPref.Voucher.Identifier,
