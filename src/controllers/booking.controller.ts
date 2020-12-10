@@ -1153,7 +1153,6 @@ const schema = {
 export const createBooking = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
-    console.log(body)
     const { CONTEXT, POS: { Source: { RequestorID } } } = body
 
     try {

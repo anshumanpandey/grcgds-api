@@ -1,6 +1,6 @@
 import axios from "axios"
 import { xmlToJson } from "../utils/XmlConfig"
-import { XmlError } from "../utils/XmlError"
+const logger = require('pino')()
 const { v4: uuidv4 } = require('uuid');
 import { ApiError } from "../utils/ApiError";
 import LogBookingToDb from "../utils/LogBookingToDb";
@@ -48,6 +48,7 @@ export default async (body: any) => {
         })
 
         if (!data.IsSuccessful || data.IsSuccessful == false) {
+            logger.error(data?.response?.error)
             throw new ApiError("We fail to call service")
         }
 
