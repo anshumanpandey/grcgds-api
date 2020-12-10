@@ -48,7 +48,7 @@ export default async (body: any) => {
         })
 
         if (!data.IsSuccessful || data.IsSuccessful == false) {
-            logger.error(data?.response?.error)
+            logger.error(data)
             throw new ApiError("We fail to call service")
         }
 
