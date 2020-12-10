@@ -67,38 +67,37 @@ export default async (body: any) => {
         getRightCarsDataUsers()
     ]);
 
-    const promises = dataUsers.map(async s => {
-        const xml = generateXmlBody(body,s.internal_code);
+    const xml = generateXmlBody(body, "1000022");
 
-        const { data } = await axios.post('https://ota.right-cars.com', xml, {
-            headers: {
-                'Content-Type': 'text/plain; charset=UTF8',
-            }
-        })
+    const { data } = await axios.post('https://ota.right-cars.com', xml, {
+        headers: {
+            'Content-Type': 'text/plain; charset=UTF8',
+        }
+    })
 
-        const json = await xmlToJson(data);
-        if (json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0] == "") {
-            json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails = [{ VehAvail: [] }]
-            return json
-        } else {
-            json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail = json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
+    const json = await xmlToJson(data);
+    if (json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0] == "") {
+        json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails = [{ VehAvail: [] }]
+        return []
+    } else {
+        return json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
             .map((r: any) => ({
                 VehAvailCore: [{
                     ...r.VehAvailCore[0],
                     $: {
                         ...r.VehAvailCore[0].$,
-                        "Supplier_ID": `GRC-${s.account_code}`,
+                        "Supplier_ID": `GRC-${rc.id}0000`,
                         "Supplier_Name": rc.clientname,
                     },
+                    Vehicle: [{
+                        ...r.VehAvailCore[0].Vehicle[0],
+                        $: {
+                            ...r.VehAvailCore[0].Vehicle[0].$,
+                            "Brand": rc.clientname,
+                        },
+                    }]
                 }],
             }))
-            return json
-        }
-        
-    })
+    }
 
-    return allSettled(promises)
-        .then((promises: any) => {
-            return promises.filter((p: any) => p.status == "fulfilled").map((r: any) => r.value)
-        })
 }

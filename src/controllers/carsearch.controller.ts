@@ -9,6 +9,7 @@ import { GetSerchForClients } from '../utils/GetSerchForClients';
 import { getDataSuppliers } from '../services/requestor.service';
 import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
 import { GetSearchServices } from '../utils/GetSearchServices';
+import RightCarsSearchUtils from '../carSearchUtils/RightCarsSearchUtils';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -341,6 +342,7 @@ export const searchCars = async (body: any) => {
 
         const services = [
             GrcgdsSearchUtils(body),
+            RightCarsSearchUtils(body),
             ...GetSerchForClients(suppliers.map(s => s.clientId)).map(f => f(body)),
         ]
 
@@ -349,7 +351,9 @@ export const searchCars = async (body: any) => {
         }
 
         const [ fromGrcgds, ...r ] = await allSettled(services)
-        .then((promises: any) => promises.filter((p: any) => p.status == "fulfilled"))
+        .then((promises: any) => {
+            return promises.filter((p: any) => p.status == "fulfilled")
+        })
         .then((promises: any) => promises.map((p: any) => p.value))
 
         if (sorted[0]?.id) await increaseCounterFor({ clientId: sorted[0].id, searchType: SearchHistoryEnum.Availability })

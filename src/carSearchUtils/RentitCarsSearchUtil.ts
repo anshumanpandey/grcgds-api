@@ -39,6 +39,8 @@ export default async (params: any) => {
     const u = await getDiscoverCarsUser()
 
     return data.Rates.map((rate: any) => {
+        const doorsRegexp = /[0-9].*[0-9]/gim
+        const doors = doorsRegexp.exec(rate.Vehicle.Type)
         return {
             VehAvailCore: [{
                 $: {
@@ -64,7 +66,7 @@ export default async (params: any) => {
                     "VehType": [{
                         $: {
                             "VehicleCategory": rate.Vehicle.Acriss,
-                            "DoorCount": rate.Vehicle.Type.split(" ").slice(1).join(" "),
+                            "DoorCount": doors ? doors[0] : 0,
                             "Baggage": parseInt(rate.Vehicle.Luggages),
                         }
                     }],
