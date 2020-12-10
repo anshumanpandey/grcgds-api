@@ -34,7 +34,7 @@ export default async (params: any) => {
         "CurrencyCode": "GBP",
         "Age": "35",
         "UserIP": "192.168.1.1",
-        "Pos": "LV",
+        "Pos": "GB",
         "Lng2L": "en",
         "DeviceTypeID": "101",
         "DomainExtension": "example: .com, .co.uk, co.za, .lv, .de",
