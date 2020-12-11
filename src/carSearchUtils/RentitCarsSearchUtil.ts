@@ -39,7 +39,7 @@ export default async (params: any) => {
     const u = await getDiscoverCarsUser()
 
     return data.Rates.map((rate: any) => {
-        const doorsRegexp = /[0-9].*[0-9]/gim
+        const doorsRegexp = /[0-9].*[0-9]$/gim
         const doors = doorsRegexp.exec(rate.Vehicle.Type)
         return {
             VehAvailCore: [{
