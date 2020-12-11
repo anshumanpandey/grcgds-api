@@ -1,6 +1,7 @@
 import { validateFor } from '../utils/JsonValidator';
 import { ApiError } from '../utils/ApiError';
 import GrcgdsSearchUtils from '../carSearchUtils/GrcgdsSearchUtils';
+import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
 import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
 import MergeResults, { getUserOfResults, wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
@@ -343,6 +344,7 @@ export const searchCars = async (body: any) => {
         const services = [
             GrcgdsSearchUtils(body),
             RightCarsSearchUtils(body),
+            EasitentSearchUtil(body),
             ...GetSerchForClients(suppliers.map(s => s.clientId)).map(f => f(body)),
         ]
 
