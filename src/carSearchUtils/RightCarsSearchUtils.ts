@@ -94,7 +94,7 @@ export default async (body: any) => {
                         $: {
                             ...r.VehAvailCore[0].Vehicle[0].$,
                             "Brand": rc.clientname,
-                            "BrandPicURL": "https://www.right-cars.com/RC170wide.png",
+                            "BrandPicURL": "https://supplierimages.rent.it/rightcars.jpg",
                         },
                     }]
                 }],
