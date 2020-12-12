@@ -31,6 +31,8 @@ export default async (params: any) => {
         getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
     ])
 
+    if(!pickupCodeObj || !returnCodeObj) return 
+
     const body = `<?xml version="1.0" encoding="utf-8"?>
     <GetVehicles>
         <bcode>$BRO166</bcode>
