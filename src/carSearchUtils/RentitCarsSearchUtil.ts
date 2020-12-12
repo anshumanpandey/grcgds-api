@@ -85,7 +85,7 @@ export default async (params: any) => {
                         "CurrencyCode": rate.TotalRate.TotalAmount.Currency,
                     }
                 }],
-                "PricedEquips": [[]]
+                "PricedEquips": []
             }]
         }
     })
