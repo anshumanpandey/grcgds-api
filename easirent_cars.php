@@ -16,21 +16,21 @@ curl_setopt_array($curl, array(
     <bcode>$BRO166</bcode>
     <vtype>1</vtype>
     <ctype>5</ctype>
-    <estmiles>100</estmiles>
+    <estmiles>10000</estmiles>
     <pickup>
-        <location>LHR</location>
+        <location>ABZ</location>
         <date>2020-12-15</date>
         <time>11:00</time>
     </pickup>
     <dropoff>
-        <location>LHR</location>
+        <location>ABZ</location>
         <date>2020-12-20</date>
         <time>11:00</time>
     </dropoff>
 </GetVehicles>',
   CURLOPT_HTTPHEADER => array(
     'Content-Type: application/xml',
-    'Cookie: ASPSESSIONIDQUCSABAA=GNANFLPCBGFMHDPJNFLLNLHG'
+    'Cookie: ASPSESSIONIDSWCRDAAA=AJFEHJNBMDHINDFICLDHEFHL; ASPSESSIONIDSWCSACAB=PCEOJEPBIBBBLFDJAMFHMNGL; ASPSESSIONIDAUDTACCC=FJNBPOGCADJBPJHNGCDDOCFL'
   ),
 ));
 

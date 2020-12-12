@@ -31,7 +31,7 @@ export default async (params: any) => {
         getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
     ])
 
-    if(!pickupCodeObj || !returnCodeObj) return 
+    if(!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
 
     const body = `<?xml version="1.0" encoding="utf-8"?>
     <GetVehicles>
