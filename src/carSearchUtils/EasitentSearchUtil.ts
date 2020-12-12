@@ -71,6 +71,8 @@ export default async (params: any) => {
                     $: {
                         "AirConditionInd": $VehAvail.aircon[0] == "Yes" ? "Yes" : "No",
                         "TransmissionType": $VehAvail.transType[0] == "Manual" ? "Manual" :"Automatic",
+                        "BrandPicURL": "https://www.easirent.com/ref/ppc/IMG/small-logo.png",
+                        "Brand": "Easirent",
                     },
                     "VehMakeModel": [{
                         $: {
