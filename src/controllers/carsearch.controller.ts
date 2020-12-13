@@ -345,7 +345,7 @@ export const searchCars = async (body: any) => {
             GrcgdsSearchUtils(body),
             RightCarsSearchUtils(body),
             EasitentSearchUtil(body),
-            ...GetSerchForClients(suppliers.map(s => s.clientId)).map(f => f(body)),
+            ...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)),
         ]
 
         if (sorted[0]?.clientId) {
