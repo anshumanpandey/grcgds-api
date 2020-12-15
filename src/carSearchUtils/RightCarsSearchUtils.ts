@@ -28,6 +28,7 @@ const generateXmlBody = (body: any, id: string) => {
     const dropLocation = body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode
     const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
+    const currency = body?.POS?.Source?.ISOCurrency
 
     return `<?xml version="1.0"?>
     <OTA_VehAvailRateRQDeep xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2010-11-12T11:00:00" Target="Test" Version="1.002">
@@ -37,7 +38,7 @@ const generateXmlBody = (body: any, id: string) => {
         </Source>
     </POS>
     <VehAvailRQCore Status="Available">
-        <Currency Code="EUR"/>
+        <Currency Code="${currency || "EUR"}"/>
         <VehRentalCore PickUpDateTime="${PickUpDateTime}" ReturnDateTime="${ReturnDateTime}">
         
         <PickUpLocation LocationCode="${pickLocation}"/>

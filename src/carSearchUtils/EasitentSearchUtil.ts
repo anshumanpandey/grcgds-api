@@ -39,6 +39,7 @@ export default async (params: any) => {
         <vtype>1</vtype>
         <ctype>5</ctype>
         <estmiles>10000</estmiles>
+        <currency>${params?.POS?.Source?.ISOCurrency}</currency>
         <pickup>
             <location>${pickupCodeObj}</location>
             <date>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)[0]}</date>

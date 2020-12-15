@@ -31,7 +31,7 @@ export default async (params: any) => {
         "DateTo": formatDate(params.VehAvailRQCore.VehRentalCore.ReturnDateTime),
         "PickupLocationID": await getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
         "DropOffLocationID": await getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
-        "CurrencyCode": "GBP",
+        "CurrencyCode": params?.POS?.Source?.ISOCurrency || "GBP",
         "Age": "35",
         "UserIP": "192.168.1.1",
         "Pos": "GB",

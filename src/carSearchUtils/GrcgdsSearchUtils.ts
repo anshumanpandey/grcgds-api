@@ -19,6 +19,7 @@ const generateXmlBody = (body: any) => {
     const dropLocation = body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode
     const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
+    const currency = body?.POS?.Source?.ISOCurrency
 
     return `<?xml version="1.0" encoding="UTF-8"?>
     <OTA_VehAvailRateRQ xmlns="http://www.opentravel.org/OTA/2003/05"
@@ -31,6 +32,7 @@ const generateXmlBody = (body: any) => {
         </Source>
         </POS>
         <VehAvailRQCore Status="Available">
+        <Currency Code="${currency || "EUR"}"/>
         <VehRentalCore PickUpDateTime="${PickUpDateTime}" ReturnDateTime="${ReturnDateTime}">
         <PickUpLocation LocationCode="${pickLocation}" />
         <ReturnLocation LocationCode="${dropLocation}" />
