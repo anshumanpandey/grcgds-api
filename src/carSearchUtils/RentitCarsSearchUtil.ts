@@ -52,7 +52,7 @@ export default async (params: any) => {
                 "Vehicle": [{
                     $: {
                         "BrandPicURL": rate.Supplier.LogoUrl,
-                        "CarClass": rate.Vehicle.AcrissGroup[0].Name,
+                        "CarClass": rate.Vehicle.AcrissGroup[0]?.Name,
                         "Brand": rate.Supplier.Name,
                         "AirConditionInd": rate.Vehicle.AC == true ? "Yes" : "No",
                         "TransmissionType": rate.Vehicle.Automatic == true ? "Automatic" : "Manual",
