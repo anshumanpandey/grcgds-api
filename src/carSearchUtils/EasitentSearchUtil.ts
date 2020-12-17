@@ -5,7 +5,7 @@ import { xmlToJson } from '../utils/XmlConfig';
 const URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
 const getDateTime = (fullDate: string) => {
     const [date, time] = fullDate.split('T')
-    return [date, time]
+    return [date, time.slice(0, 5)]
 }
 
 const getDiscoverCarsUser = async () => {
