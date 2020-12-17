@@ -37,7 +37,6 @@ export default async (params: any) => {
     <GetVehicles>
         <bcode>$BRO166</bcode>
         <vtype>1</vtype>
-        <ctype>5</ctype>
         <estmiles>10000</estmiles>
         <currency>${params?.POS?.Source?.ISOCurrency}</currency>
         <pickup>
@@ -64,7 +63,7 @@ export default async (params: any) => {
             VehAvailCore: [{
                 $: {
                     "VehID": "",
-                    "Deeplink": $VehAvail.deeplink[0].replace(/\s/g, "").replace(/[\\r]/g, "").replace(/[\\n]/g, ""),
+                    "Deeplink": $VehAvail.deeplink[0].replace(/\s/g, "").replace(/[\r]/g, "").replace(/[\n]/g, ""),
                     "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
                     "Supplier_Name": u.clientname,
                 },
