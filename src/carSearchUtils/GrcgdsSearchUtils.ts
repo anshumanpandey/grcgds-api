@@ -28,7 +28,7 @@ const generateXmlBody = (body: any) => {
     TimeStamp="2020-06-04T19:32:01" Target="Production" Version="1.002">
         <POS>
         <Source>
-            <RequestorID Type="5" ID="GRC-300000" RATEID="GRC-930001" RATETYPES=""/>
+            <RequestorID Type="5" ID="GRC-320000" RATEID="GRC-930001" RATETYPES=""/>
         </Source>
         </POS>
         <VehAvailRQCore Status="Available">
