@@ -19,7 +19,7 @@ routes.post('/', XmlMiddleware(), JwtMiddleware(),expressAsyncHandler(async (req
       //@ts-expect-error
       BuildXmlResponse(res,...r)
     } else if (req.body.OTA_VehAvailRateRQ) {
-      const r = await searchCars(req.body.OTA_VehAvailRateRQ)
+      const r = await searchCars(req.body.OTA_VehAvailRateRQ, req)
       //@ts-expect-error
       BuildXmlResponse(res,...r)
     } else if (req.body.OTA_VehResRQ) {

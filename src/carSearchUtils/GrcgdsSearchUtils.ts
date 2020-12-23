@@ -12,6 +12,17 @@ const getGrcgds = async () => {
     return r && r.length != 0 ? r[0] : null
 }
 
+const getDataUser = async (body: any, req: any) => {
+    const query = DB?.select()
+    .from("client_broker_locations_accountype")
+    .where("clientId",body.POS.Source.RequestorID.ID.slice(4,6))
+    .andWhere("description", "like", "%Mobile Rates%")
+
+    const r = await query
+    
+    return r && r.length != 0 ? r[0] : null
+}
+
 const generateXmlBody = (body: any) => {
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
     const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
@@ -28,7 +39,7 @@ const generateXmlBody = (body: any) => {
     TimeStamp="2020-06-04T19:32:01" Target="Production" Version="1.002">
         <POS>
         <Source>
-            <RequestorID Type="5" ID="GRC-320000" RATEID="GRC-930001" RATETYPES=""/>
+            <RequestorID Type="5" ID="GRC-320000" RATEID="GRC-${body?.account_code}" RATETYPES=""/>
         </Source>
         </POS>
         <VehAvailRQCore Status="Available">
@@ -49,10 +60,12 @@ const generateXmlBody = (body: any) => {
     </OTA_VehAvailRateRQ>`
 }
 
-export default async (body: any) => {
+export default async (body: any, req: any) => {
+
+    const t = await getDataUser(body, req);
 
     const grc = await getGrcgds()
-    const xml = generateXmlBody(body);
+    const xml = generateXmlBody({ ...body, account_code: t?.account_code});
 
     const { data } = await axios.post('https://www.grcgds.com/XML/', xml, {
         headers: {

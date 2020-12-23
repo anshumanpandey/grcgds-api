@@ -331,7 +331,7 @@ const schema = {
 const DATA_POPULATORS = new Map();
 DATA_POPULATORS.set(17, (body: any) => DiscoverCarsSearchUtil(body))
 
-export const searchCars = async (body: any) => {
+export const searchCars = async (body: any, req: any) => {
     const validator = validateFor(schema)
     validator(body)
 
@@ -343,7 +343,7 @@ export const searchCars = async (body: any) => {
         const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
 
         const services = [
-            GrcgdsSearchUtils(body),
+            GrcgdsSearchUtils(body, req),
             RightCarsSearchUtils(body),
             EasitentSearchUtil(body),
             RentitCarsSearchUtil(body),
