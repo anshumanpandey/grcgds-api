@@ -24,8 +24,8 @@ $paypalConfig = [
 $paypalUrl = $enableSandbox ? 'https://sandbox.paypal.com/cgi-bin/webscr' : 'https://www.paypal.com/cgi-bin/webscr';
 
 // Product being purchased.
-$itemName = 'Citroen C1';
-$itemAmount = 10.99;
+$itemName = 'Toyota Aygo';
+$itemAmount = 153.62;
 
 // Include Functions
 require 'functions.php';

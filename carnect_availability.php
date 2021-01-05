@@ -1,7 +1,7 @@
 <?php 
  //Data, connection, auth
  $dataFromTheForm = $_POST['fieldName']; // request data from the form
- $soapUrl = "https://ota2007a.carhire-solutions.com/service.asmx"; // asmx URL of WSDL
+ $soapUrl = "https://ota2007a.micronnexus-staging.com/service.asmx"; // asmx URL of WSDL
  $soapUser = "CarnectCom";  //  username
  $soapPassword = "2wRA771E"; // password
 
