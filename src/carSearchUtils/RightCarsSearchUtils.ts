@@ -61,6 +61,8 @@ const generateXmlBody = (body: any, id: string) => {
 `
 }
 
+export const RC_URL = 'https://ota.right-cars.com'
+
 export default async (body: any) => {
 
     const [rc, dataUsers] = await Promise.all([
@@ -70,7 +72,7 @@ export default async (body: any) => {
 
     const xml = generateXmlBody(body, "1000022");
 
-    const { data } = await axios.post('https://ota.right-cars.com', xml, {
+    const { data } = await axios.post(RC_URL, xml, {
         headers: {
             'Content-Type': 'text/plain; charset=UTF8',
         }

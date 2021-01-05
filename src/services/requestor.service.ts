@@ -1,5 +1,12 @@
 import { DB, getDbFor } from "../utils/DB"
 
+export const getGrcgdsClient = async ({ ClientId }: { ClientId: string }) => {
+    const r = await DB?.select()
+        .from("clients")
+        .where({ id: ClientId })
+    return r && r.length != 0 ? r[0] : null
+}
+
 export const getDataSuppliers = async ({ RequestorID }: { RequestorID: string }) => {
     const r = await DB?.select(["data_suppliers_user.clientId", "clients.clientname", "data_suppliers_user.account_code"])
         .from("data_suppliers_user")

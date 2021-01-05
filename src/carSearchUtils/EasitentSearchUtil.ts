@@ -2,7 +2,7 @@ import Axios from "axios"
 import { DB } from "../utils/DB"
 import { xmlToJson } from '../utils/XmlConfig';
 
-const URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
+export const EASIRENT_URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
 const getDateTime = (fullDate: string) => {
     const [date, time] = fullDate.split('T')
     return [date, time.slice(0, 5)]
@@ -52,7 +52,7 @@ export default async (params: any) => {
     </GetVehicles>`
 
     const [{ data }, u, ] = await Promise.all([
-        Axios.post(URL, body, {}),
+        Axios.post(EASIRENT_URL, body, {}),
         getDiscoverCarsUser()
     ])
 

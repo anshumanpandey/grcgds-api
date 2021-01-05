@@ -1,17 +1,17 @@
 import { validateFor } from '../utils/JsonValidator';
 import { ApiError } from '../utils/ApiError';
-import GrcgdsSearchUtils from '../carSearchUtils/GrcgdsSearchUtils';
-import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
+import GrcgdsSearchUtils, { GRCGDS_URL } from '../carSearchUtils/GrcgdsSearchUtils';
+import EasitentSearchUtil, { EASIRENT_URL } from '../carSearchUtils/EasitentSearchUtil';
 import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
 import MergeResults, { getUserOfResults, wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 import { GetSerchForClients } from '../utils/GetSerchForClients';
-import { getDataSuppliers } from '../services/requestor.service';
+import { getDataSuppliers, getDataUsersForUserId, getGrcgdsClient } from '../services/requestor.service';
 import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
 import { GetSearchServices } from '../utils/GetSearchServices';
-import RightCarsSearchUtils from '../carSearchUtils/RightCarsSearchUtils';
-import RentitCarsSearchUtil from '../carSearchUtils/RentitCarsSearchUtil';
+import RightCarsSearchUtils, { RC_URL } from '../carSearchUtils/RightCarsSearchUtils';
+import RentitCarsSearchUtil, { RENTI_URL } from '../carSearchUtils/RentitCarsSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -328,33 +328,39 @@ const schema = {
     "additionalProperties": true
 }
 
-const DATA_POPULATORS = new Map();
-DATA_POPULATORS.set(17, (body: any) => DiscoverCarsSearchUtil(body))
+const SUPORTED_URL = new Map();
+SUPORTED_URL.set(GRCGDS_URL, (body: any) => GrcgdsSearchUtils(body))
+SUPORTED_URL.set(RC_URL, (body: any) => RightCarsSearchUtils(body))
+SUPORTED_URL.set(EASIRENT_URL, (body: any) => EasitentSearchUtil(body))
+SUPORTED_URL.set(RENTI_URL, (body: any) => RentitCarsSearchUtil(body))
 
 export const searchCars = async (body: any, req: any) => {
     const validator = validateFor(schema)
     validator(body)
 
     const { CONTEXT, POS } = body
+    const clientId = body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4)
 
     try {
-        const suppliers = await getDataSuppliers({ RequestorID: body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) });
-        const searchServices = await GetSearchServices(body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4))
-        const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
+        const [grcgdsClient, suppliers, dataUsers, searchServices] = await Promise.all([
+            getGrcgdsClient({ ClientId: clientId }),
+            getDataSuppliers({ RequestorID: clientId }),
+            getDataUsersForUserId({ id: clientId }),
+            GetSearchServices(clientId)
+        ])
 
-        const services = [
-            GrcgdsSearchUtils(body, req),
-            RightCarsSearchUtils(body),
-            EasitentSearchUtil(body),
-            RentitCarsSearchUtil(body),
-            ...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)),
-        ]
+        const servicesToCall = []
 
-        if (sorted[0]?.clientId) {
-            services.push(DATA_POPULATORS.get(sorted[0].clientId)(body))
+        if (grcgdsClient) {
+            if (grcgdsClient.integrationEndpointUrl && SUPORTED_URL.has(grcgdsClient.integrationEndpointUrl)) {
+                servicesToCall.push(SUPORTED_URL.get(grcgdsClient.integrationEndpointUrl)(body))
+            }
         }
 
-        const [ fromGrcgds, ...r ] = await allSettled(services)
+        const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
+        servicesToCall.push(...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)))
+
+        const [ fromGrcgds, ...r ] = await allSettled(servicesToCall)
         .then((promises: any) => {
             return promises.filter((p: any) => p.status == "fulfilled")
         })

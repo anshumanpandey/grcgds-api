@@ -1,12 +1,15 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 
+const URL_PATH = "https://webapi.rent.it/api-ri/Quote/CreateAndLoad/"
+export const RENTI_URL = URL_PATH
+
 const getUrl = async (params: any) => {
     const [pickCode, dropCode ] = await Promise.all([
         getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
         getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
     ])
-    return `https://webapi.rent.it/api-ri/Quote/CreateAndLoad/?ClientId=35&APIKey=30995a94-bc9b-f1ba-b47e-21a0091c24c4&Language=GB&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=IT&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
+    return `${URL_PATH}?ClientId=35&APIKey=30995a94-bc9b-f1ba-b47e-21a0091c24c4&Language=GB&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=IT&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
 }
 
 
