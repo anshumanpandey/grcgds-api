@@ -1,6 +1,3 @@
 import * as pino from "pino"
-export const logger = pino.default({
-    enabled: process.env.DEV ? true : false
-}, pino.destination({
-    minLength: 0,
-}))
+
+export const logger = pino.default({ enabled: process.env.DEV ? true : false })

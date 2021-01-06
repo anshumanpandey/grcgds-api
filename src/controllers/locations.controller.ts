@@ -145,7 +145,7 @@ export const getLocations = async (body: any) => {
             }
         }
 
-        logger.debug(`Getting services from clients ${clientsToCall.join(",")}`)
+        logger.info(`Getting services from clients ${clientsToCall.join(",")}`)
         const firstResult = await getLocationsByClient({ whereFilters, clientId: clientsToCall })
 
         r = mergeSupplierLocations([firstResult, secondResult])
