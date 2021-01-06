@@ -3,6 +3,7 @@ import { getBrokersOwners, getDataSuppliers, getGrcgdsClient, SUPORTED_URL } fro
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { ApiError } from '../utils/ApiError';
 import { validateFor } from '../utils/JsonValidator';
+import { logger } from '../utils/Logger';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 
 const schema = {
@@ -144,6 +145,7 @@ export const getLocations = async (body: any) => {
             }
         }
 
+        logger.debug(`Getting services from clients ${clientsToCall.join(",")}`)
         const firstResult = await getLocationsByClient({ whereFilters, clientId: clientsToCall })
 
         r = mergeSupplierLocations([firstResult, secondResult])
