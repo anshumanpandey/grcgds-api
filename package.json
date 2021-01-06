@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "rm -rf dist/* && ./node_modules/.bin/tsc",
     "build": "./node_modules/.bin/tsc && cp -rf package.json dist/package.json",
-    "start": "ts-node ./src/index.ts | pino-tee info ./logs/info-logs.log > ./logs/all.log",
+    "start": "ts-node ./src/index.ts",
     "heroku-postbuild": "cd ./feedback-form && npm install && npm run build",
     "deploy": "./node_modules/.bin/tsc && cp -rf package.json dist/package.json",
     "postdeploy": "cd ./feedback-form && npm install && npm run build"
