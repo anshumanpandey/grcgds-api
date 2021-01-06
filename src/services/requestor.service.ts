@@ -1,3 +1,7 @@
+import EasitentSearchUtil, { EASIRENT_URL } from "../carSearchUtils/EasitentSearchUtil"
+import GrcgdsSearchUtils, { GRCGDS_URL } from "../carSearchUtils/GrcgdsSearchUtils"
+import RentitCarsSearchUtil, { RENTI_URL } from "../carSearchUtils/RentitCarsSearchUtil"
+import RightCarsSearchUtils, { RC_URL } from "../carSearchUtils/RightCarsSearchUtils"
 import { DB, getDbFor } from "../utils/DB"
 
 export const getGrcgdsClient = async ({ ClientId }: { ClientId: string }) => {
@@ -60,3 +64,9 @@ export const getHannkUserByEmail = async ({ email }: { email: string }) => {
 
     return r.length != 0 ? r[0] : null
 }
+
+export const SUPORTED_URL = new Map();
+SUPORTED_URL.set(GRCGDS_URL, (body: any) => GrcgdsSearchUtils(body))
+SUPORTED_URL.set(RC_URL, (body: any) => RightCarsSearchUtils(body))
+SUPORTED_URL.set(EASIRENT_URL, (body: any) => EasitentSearchUtil(body))
+SUPORTED_URL.set(RENTI_URL, (body: any) => RentitCarsSearchUtil(body))

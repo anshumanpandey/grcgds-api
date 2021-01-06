@@ -1,17 +1,15 @@
 import { validateFor } from '../utils/JsonValidator';
 import { ApiError } from '../utils/ApiError';
-import GrcgdsSearchUtils, { GRCGDS_URL } from '../carSearchUtils/GrcgdsSearchUtils';
-import EasitentSearchUtil, { EASIRENT_URL } from '../carSearchUtils/EasitentSearchUtil';
-import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
-import MergeResults, { getUserOfResults, wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
+import { wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 import { GetSerchForClients } from '../utils/GetSerchForClients';
-import { getDataSuppliers, getDataUsersForUserId, getGrcgdsClient } from '../services/requestor.service';
+import { getBrokersOwners, getDataSuppliers, getDataUsersForUserId, getGrcgdsClient, SUPORTED_URL } from '../services/requestor.service';
 import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
 import { GetSearchServices } from '../utils/GetSearchServices';
 import RightCarsSearchUtils, { RC_URL } from '../carSearchUtils/RightCarsSearchUtils';
 import RentitCarsSearchUtil, { RENTI_URL } from '../carSearchUtils/RentitCarsSearchUtil';
+import SurpriceCarsSearchUtil from '../carSearchUtils/SurpriceCarsSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -328,11 +326,11 @@ const schema = {
     "additionalProperties": true
 }
 
-const SUPORTED_URL = new Map();
-SUPORTED_URL.set(GRCGDS_URL, (body: any) => GrcgdsSearchUtils(body))
-SUPORTED_URL.set(RC_URL, (body: any) => RightCarsSearchUtils(body))
-SUPORTED_URL.set(EASIRENT_URL, (body: any) => EasitentSearchUtil(body))
-SUPORTED_URL.set(RENTI_URL, (body: any) => RentitCarsSearchUtil(body))
+const SUPORTED_CLIENT_SERVICES = new Map();
+SUPORTED_CLIENT_SERVICES.set(1, (body: any) => RightCarsSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(11, (body: any) => RentitCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(37, (body: any) => SurpriceCarsSearchUtil(body))
+
 
 export const searchCars = async (body: any, req: any) => {
     const validator = validateFor(schema)
@@ -342,11 +340,12 @@ export const searchCars = async (body: any, req: any) => {
     const clientId = body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4)
 
     try {
-        const [grcgdsClient, suppliers, dataUsers, searchServices] = await Promise.all([
+        const [grcgdsClient, searchServices, brokerOwners,/*suppliers, dataUsers*/] = await Promise.all([
             getGrcgdsClient({ ClientId: clientId }),
-            getDataSuppliers({ RequestorID: clientId }),
-            getDataUsersForUserId({ id: clientId }),
-            GetSearchServices(clientId)
+            GetSearchServices(clientId),
+            getBrokersOwners({ RequestorID: clientId })
+            //getDataSuppliers({ RequestorID: clientId }),
+            //getDataUsersForUserId({ id: clientId }),
         ])
 
         const servicesToCall = []
@@ -354,6 +353,11 @@ export const searchCars = async (body: any, req: any) => {
         if (grcgdsClient) {
             if (grcgdsClient.integrationEndpointUrl && SUPORTED_URL.has(grcgdsClient.integrationEndpointUrl)) {
                 servicesToCall.push(SUPORTED_URL.get(grcgdsClient.integrationEndpointUrl)(body))
+            } else {
+                const servicesToAdd = Array.from(SUPORTED_CLIENT_SERVICES.entries())
+                .filter(entry => brokerOwners.find(brokerOwner => brokerOwner.id == entry[0]))
+                .map(entry => entry[1]);
+                servicesToCall.push(...servicesToAdd.map(service => service(body)))
             }
         }
 
