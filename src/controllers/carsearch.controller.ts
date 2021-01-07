@@ -348,7 +348,7 @@ export const searchCars = async (body: any, req: any) => {
             //getDataUsersForUserId({ id: clientId }),
         ])
 
-        const servicesToCall = []
+    const servicesToCall = []
 
         if (grcgdsClient) {
             if (grcgdsClient.integrationEndpointUrl && SUPORTED_URL.has(grcgdsClient.integrationEndpointUrl)) {
