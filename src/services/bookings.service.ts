@@ -1,7 +1,9 @@
 import { DB, getDbFor } from "../utils/DB";
+import { logger } from "../utils/Logger";
 import { getCompanyLocations, getGrcgsCode, getGrcgsCodes } from "./locations.service";
 
 export const getBookings = async () => {
+    logger.info("Getting bookings")
     const [r, extras ] = await Promise.all([
         DB?.select().from("Bookings").whereNot('customerId', null),
         DB?.select().from("BookingsExtras")
@@ -34,6 +36,7 @@ export const cancelBookingByResNumber = async (resNumber: string) => {
 }
 
 export const createBookingsXmlResponse = async (bookings: any[]) => {
+    logger.info('Creating booking response')
     const codes = await getCompanyLocations()
     return `
     <?xml version="1.0"?>
