@@ -1,6 +1,7 @@
 const requestIp = require('request-ip');
 import express from 'express';
 import { DB, getDbFor } from '../utils/DB';
+import { logger } from './Logger';
 const md5 = require('md5');
 
 export default () => {
@@ -25,6 +26,7 @@ export default () => {
         DB?.select().where('pall', md5(ip)).table("white")
             .then((r) => {
                 if (r.length == 0) {
+                    logger.info("Whitelisted IP found!")
                     return getDbFor("grcgds_gateway_db")?.select()
                         .from("api_key")
                         .where({
@@ -37,8 +39,10 @@ export default () => {
             })
             .then((r) => {
                 if (r && r.length != 0) {
+                    logger.info(`VALID API KEY ${pos.Source.ApiKey}!`)
                     n();
                 } else {
+                    logger.info(`INVALID API KEY ${pos.Source.ApiKey}!`)
                     n({ name: "UnauthorizedError" });
                 }
             })
