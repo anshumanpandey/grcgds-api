@@ -8,6 +8,7 @@ import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXm
 import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
+import { logger } from '../utils/Logger';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1190,6 +1191,7 @@ export const searchBookings = async (body: any) => {
         const xml = await createBookingsXmlResponse(await getBookings())
         const response = await xmlToJson(xml)
 
+        logger.info("Sending OTA_VehRetResRQ response")
         return [
             response.OTA_VehRetResRS,
             200,
