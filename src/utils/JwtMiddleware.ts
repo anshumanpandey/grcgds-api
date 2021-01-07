@@ -38,7 +38,7 @@ export default () => {
                 if (r && r.length != 0) {
                     n();
                 } else {
-                    n({ name: "RequestorIDError" });
+                    n({ name: "UnauthorizedError" });
                 }
             })
             .catch((err) => {
