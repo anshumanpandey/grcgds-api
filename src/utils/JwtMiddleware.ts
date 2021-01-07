@@ -32,6 +32,7 @@ export default () => {
                         })
                 } else {
                     n();
+                    return [1]
                 }
             })
             .then((r) => {
