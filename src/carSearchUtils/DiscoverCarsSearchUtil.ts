@@ -88,11 +88,13 @@ export default async (params: any) => {
                 "VehicleCharge": {
                     "CurrencyCode": $VehAvail["Currency"],
                 },
-                "TotalCharge": [{
-                    $: {
-                        "RateTotalAmount": Number($VehAvail["Price"]).toFixed(2),
+                "TotalCharges": [{
+                    "TotalCharge": [{
+                        $: {
+                            "RateTotalAmount": Number($VehAvail["Price"]).toFixed(2),
                         "CurrencyCode": $VehAvail["Currency"],
-                    }
+                        }
+                    }]
                 }],
                 "PricedEquips": $VehAvail.OptionalEquipmentList.map((equip: any) => {
                     return {
