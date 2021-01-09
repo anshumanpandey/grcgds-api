@@ -26,7 +26,7 @@ export default () => {
         DB?.select().where('pall', md5(ip)).table("white")
             .then((r) => {
                 if (r.length == 0) {
-                    logger.info("Whitelisted IP found!")
+                    logger.info("Whitelisted IP NOT found!")
                     return getDbFor("grcgds_gateway_db")?.select()
                         .from("api_key")
                         .where({

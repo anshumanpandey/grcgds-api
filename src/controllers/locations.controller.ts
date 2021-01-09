@@ -2,6 +2,7 @@ import { getAllLocations, getGrcgdsLocations, getLocationsByClient, mergeSupplie
 import { getBrokersOwners, getDataSuppliers, getGrcgdsClient, SUPORTED_URL } from '../services/requestor.service';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { ApiError } from '../utils/ApiError';
+import { GetSearchServices } from '../utils/GetSearchServices';
 import { validateFor } from '../utils/JsonValidator';
 import { logger } from '../utils/Logger';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
@@ -117,30 +118,28 @@ export const getLocations = async (body: any) => {
         const clientsToCall = []
         let secondResult = []
 
-        if (grcgdsClient) {
-            if (grcgdsClient.integrationEndpointUrl && SUPORTED_URL.has(grcgdsClient.integrationEndpointUrl)) {
-                clientsToCall.push(grcgdsClient.id)
-            } else {
-                const [requestorDataSuppliers, ownersOfCurrentBroker] = await Promise.all([
-                    getDataSuppliers({ RequestorID: ClientId }),
-                    getBrokersOwners({ RequestorID: ClientId }),
-                ])
-        
-                if (requestorDataSuppliers.length == 0 && ownersOfCurrentBroker.length == 0) {
-                    throw new ApiError("No suppliers have been setup.")
-                }           
-                
-                clientsToCall.push(...requestorDataSuppliers.map(r => r.clientId))
+        if (grcgdsClient && grcgdsClient.integrationEndpointUrl && SUPORTED_URL.has(grcgdsClient.integrationEndpointUrl)) {
+            clientsToCall.push(grcgdsClient.id)
+        } else {
+            const [requestorDataSuppliers, ownersOfCurrentBroker] = await Promise.all([
+                getDataSuppliers({ RequestorID: ClientId }),
+                getBrokersOwners({ RequestorID: ClientId }),
+            ])
+    
+            if (requestorDataSuppliers.length == 0 && ownersOfCurrentBroker.length == 0) {
+                throw new ApiError("No suppliers have been setup.")
+            }           
+            
+            clientsToCall.push(...requestorDataSuppliers.map(r => r.clientId))
 
-                if (ownersOfCurrentBroker.length != 0) {
-                    const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
-                    for (const record of orderedSuppliers) {
-                        const results = await getLocationsByClient({ whereFilters, clientId: [record.id] })
-                        if (results.length == 0) continue;
-                        secondResult = results
-                        await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
-                        break;
-                    }
+            if (ownersOfCurrentBroker.length != 0) {
+                const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
+                for (const record of orderedSuppliers) {
+                    const results = await getLocationsByClient({ whereFilters, clientId: [record.id] })
+                    if (results.length == 0) continue;
+                    secondResult = results
+                    await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
+                    break;
                 }
             }
         }
