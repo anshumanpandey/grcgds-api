@@ -2,6 +2,7 @@ import EasitentSearchUtil, { EASIRENT_URL } from "../carSearchUtils/EasitentSear
 import GrcgdsSearchUtils, { GRCGDS_URL } from "../carSearchUtils/GrcgdsSearchUtils"
 import RentitCarsSearchUtil, { RENTI_URL } from "../carSearchUtils/RentitCarsSearchUtil"
 import RightCarsSearchUtils, { RC_URL } from "../carSearchUtils/RightCarsSearchUtils"
+import UnitedCarsSearchUtil, { UNITEDCAR_URL } from "../carSearchUtils/UnitedCarsSearchUtil"
 import { DB, getDbFor } from "../utils/DB"
 
 export const getGrcgdsClient = async ({ ClientId }: { ClientId: string }) => {
@@ -70,3 +71,4 @@ SUPORTED_URL.set(GRCGDS_URL, (body: any) => GrcgdsSearchUtils(body))
 SUPORTED_URL.set(RC_URL, (body: any) => RightCarsSearchUtils(body))
 SUPORTED_URL.set(EASIRENT_URL, (body: any) => EasitentSearchUtil(body))
 SUPORTED_URL.set(RENTI_URL, (body: any) => RentitCarsSearchUtil(body))
+SUPORTED_URL.set(UNITEDCAR_URL, (body: any) => UnitedCarsSearchUtil(body))

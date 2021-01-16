@@ -10,6 +10,7 @@ import { GetSearchServices } from '../utils/GetSearchServices';
 import RightCarsSearchUtils, { RC_URL } from '../carSearchUtils/RightCarsSearchUtils';
 import RentitCarsSearchUtil, { RENTI_URL } from '../carSearchUtils/RentitCarsSearchUtil';
 import SurpriceCarsSearchUtil from '../carSearchUtils/SurpriceCarsSearchUtil';
+import UnitedCarsSearchUtil from '../carSearchUtils/UnitedCarsSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -330,6 +331,7 @@ const SUPORTED_CLIENT_SERVICES = new Map();
 SUPORTED_CLIENT_SERVICES.set(1, (body: any) => RightCarsSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(11, (body: any) => RentitCarsSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(37, (body: any) => SurpriceCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(58, (body: any) => UnitedCarsSearchUtil(body))
 
 
 export const searchCars = async (body: any, req: any) => {
@@ -364,7 +366,7 @@ export const searchCars = async (body: any, req: any) => {
         const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
         servicesToCall.push(...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)))
 
-        const [ fromGrcgds, ...r ] = await allSettled(servicesToCall)
+        const [ fromGrcgds = [], ...r ] = await allSettled(servicesToCall)
         .then((promises: any) => {
             return promises.filter((p: any) => p.status == "fulfilled")
         })
