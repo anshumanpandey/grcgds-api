@@ -2,10 +2,17 @@ import { DB, getDbFor } from "../utils/DB";
 import { logger } from "../utils/Logger";
 import { getCompanyLocations, getGrcgsCode, getGrcgsCodes } from "./locations.service";
 
-export const getBookings = async () => {
+type GetBookingsParams = { RequestorIDs? : string[] }
+export const getBookings = async ({ RequestorIDs = [] }: GetBookingsParams ) => {
     logger.info("Getting bookings")
+    const getBookingQuery = DB?.select().from("Bookings").whereNot('customerId', null)
+    if (RequestorIDs && RequestorIDs.length != 0) {
+        RequestorIDs.forEach(id => {
+            getBookingQuery?.where("requestorId", id)
+        })
+    }
     const [r, extras ] = await Promise.all([
-        DB?.select().from("Bookings").whereNot('customerId', null),
+        getBookingQuery,
         DB?.select().from("BookingsExtras")
     ]);
 

@@ -40,10 +40,10 @@ export default async (body: any) => {
             <req:CreateReserveRequest>
                 <ReserveId>${resNumber}</ReserveId>
                 <ClientName>Hannk</ClientName>
-                <PickUpOfficeId>${pickupCode.internal_code}</PickUpOfficeId>
+                <PickUpOfficeId>${pickupCode}</PickUpOfficeId>
                 <PickUpDate>${pickupDate}</PickUpDate>
                 <PickUpTime>${pickupTime.slice(0,5)}</PickUpTime>
-                <DropOffOfficeId>${dropoffCode.internal_code}</DropOffOfficeId>
+                <DropOffOfficeId>${dropoffCode}</DropOffOfficeId>
                 <DropOffDate>${dropoffDate}</DropOffDate>
                 <DropOffTime>${dropoffTime.slice(0,5)}</DropOffTime>
                 <CarTypeId>${VehPref.Acriss}</CarTypeId>

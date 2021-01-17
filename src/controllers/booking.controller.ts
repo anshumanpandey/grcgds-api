@@ -1109,11 +1109,11 @@ export const createBooking = async (body: any) => {
 export const searchBookings = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
-    const { POS: { Source: { RequestorID } } } = body
+    const { CONTEXT: { Filter = [] } } = body
 
     try {
 
-        const xml = await createBookingsXmlResponse(await getBookings())
+        const xml = await createBookingsXmlResponse(await getBookings({ RequestorIDs: Filter.map((f: any) => f.content) }))
         const response = await xmlToJson(xml)
 
         logger.info("Sending OTA_VehRetResRQ response")
