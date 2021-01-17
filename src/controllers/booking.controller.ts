@@ -321,7 +321,6 @@ const schema = {
                 "Customer",
                 "VendorPref",
                 "VehPref",
-                "SpecialEquipPrefs",
                 "PromoDesc"
             ],
             "properties": {
