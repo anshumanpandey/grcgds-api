@@ -781,7 +781,6 @@ const schema = {
                         }
                     ],
                     "required": [
-                        "SpecialEquipPref"
                     ],
                     "properties": {
                         "SpecialEquipPref": {
