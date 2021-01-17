@@ -8,6 +8,7 @@ import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXm
 import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
+import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
 import { logger } from '../utils/Logger';
 const allSettled = require('promise.allsettled');
 
@@ -1162,6 +1163,8 @@ export const createBooking = async (body: any) => {
 
         if (CONTEXT.Filter.content == "GRC-170000") {
             json = await DiscoverCarsBooking(body)
+        } else if (CONTEXT.Filter.content == "GRC-580000") {
+            json = await UnitedCarsBooking(body)
         } else {
             json = await GrcgdsXmlBooking(body)
         }
@@ -1213,12 +1216,13 @@ export const cancelBooking = async (body: any) => {
     const { VehCancelRQCore, POS: { Source: { RequestorID } } } = body
 
     const supportedServices = [
-        cancelGrcBooking
+        cancelGrcBooking,
+        cancelUnitedCarBooking
     ];
 
     try {
 
-        let xml = null;
+        let json = null;
 
         await allSettled(supportedServices.map(s => s(body)))
             .then((promises: any) => {
@@ -1228,18 +1232,26 @@ export const cancelBooking = async (body: any) => {
                 return cancelBookingByResNumber(VehCancelRQCore.ResNumber.Number)
             })
             .then(() => {
-                xml = `<OTA_VehCancelRS xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehCancelRS.xsd" Version="2.001">
+                json = {
+                    VehRetResRSCore: {
+                        VehReservation: {
+                            Status: "Cancelled",
+                            Resnumber: VehCancelRQCore.ResNumber.Number,
+                        }
+                    }
+                }
+                /*`<OTA_VehCancelRS xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehCancelRS.xsd" Version="2.001">
                     <VehRetResRSCore>
                     <VehReservation>
                         <Status>Cancelled</Status>
                         <Resnumber>${VehCancelRQCore.ResNumber.Number}</Resnumber>
                     </VehReservation>
                     </VehRetResRSCore>
-                </OTA_VehCancelRS>`
+                </OTA_VehCancelRS>`*/
             })
 
         return [
-            xml,
+            json,
             200,
             "OTA_VehCancelRS",
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }

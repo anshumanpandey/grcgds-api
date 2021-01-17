@@ -85,6 +85,7 @@ export default async (params: any) => {
                     }],
                     "VehType": [{
                         $: {
+                            "RateId": $VehAvail.rateId[0],
                             "VehicleCategory": $VehAvail.carTypeId[0],
                             "DoorCount": $VehAvail.carTypeFeatures[0]?.doorsNumber?.[0] || 0,
                             //we need baggage property
