@@ -14,7 +14,7 @@ const allSettled = require('promise.allsettled');
 
 const schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "OTA_VehResRQReq",
+    "$id": "http://example.com/example.json",
     "type": "object",
     "title": "The root schema",
     "description": "The root schema comprises the entire JSON document.",
@@ -74,16 +74,7 @@ const schema = {
                     "price": ""
                 },
                 "SpecialEquipPrefs": {
-                    "SpecialEquipPref": [
-                        {
-                            "vendorEquipID": "BSIT",
-                            "Quantity": "2"
-                        },
-                        {
-                            "vendorEquipID": "GPS",
-                            "Quantity": "1"
-                        }
-                    ]
+                    "SpecialEquipPref": []
                 },
                 "PromoDesc": ""
             },
@@ -256,10 +247,8 @@ const schema = {
         },
         "VehResRQCore": {
             "$id": "#/properties/VehResRQCore",
-            "type": "object",
-            "title": "The VehResRQCore schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": {},
+            "description": "An explanation about the purpose of this instance.",
             "examples": [
                 {
                     "VehRentalCore": {
@@ -302,16 +291,7 @@ const schema = {
                         "price": ""
                     },
                     "SpecialEquipPrefs": {
-                        "SpecialEquipPref": [
-                            {
-                                "vendorEquipID": "BSIT",
-                                "Quantity": "2"
-                            },
-                            {
-                                "vendorEquipID": "GPS",
-                                "Quantity": "1"
-                            }
-                        ]
+                        "SpecialEquipPref": []
                     },
                     "PromoDesc": ""
                 }
@@ -323,6 +303,8 @@ const schema = {
                 "VehPref",
                 "PromoDesc"
             ],
+            "title": "The VehResRQCore schema",
+            "type": "object",
             "properties": {
                 "VehRentalCore": {
                     "$id": "#/properties/VehResRQCore/properties/VehRentalCore",
@@ -762,25 +744,20 @@ const schema = {
                 },
                 "SpecialEquipPrefs": {
                     "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs",
-                    "type": "object",
-                    "title": "The SpecialEquipPrefs schema",
-                    "description": "An explanation about the purpose of this instance.",
                     "default": {},
+                    "description": "An explanation about the purpose of this instance.",
                     "examples": [
                         {
-                            "SpecialEquipPref": [
-                                {
-                                    "vendorEquipID": "BSIT",
-                                    "Quantity": "2"
-                                },
-                                {
-                                    "vendorEquipID": "GPS",
-                                    "Quantity": "1"
-                                }
-                            ]
+                            "SpecialEquipPref": []
                         }
                     ],
                     "required": [
+                        ""
+                    ],
+                    "title": "The SpecialEquipPrefs schema",
+                    "type": [
+                        "object",
+                        "string"
                     ],
                     "properties": {
                         "SpecialEquipPref": {
@@ -790,62 +767,11 @@ const schema = {
                             "description": "An explanation about the purpose of this instance.",
                             "default": [],
                             "examples": [
-                                [
-                                    {
-                                        "vendorEquipID": "BSIT",
-                                        "Quantity": "2"
-                                    },
-                                    {
-                                        "vendorEquipID": "GPS",
-                                        "Quantity": "1"
-                                    }
-                                ]
+                                []
                             ],
                             "additionalItems": true,
                             "items": {
-                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items",
-                                "anyOf": [
-                                    {
-                                        "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0",
-                                        "type": "object",
-                                        "title": "The first anyOf schema",
-                                        "description": "An explanation about the purpose of this instance.",
-                                        "default": {},
-                                        "examples": [
-                                            {
-                                                "vendorEquipID": "BSIT",
-                                                "Quantity": "2"
-                                            }
-                                        ],
-                                        "required": [
-                                            "vendorEquipID",
-                                            "Quantity"
-                                        ],
-                                        "properties": {
-                                            "vendorEquipID": {
-                                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0/properties/vendorEquipID",
-                                                "type": "string",
-                                                "title": "The vendorEquipID schema",
-                                                "description": "An explanation about the purpose of this instance.",
-                                                "default": "",
-                                                "examples": [
-                                                    "BSIT"
-                                                ]
-                                            },
-                                            "Quantity": {
-                                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0/properties/Quantity",
-                                                "type": "string",
-                                                "title": "The Quantity schema",
-                                                "description": "An explanation about the purpose of this instance.",
-                                                "default": "",
-                                                "examples": [
-                                                    "2"
-                                                ]
-                                            }
-                                        },
-                                        "additionalProperties": true
-                                    }
-                                ]
+                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items"
                             }
                         }
                     },
@@ -1042,25 +968,23 @@ const schema = {
                                 },
                                 "AmountPaid": {
                                     "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/AmountPaid",
-                                    "default": "",
+                                    "type": "string",
+                                    "title": "The AmountPaid schema",
                                     "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
                                     "examples": [
                                         ""
-                                    ],
-                                    "title": "The AmountPaid schema",
-                                    "minLength": 1,
-                                    "type": "string"
+                                    ]
                                 },
                                 "CurrencyUsed": {
                                     "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/CurrencyUsed",
-                                    "default": "",
+                                    "type": "string",
+                                    "title": "The CurrencyUsed schema",
                                     "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
                                     "examples": [
                                         ""
-                                    ],
-                                    "title": "The CurrencyUsed schema",
-                                    "minLength": 1,
-                                    "type": "string"
+                                    ]
                                 }
                             },
                             "additionalProperties": true
