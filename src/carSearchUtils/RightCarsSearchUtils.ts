@@ -34,7 +34,7 @@ const generateXmlBody = (body: any, id: string) => {
     <OTA_VehAvailRateRQDeep xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2010-11-12T11:00:00" Target="Test" Version="1.002">
     <POS>
         <Source>
-            <RequestorID Type="5" ID="${id}"/>
+            <RequestorID Type="5" ID="Mobile001"/>
         </Source>
     </POS>
     <VehAvailRQCore Status="Available">
