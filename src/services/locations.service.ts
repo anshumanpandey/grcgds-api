@@ -1,8 +1,8 @@
 import { DB } from "../utils/DB"
 
 export type whereFilter = {'columnName': string, op: string, val: string}
-export const getLocationsByClient = async ({ clientId, whereFilters }: { clientId: string[], whereFilters?: whereFilter[] }) => {
-    return getAllLocations({clientId, whereFilters})
+export const getLocationsByClient = async ({ clientId, whereFilters, orWhereFilters }: { clientId: string[], whereFilters?: whereFilter[], orWhereFilters?: whereFilter[]}) => {
+    return getAllLocations({clientId, whereFilters, orWhereFilters })
 }
 
 export const mergeSupplierLocations = (locations: any[][]) => {

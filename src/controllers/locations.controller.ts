@@ -119,7 +119,7 @@ export const getLocations = async (body: any) => {
             throw new ApiError("No suppliers have been setup.")
         }
 
-        const firstResult = await getLocationsByClient({ whereFilters, clientId: requestorDataSuppliers.map(r => r.clientId) })
+        const firstResult = await getLocationsByClient({ whereFilters, orWhereFilters ,clientId: requestorDataSuppliers.map(r => r.clientId) })
 
         let secondResult = []
 
