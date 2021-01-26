@@ -11,6 +11,9 @@ import RightCarsSearchUtils, { RC_URL } from '../carSearchUtils/RightCarsSearchU
 import RentitCarsSearchUtil, { RENTI_URL } from '../carSearchUtils/RentitCarsSearchUtil';
 import SurpriceCarsSearchUtil from '../carSearchUtils/SurpriceCarsSearchUtil';
 import UnitedCarsSearchUtil from '../carSearchUtils/UnitedCarsSearchUtil';
+import LocalcarsSearchUtils from '../carSearchUtils/LocalcarsSearchUtils';
+import ZezgoCarsSearchUtils from '../carSearchUtils/ZezgoCarsSearchUtils';
+import RetajSearchUtils from '../carSearchUtils/RetajSearchUtils';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -332,6 +335,9 @@ SUPORTED_CLIENT_SERVICES.set(1, (body: any) => RightCarsSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(11, (body: any) => RentitCarsSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(37, (body: any) => SurpriceCarsSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(58, (body: any) => UnitedCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(32, (body: any) => LocalcarsSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(10, (body: any) => ZezgoCarsSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(36, (body: any) => RetajSearchUtils(body))
 
 
 export const searchCars = async (body: any, req: any) => {
