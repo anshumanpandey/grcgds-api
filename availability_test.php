@@ -7,11 +7,11 @@ xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRQ.xsd
 TimeStamp="2020-06-04T19:32:01" Target="Production" Version="1.002">
 <POS>
 <Source>
-<RequestorID Type="5" ID="GRC-300000" RATEID="GRC-930001" RATETYPES=""/>
+<RequestorID Type="5" ID="GRC-470000" RATEID="GRC-930005" RATETYPES=""/>
 </Source>
 </POS>
 <VehAvailRQCore Status="Available">
-<VehRentalCore PickUpDateTime="2020-12-18T12:00:00" ReturnDateTime="2020-12-20T10:00:00">
+<VehRentalCore PickUpDateTime="2021-02-18T12:00:00" ReturnDateTime="2021-02-20T10:00:00">
 <PickUpLocation LocationCode="AMMA01" />
 <ReturnLocation LocationCode="AMMA01" />
 </VehRentalCore>
@@ -28,7 +28,7 @@ TimeStamp="2020-06-04T19:32:01" Target="Production" Version="1.002">
 
 //var_dump($url);
 
-$gg="https://www.grcgds.com/XML/";
+$gg="https://grcgds.com/XML/";
 
 $ch = curl_init();    // initialize curl handle
 curl_setopt($ch, CURLOPT_URL,$gg); // set url to post to

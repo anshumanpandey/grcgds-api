@@ -12,6 +12,9 @@ import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
 import { GetSearchServices } from '../utils/GetSearchServices';
 import RightCarsSearchUtils from '../carSearchUtils/RightCarsSearchUtils';
 import RentitCarsSearchUtil from '../carSearchUtils/RentitCarsSearchUtil';
+import RetajSearchUtils from '../carSearchUtils/RetajSearchUtils';
+import ZezgoCarsSearchUtils from '../carSearchUtils/ZezgoCarsSearchUtils';
+import LocalcarsSearchUtils from '../carSearchUtils/LocalcarsSearchUtils';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -347,6 +350,9 @@ export const searchCars = async (body: any, req: any) => {
             RightCarsSearchUtils(body),
             EasitentSearchUtil(body),
             RentitCarsSearchUtil(body),
+            RetajSearchUtils(body),
+            ZezgoCarsSearchUtils(body),
+            LocalcarsSearchUtils(body),
             ...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)),
         ]
 
