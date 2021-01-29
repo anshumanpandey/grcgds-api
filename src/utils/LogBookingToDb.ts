@@ -1,3 +1,4 @@
+import { getGrcgdsLocations } from "../services/locations.service"
 import { DB } from "./DB"
 import { logger } from "./Logger"
 
@@ -30,12 +31,18 @@ export default async ({
     extras,
     hannkUser
 }: Params) => {
+    const [pickupFullAddress, dropoffFullAddress] = await Promise.all([
+        getGrcgdsLocations({ whereFilters: [{ columnName: 'internalcode', op: '=', val: pickLocation }]}),
+        getGrcgdsLocations({ whereFilters: [{ columnName: 'internalcode', op: '=', val: dropLocation }]}),
+    ])
     const toInsert = {
         pickupDate,
         pickupTime,
         dropoffDate,
         dropoffTime,
         pickLocation,
+        pickupFullAddress: pickupFullAddress[0],
+        dropoffFullAddress: dropoffFullAddress[0],
         dropoffLocation: dropLocation,
         requestorId: POS.Source.RequestorID.ID,
         requestBody: xml,
