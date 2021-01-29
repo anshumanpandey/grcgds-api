@@ -1,11 +1,18 @@
 import { DB, getDbFor } from "../utils/DB";
 import { logger } from "../utils/Logger";
 import { getCompanyLocations } from "./locations.service";
+import { getHannkUserByEmail } from "./requestor.service";
 
-type GetBookingsParams = { RequestorIDs? : string[] }
-export const getBookings = async ({ RequestorIDs = [] }: GetBookingsParams ) => {
+type GetBookingsParams = { RequestorIDs? : string[], appUserEmail?: string }
+export const getBookings = async ({ RequestorIDs = [], appUserEmail }: GetBookingsParams ) => {
     logger.info("Getting bookings")
     const getBookingQuery = DB?.select().from("Bookings").whereNot('customerId', null)
+    if (appUserEmail) {
+        const hannkUser = await getHannkUserByEmail({ email: appUserEmail })
+        if (hannkUser) {
+            getBookingQuery?.where("customerId", hannkUser.id)
+        }
+    }
     if (RequestorIDs && RequestorIDs.length != 0) {
         getBookingQuery?.andWhere(function() {
             RequestorIDs.forEach(id => {

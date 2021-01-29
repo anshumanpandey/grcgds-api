@@ -1109,13 +1109,13 @@ export const createBooking = async (body: any) => {
 export const searchBookings = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
-    const { CONTEXT: { Filter = [] } } = body
+    const { VehRetResRQCore: { Email }, CONTEXT: { Filter = [] } } = body
 
     try {
 
         const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
 
-        const bookings = await getBookings({ RequestorIDs })
+        const bookings = await getBookings({ RequestorIDs, appUserEmail: Email })
         const xml = await createBookingsXmlResponse(bookings)
         const response = await xmlToJson(xml)
 
