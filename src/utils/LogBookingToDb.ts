@@ -1,4 +1,5 @@
 import { DB } from "./DB"
+import { logger } from "./Logger"
 
 type Params = {
     pickupDate: string,
@@ -44,6 +45,11 @@ export default async ({
         updatedAt: new Date(),
         customerId : hannkUser?.id
     }
+    logger.info("Login booking to DB", toInsert)
+    if (hannkUser) {
+        logger.info("For mobile app user", hannkUser)
+    }
+
 
     await DB?.insert(toInsert).into('Bookings')
     const bookings = await DB?.select(DB?.raw('LAST_INSERT_ID()'))

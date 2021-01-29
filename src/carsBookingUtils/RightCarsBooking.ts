@@ -5,6 +5,7 @@ import { DB } from '../utils/DB';
 import { ApiError } from "../utils/ApiError";
 import LogBookingToDb from "../utils/LogBookingToDb";
 import { logger } from "../utils/Logger";
+import { getHannkUserByEmail } from "../services/requestor.service";
 
 export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
@@ -86,6 +87,8 @@ export default async (body: any) => {
         POS,
         xml,
         grcgdsClient: "1",
+        hannkUser: await getHannkUserByEmail({ email: Email }),
+        extras: [],
         resNumber: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
     }
 
