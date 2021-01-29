@@ -45,9 +45,9 @@ export default async ({
         updatedAt: new Date(),
         customerId : hannkUser?.id
     }
-    logger.info("Login booking to DB", toInsert)
+    logger.info(`Login booking to DB ${JSON.stringify(toInsert)}`)
     if (hannkUser) {
-        logger.info("For mobile app user", hannkUser)
+        logger.info(`For mobile app user ${JSON.stringify(hannkUser)}`)
     }
 
 
