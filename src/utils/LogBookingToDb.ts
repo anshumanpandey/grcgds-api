@@ -43,7 +43,7 @@ export default async ({
         dropoffDate,
         dropoffTime,
         pickLocation,
-        price,
+        carPrice: price,
         pickupFullAddress: pickupFullAddress[0].locationname,
         dropoffFullAddress: dropoffFullAddress[0].locationname,
         dropoffLocation: dropLocation,
