@@ -86,6 +86,7 @@ export default async (body: any) => {
         dropLocation,
         POS,
         xml,
+        price: RentalPaymentPref.Voucher.PaymentCard.AmountPaid,
         grcgdsClient: "1",
         hannkUser: await getHannkUserByEmail({ email: Email }),
         extras: [],

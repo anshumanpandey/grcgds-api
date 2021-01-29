@@ -9,6 +9,7 @@ type Params = {
     dropoffTime: string,
     pickLocation: string,
     dropLocation: string,
+    price: string,
     POS: any,
     xml: string
     grcgdsClient: string,
@@ -24,6 +25,7 @@ export default async ({
     dropoffTime,
     pickLocation,
     dropLocation,
+    price,
     POS,
     xml,
     grcgdsClient,
@@ -41,6 +43,7 @@ export default async ({
         dropoffDate,
         dropoffTime,
         pickLocation,
+        price,
         pickupFullAddress: pickupFullAddress[0],
         dropoffFullAddress: dropoffFullAddress[0],
         dropoffLocation: dropLocation,
