@@ -1113,9 +1113,10 @@ export const searchBookings = async (body: any) => {
 
     try {
 
-        const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : [Filter.content]
+        const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
 
-        const xml = await createBookingsXmlResponse(await getBookings({ RequestorIDs }))
+        const bookings = await getBookings({ RequestorIDs })
+        const xml = await createBookingsXmlResponse(bookings)
         const response = await xmlToJson(xml)
 
         logger.info("Sending OTA_VehRetResRQ response")

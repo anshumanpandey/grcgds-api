@@ -49,7 +49,7 @@ export default async ({
     const bookings = await DB?.select(DB?.raw('LAST_INSERT_ID()'))
     if (!bookings) return Promise.resolve()
 
-    const extrasToInsert = extras.map(e => {
+    const extrasToInsert = extras?.map(e => {
         return {
             'vendorEquipId': e["vendorEquipID"],
             'quantity': e["Quantity"],
@@ -57,5 +57,5 @@ export default async ({
         }
     })
 
-    return DB?.insert(extrasToInsert).into('BookingsExtras')
+    return DB?.insert(extrasToInsert || [] ).into('BookingsExtras')
 }
