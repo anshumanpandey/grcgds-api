@@ -136,14 +136,14 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <CountryName>
                     <Name/>
                     <Code/>
-                    <CountryCode>${codes.find(c => c.internal_code == b.pickLocation).country}</CountryCode>
+                    <CountryCode>${codes.find(c => c.internal_code == b.pickLocation)?.country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.pickLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.pickLocation).location}</Name>
+                <Name>${codes.find(c => c.internal_code == b.pickLocation)?.location}</Name>
                 <CodeContext>Pickup Location</CodeContext>
                 </LocationDetails>
                 <LocationDetails>
@@ -154,14 +154,14 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <CountryName>
                         <Name/>
                         <Code/>
-                        <CountryCode>${codes.find(c => c.internal_code == b.dropoffLocation).country}</CountryCode>
+                        <CountryCode>${codes.find(c => c.internal_code == b.dropoffLocation)?.country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.dropoffLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.dropoffLocation).location}</Name>
+                <Name>${codes.find(c => c.internal_code == b.dropoffLocation)?.location}</Name>
                 <CodeContext>Return Location</CodeContext>
                 </LocationDetails>
             </VehSegmentInfo>
