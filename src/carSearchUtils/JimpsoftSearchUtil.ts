@@ -3,7 +3,7 @@ import { DB } from "../utils/DB"
 import { xmlToJson } from '../utils/XmlConfig';
 const https = require('https');
 
-export const JIMPSOFT_URL = `https://62.28.221.122/Rentway_WS/getMultiplePrices.asmx`
+export const JIMPSOFT_URL = `https://62.28.221.122/Rentway_WS/getMultiplePrices_GroupDetails.asmx`
 const getDateTime = (fullDate: string) => {
     //2021-02-02 10:00
     const [date, time] = fullDate.split('T')
@@ -64,7 +64,7 @@ export default async (params: any) => {
         httpsAgent: new https.Agent({
             rejectUnauthorized: false
         }),
-        url: `http://jsserver10.jimpisoft.pt/Rentway_WS_TEST/getMultiplePrices_GroupDetails.asmx`,
+        url: `https://62.28.221.122/Rentway_WS/getMultiplePrices_GroupDetails.asmx`,
         headers: {
             "Content-Type": "text/xml;charset=UTF-8",
             "SOAPAction": "http://www.jimpisoft.pt/Rentway_Reservations_WS/getMultiplePrices_GroupDetails/MultiplePrices_GroupDetails"
