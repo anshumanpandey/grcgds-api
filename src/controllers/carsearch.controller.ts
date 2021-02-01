@@ -15,6 +15,7 @@ import RentitCarsSearchUtil from '../carSearchUtils/RentitCarsSearchUtil';
 import RetajSearchUtils from '../carSearchUtils/RetajSearchUtils';
 import ZezgoCarsSearchUtils from '../carSearchUtils/ZezgoCarsSearchUtils';
 import LocalcarsSearchUtils from '../carSearchUtils/LocalcarsSearchUtils';
+import JimpsoftSearchUtil from '../carSearchUtils/JimpsoftSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -353,6 +354,7 @@ export const searchCars = async (body: any, req: any) => {
             RetajSearchUtils(body),
             ZezgoCarsSearchUtils(body),
             LocalcarsSearchUtils(body),
+            JimpsoftSearchUtil(body),
             ...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)),
         ]
 
