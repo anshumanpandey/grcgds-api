@@ -1,5 +1,6 @@
 import EasitentSearchUtil, { EASIRENT_URL } from "../carSearchUtils/EasitentSearchUtil"
 import GrcgdsSearchUtils, { GRCGDS_URL } from "../carSearchUtils/GrcgdsSearchUtils"
+import JimpsoftSearchUtil, { JIMPSOFT_URL } from "../carSearchUtils/JimpsoftSearchUtil"
 import LocalcarsSearchUtils, { LOCALCARS_URL } from "../carSearchUtils/LocalcarsSearchUtils"
 import RentitCarsSearchUtil, { RENTI_URL } from "../carSearchUtils/RentitCarsSearchUtil"
 import RetajSearchUtils, { RETAJ_URL } from "../carSearchUtils/RetajSearchUtils"
@@ -79,3 +80,4 @@ SUPORTED_URL.set(LOCALCARS_URL, (body: any) => LocalcarsSearchUtils(body))
 SUPORTED_URL.set(LOCALCARS_URL, (body: any) => LocalcarsSearchUtils(body))
 SUPORTED_URL.set(RETAJ_URL, (body: any) => RetajSearchUtils(body))
 SUPORTED_URL.set(ZEZGO_URL, (body: any) => ZezgoCarsSearchUtils(body))
+SUPORTED_URL.set(JIMPSOFT_URL, (body: any) => JimpsoftSearchUtil(body))
