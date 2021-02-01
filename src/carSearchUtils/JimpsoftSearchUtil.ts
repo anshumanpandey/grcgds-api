@@ -52,8 +52,8 @@ export default async (params: any) => {
                 <rentalStation>${returnCodeObj}</rentalStation>
                 </dropOff>
                 <Date_of_Birth>1990-01-30</Date_of_Birth>
-                <companyCode>9999</companyCode>
-        <customerCode>10005</customerCode>
+                <companyCode>9948</companyCode>
+                <customerCode>23247</customerCode>
             </objRequest>
             </MultiplePrices_GroupDetails>
         </soap:Body>
