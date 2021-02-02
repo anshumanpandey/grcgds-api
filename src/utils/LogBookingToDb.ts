@@ -75,3 +75,13 @@ export default async ({
 
     return DB?.insert(extrasToInsert || [] ).into('BookingsExtras')
 }
+
+export const bookingExistOnDd = async (params: { resNumber: string }) => {
+    const result = await DB?.table('Bookings')
+    .where({ resNumber: params.resNumber })
+    .select()
+
+    if (!result) return false
+    if (result.length == 0) return false 
+    return true
+}

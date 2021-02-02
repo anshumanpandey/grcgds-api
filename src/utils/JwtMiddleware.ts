@@ -22,6 +22,8 @@ export default () => {
             pos = req.body.OTA_VehRetResRQ.POS
         } else if (req.body.OTA_VehCancelRQ) {
             pos = req.body.OTA_VehCancelRQ.POS
+        } else if (req.body.OTA_VehRetSingleResRQ) {
+            pos = req.body.OTA_VehRetSingleResRQ.POS
         }
         DB?.select().where('pall', md5(ip)).table("white")
             .then((r) => {

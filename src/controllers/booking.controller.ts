@@ -3,7 +3,7 @@ import { validateFor } from '../utils/JsonValidator';
 import axios from "axios"
 import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
-import RightCarsBooking, { cancelRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
+import RightCarsBooking, { cancelRightCarsBooking, getRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
 import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
 import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
@@ -1182,6 +1182,32 @@ export const cancelBooking = async (body: any) => {
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
         ]
 
+    } catch (error) {
+        if (error.response) {
+            throw new ApiError(error.response.data.error)
+        } else {
+            throw error
+        }
+    }
+}
+
+export const getSingleBooking = async (body: any) => {
+    //const validator = validateFor(schema)
+    //validator(body)
+
+    try {
+        const booking = await getRightCarsBooking(body)
+        if (!booking) throw new ApiError('Booking now found')
+        const xml = await createBookingsXmlResponse([booking])
+        const response = await xmlToJson(xml)
+
+        logger.info("Sending OTA_VehRetResRQ response")
+        return [
+            response.OTA_VehRetResRS,
+            200,
+            "OTA_VehRetResRS",
+            { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehRetResRS.xsd" }
+        ]
     } catch (error) {
         if (error.response) {
             throw new ApiError(error.response.data.error)

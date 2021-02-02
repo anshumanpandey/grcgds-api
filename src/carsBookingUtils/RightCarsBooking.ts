@@ -2,10 +2,12 @@ import axios from "axios"
 import { xmlToJson } from "../utils/XmlConfig"
 import { XmlError } from "../utils/XmlError"
 import { DB } from '../utils/DB';
+import { fromUnixTime, lightFormat } from 'date-fns'
 import { ApiError } from "../utils/ApiError";
-import LogBookingToDb from "../utils/LogBookingToDb";
+import LogBookingToDb, { bookingExistOnDd } from "../utils/LogBookingToDb";
 import { logger } from "../utils/Logger";
 import { getHannkUserByEmail } from "../services/requestor.service";
+import { getBookings } from "../services/bookings.service";
 
 export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
@@ -98,8 +100,8 @@ export default async (body: any) => {
     return res
 }
 
-export const getRightCarsBookings = async (body: any) => {
-    const { VehRetResRQCore, POS } = body
+export const getRightCarsBooking = async (body: any) => {
+    const { VehRetSingleResRQ, POS } = body
 
     const xml = `<OTA_VehListRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation = "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd" >
     <POS>
@@ -109,7 +111,7 @@ export const getRightCarsBookings = async (body: any) => {
     </POS>
     <Customer>
     <Primary>
-    <Email>${VehRetResRQCore.Email}</Email>
+    <Email>${VehRetSingleResRQ.Email.Address}</Email>
     </Primary>
     </Customer>
     </OTA_OTA_VehListRQ>`;
@@ -125,9 +127,44 @@ export const getRightCarsBookings = async (body: any) => {
             throw new XmlError(data)
         }
 
-        const reservation = await xmlToJson(data);
+        const reservations = await xmlToJson(data);
+    
+        const reservationFound = reservations.OTA_VehListRS.VehResRSCore.find((res: any) => {
+            return res.VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0] == VehRetSingleResRQ.ResNumber.Number
+        })
 
-        return reservation
+        if (!reservationFound) return reservationFound
+
+        const pickDateTime = fromUnixTime(reservationFound.VehReservation[0].VehSegmentCore[0].VehRentalCore[0].PickUpDateTime[0])
+        const returnDateTime = fromUnixTime(reservationFound.VehReservation[0].VehSegmentCore[0].VehRentalCore[0].ReturnDateTime[0])
+        const pickCode = reservationFound.VehReservation[0].VehSegmentCore[0].VehRentalCore[0].PickUpLocation[0].LocationCode[0]
+        const dropCode = reservationFound.VehReservation[0].VehSegmentCore[0].VehRentalCore[0].ReturnLocation[0].LocationCode[0]
+        const price = reservationFound.VehReservation[0].VehSegmentCore[0].Payment[0].AmountToPayForRental[0]
+        const resNumber = reservationFound.VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
+        const toInsert = {
+            pickupDate: lightFormat(pickDateTime, 'yyyy-MM-dd'),
+            pickupTime: lightFormat(pickDateTime, 'HH:mm'),
+            dropoffDate: lightFormat(returnDateTime, 'yyyy-MM-dd'),
+            dropoffTime: lightFormat(returnDateTime, 'HH:mm'),
+            pickLocation: pickCode,
+            dropLocation: dropCode,
+            POS,
+            xml: data,
+            price,
+            grcgdsClient: "1",
+            hannkUser: await getHannkUserByEmail({ email: VehRetSingleResRQ.Email.Address }),
+            extras: [],
+            resNumber
+        }
+        const exist = await bookingExistOnDd({ resNumber })
+        if (!exist) {
+            await LogBookingToDb(toInsert)
+        }
+
+        const usersBookings = await getBookings({ appUserEmail: VehRetSingleResRQ.Email.Address })
+
+        return usersBookings.find(b => b.resNumber == VehRetSingleResRQ.ResNumber.Number)
+
     } catch (error) {
         if (error.response) {
             throw new ApiError(error.response.data.error)

@@ -150,7 +150,7 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.pickLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.pickLocation)?.location}</Name>
+                <Name>${codes.find(c => c.internal_code == b.pickLocation)?.location || b.pickupFullAddress}</Name>
                 <CodeContext>Pickup Location</CodeContext>
                 </LocationDetails>
                 <LocationDetails>
@@ -168,7 +168,7 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.dropoffLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.dropoffLocation)?.location}</Name>
+                <Name>${codes.find(c => c.internal_code == b.dropoffLocation)?.location || b.dropoffFullAddress}</Name>
                 <CodeContext>Return Location</CodeContext>
                 </LocationDetails>
             </VehSegmentInfo>
