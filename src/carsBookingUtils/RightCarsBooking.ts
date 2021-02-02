@@ -128,6 +128,8 @@ export const getRightCarsBooking = async (body: any) => {
         }
 
         const reservations = await xmlToJson(data);
+
+        if (!reservations.OTA_VehListRS.VehResRSCore) return undefined
     
         const reservationFound = reservations.OTA_VehListRS.VehResRSCore.find((res: any) => {
             return res.VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0] == VehRetSingleResRQ.ResNumber.Number
@@ -141,6 +143,8 @@ export const getRightCarsBooking = async (body: any) => {
         const dropCode = reservationFound.VehReservation[0].VehSegmentCore[0].VehRentalCore[0].ReturnLocation[0].LocationCode[0]
         const price = reservationFound.VehReservation[0].VehSegmentCore[0].Payment[0].AmountToPayForRental[0]
         const resNumber = reservationFound.VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
+        const appUser = await getHannkUserByEmail({ email: VehRetSingleResRQ.Email.Address })
+
         const toInsert = {
             pickupDate: lightFormat(pickDateTime, 'yyyy-MM-dd'),
             pickupTime: lightFormat(pickDateTime, 'HH:mm'),
@@ -152,11 +156,11 @@ export const getRightCarsBooking = async (body: any) => {
             xml: data,
             price,
             grcgdsClient: "1",
-            hannkUser: await getHannkUserByEmail({ email: VehRetSingleResRQ.Email.Address }),
+            hannkUser: appUser,
             extras: [],
             resNumber
         }
-        const exist = await bookingExistOnDd({ resNumber })
+        const exist = await bookingExistOnDd({ resNumber, appUser })
         if (!exist) {
             await LogBookingToDb(toInsert)
         }
