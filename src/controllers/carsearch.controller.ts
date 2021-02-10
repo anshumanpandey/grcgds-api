@@ -4,7 +4,7 @@ import { wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 import { GetSerchForClients } from '../utils/GetSerchForClients';
-import { getBrokersOwners, getDataSuppliers, getDataUsersForUserId, getGrcgdsClient, SUPORTED_URL } from '../services/requestor.service';
+import { getBrokersOwners, getDataSuppliers, getDataUsersForUserId, getGrcgdsClient, getHannkUserByEmail, SUPORTED_URL } from '../services/requestor.service';
 import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
 import { GetSearchServices } from '../utils/GetSearchServices';
 import RightCarsSearchUtils, { RC_URL } from '../carSearchUtils/RightCarsSearchUtils';
@@ -15,6 +15,7 @@ import LocalcarsSearchUtils from '../carSearchUtils/LocalcarsSearchUtils';
 import ZezgoCarsSearchUtils from '../carSearchUtils/ZezgoCarsSearchUtils';
 import RetajSearchUtils from '../carSearchUtils/RetajSearchUtils';
 import JimpsoftSearchUtil from '../carSearchUtils/JimpsoftSearchUtil';
+import { LogCarSearchToDb } from '../utils/LogCarSearch';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -393,6 +394,19 @@ export const searchCars = async (body: any, req: any) => {
         const filterBrands = await FilterBrandsForClient(body.POS.Source.RequestorID.ID)
         filteredResponse = filteredResponse.concat(...r)
             .filter(filterBrands)
+
+        const [pickDate, pickTime] = body.VehAvailRQCore.VehRentalCore.PickUpDateTime.split('T')
+        const [returnDate, returnTime] = body.VehAvailRQCore.VehRentalCore.ReturnDateTime.split('T')
+
+        await LogCarSearchToDb({
+            pickupDate: pickDate,
+            pickupTime: pickTime,
+            dropoffDate: returnDate,
+            dropoffTime: returnTime,
+            pickLocation: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode,
+            dropoffLocation: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode,
+            hannkClientData: { id: clientId }
+        })
 
         const response = wrapCarsResponseIntoXml(filteredResponse, body)
 
