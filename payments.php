@@ -25,7 +25,7 @@ $paypalUrl = $enableSandbox ? 'https://sandbox.paypal.com/cgi-bin/webscr' : 'htt
 
 // Product being purchased.
 $itemName = 'Toyota Aygo';
-$itemAmount = 153.62;
+$itemAmount = 97.69;
 
 // Include Functions
 require 'functions.php';
@@ -53,7 +53,7 @@ if (!isset($_POST["txn_id"]) && !isset($_POST["txn_type"])) {
 	// and currency so that these aren't overridden by the form data.
 	$data['item_name'] = $itemName;
 	$data['amount'] = $itemAmount;
-	$data['currency_code'] = 'EUR';
+	$data['currency_code'] = 'GBP';
 
 	// Add any custom fields for the query string.
 	//$data['custom'] = USERID;
