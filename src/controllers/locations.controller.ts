@@ -126,7 +126,7 @@ export const getLocations = async (body: any) => {
         if (ownersOfCurrentBroker.length != 0) {
             const orderedSuppliers = await sortClientsBySearch({ clients: ownersOfCurrentBroker, searchType: SearchHistoryEnum.Locations })
             for (const record of orderedSuppliers) {
-                const results = await getLocationsByClient({ whereFilters, clientId: [record.id] })
+                const results = await getLocationsByClient({ whereFilters, orWhereFilters ,clientId: [record.id] })
                 if (results.length == 0) continue;
                 secondResult = results
                 await increaseCounterFor({ clientId: record.id, searchType: SearchHistoryEnum.Locations })
