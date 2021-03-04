@@ -39,7 +39,7 @@ const generateXmlBody = (body: any) => {
     TimeStamp="2020-06-04T19:32:01" Target="Production" Version="1.002">
         <POS>
         <Source>
-            <RequestorID Type="5" ID="GRC-470000" RATEID="${body.rateId}" RATETYPES=""/>
+            <RequestorID Type="5" ID="${body.requestorID || "GRC-470000"}" RATEID="${body.rateId}" RATETYPES=""/>
         </Source>
         </POS>
         <VehAvailRQCore Status="Available">
@@ -60,12 +60,12 @@ const generateXmlBody = (body: any) => {
     </OTA_VehAvailRateRQ>`
 }
 
-export default async ({ reqBody, rateId, grcgdsClientId, url = 'https://www.grcgds.com/XML/' }: { reqBody: any, rateId: string, grcgdsClientId: string, url?: string }) => {
+export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'https://www.grcgds.com/XML/' }: { reqBody: any, rateId: string, requestorID?: string,grcgdsClientId: string, url?: string }) => {
 
     const t = await getDataUser(reqBody);
 
     const grc = await getGrcgds({ clientId: grcgdsClientId })
-    const xml = generateXmlBody({ ...reqBody, rateId, account_code: t?.account_code});
+    const xml = generateXmlBody({ ...reqBody, rateId, requestorID, account_code: t?.account_code});
 
     const { data } = await axios.post(url, xml, {
         headers: {
