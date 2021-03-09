@@ -51,7 +51,7 @@ export const BuildXmlResponse = (response: any, data:any, statusCode: number = 2
                 "Version": "1.002",
                 ...extraKeys
             }
-            const r = builder.buildObject({ [preTag]: { $: keys, ...data } })
+            const r = builder.buildObject({ [preTag]: { $: keys, ...data } }).replace(/(&amp;)/g, "&")
             response.status(statusCode).send(r);
         },
         'application/json': () => {

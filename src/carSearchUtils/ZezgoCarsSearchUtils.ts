@@ -81,6 +81,7 @@ export default async (body: any) => {
                     ...r.VehAvailCore[0],
                     $: {
                         ...r.VehAvailCore[0].$,
+                        Deeplink: r.VehAvailCore[0].$.deeplink,
                         "Supplier_ID": `GRC-${grc.clientAccountCode}`,
                         "Supplier_Name": grc.clientname,
                     },
