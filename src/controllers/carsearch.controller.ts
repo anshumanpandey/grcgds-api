@@ -355,11 +355,10 @@ export const searchCars = async (body: any, req: any) => {
     const clientId = body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4)
 
     try {
-        const [grcgdsClient, searchServices, brokerOwners,/*suppliers, dataUsers*/] = await Promise.all([
+        const [grcgdsClient, searchServices, suppliers, /*dataUsers*/] = await Promise.all([
             getGrcgdsClient({ ClientId: clientId }),
             GetSearchServices(clientId),
-            getBrokersOwners({ RequestorID: clientId })
-            //getDataSuppliers({ RequestorID: clientId }),
+            getDataSuppliers({ RequestorID: clientId }),
             //getDataUsersForUserId({ id: clientId }),
         ])
 
@@ -370,7 +369,7 @@ export const searchCars = async (body: any, req: any) => {
                 servicesToCall.push(SUPORTED_URL.get(grcgdsClient.integrationEndpointUrl)(body))
             } else {
                 const servicesToAdd = Array.from(SUPORTED_CLIENT_SERVICES.entries())
-                .filter(entry => brokerOwners.find(brokerOwner => brokerOwner.id == entry[0]))
+                .filter(entry => suppliers.find(suppliers => suppliers.clientId == entry[0]))
                 .map(entry => entry[1]);
                 servicesToCall.push(...servicesToAdd.map(service => service(body)))
             }
