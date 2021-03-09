@@ -84,6 +84,14 @@ export default async (body: any) => {
                         "Supplier_ID": `GRC-${grc.clientAccountCode}`,
                         "Supplier_Name": grc.clientname,
                     },
+                    Vehicle: [{
+                        ...r.VehAvailCore[0].Vehicle[0],
+                        $: {
+                            ...r.VehAvailCore[0].Vehicle[0].$,
+                            "Brand": grc.clientname,
+                            "BrandPicURL": "https://www.zezgo.com/public/img/logo.png",
+                        },
+                    }]
                 }],
             }))
         return json
