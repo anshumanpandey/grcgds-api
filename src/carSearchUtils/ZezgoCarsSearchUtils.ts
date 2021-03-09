@@ -81,6 +81,7 @@ export default async (body: any) => {
                     ...r.VehAvailCore[0],
                     $: {
                         ...r.VehAvailCore[0].$,
+                        Deeplink: r.VehAvailCore[0].$.deeplink,
                         "Supplier_ID": `GRC-${grc.clientAccountCode}`,
                         "Supplier_Name": grc.clientname,
                     },
@@ -88,6 +89,8 @@ export default async (body: any) => {
                         ...r.VehAvailCore[0].Vehicle[0],
                         $: {
                             ...r.VehAvailCore[0].Vehicle[0].$,
+                            "Brand": grc.clientname,
+                            "BrandPicURL": "https://www.zezgo.com/public/img/logo.png",
                         },
                     }]
                 }],
