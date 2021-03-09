@@ -8,7 +8,7 @@ const getGrcgds = async () => {
         .from("clients")
         .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
         .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", 36)
+        .where("clients.id", 10)
     return r && r.length != 0 ? r[0] : null
 }
 
