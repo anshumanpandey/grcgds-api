@@ -20,7 +20,9 @@ export const LogCarSearchToDb = async (parmas: Params) => {
         "pickLocation": parmas["pickLocation"],
         "dropoffLocation": parmas["dropoffLocation"],
         "customerId": parmas.hannkMobileUser ? parmas.hannkMobileUser["id"] : '',
-        "clientId": parmas.hannkClientData ? parmas.hannkClientData.id : ''
+        "clientId": parmas.hannkClientData ? parmas.hannkClientData.id : '',
+        "createdAt": new Date(),
+        "updatedAt ": new Date(),
     }
     return  getDbFor("grcgds_gateway_db")?.insert(toInsert).into('CarSearches')
 }
