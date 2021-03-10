@@ -18,6 +18,7 @@ import JimpsoftSearchUtil from '../carSearchUtils/JimpsoftSearchUtil';
 import { LogCarSearchToDb } from '../utils/LogCarSearch';
 import MexrentacarSearchUtil from '../carSearchUtils/MexrentacarSearchUtil';
 import EasyRentSearchUtils from '../carSearchUtils/EasyRentSearchUtils';
+import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -339,6 +340,7 @@ SUPORTED_CLIENT_SERVICES.set(1, (body: any) => RightCarsSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(11, (body: any) => RentitCarsSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(37, (body: any) => SurpriceCarsSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(58, (body: any) => UnitedCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(57, (body: any) => EasitentSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(32, (body: any) => LocalcarsSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(10, (body: any) => ZezgoCarsSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(36, (body: any) => RetajSearchUtils(body))
