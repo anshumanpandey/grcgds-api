@@ -57,12 +57,14 @@ export const getAllLocations = async ({ clientId, whereFilters, orWhereFilters }
         .from("companies_locations")
         .innerJoin('clients','clients.id','companies_locations.clientId')
 
-        whereFilters?.forEach(w => {
-            query?.where(w.columnName, w.op, w.val);
-        })
-        orWhereFilters?.forEach(w => {
-            query?.orWhere(w.columnName, w.op, w.val);
-        })        
+        query?.where(function() {
+            whereFilters?.forEach(w => {
+                this.where(w.columnName, w.op, w.val);
+            })
+            orWhereFilters?.forEach(w => {
+                this.orWhere(w.columnName, w.op, w.val);
+            })        
+        });
 
         if (clientId) {
             query?.where("companies_locations.clientId", "in",clientId);
