@@ -6,9 +6,9 @@ export const FilterBrandsForClient = async (grcCode: string) => {
     return (result: any) => {
         if (blockedBrands.length == 0) return true
 
-        const brand = result.VehAvailCore[0].Vehicle[0].$.Brand
+        const brand = result.VehAvailCore[0].$.Supplier_Name.toLowerCase().replace(/\s/g,'')
         return !blockedBrands
-            .filter(i => i.brandName.toLowerCase().replace(/\s/g,'') == result.VehAvailCore[0].$.Supplier_Name.toLowerCase().replace(/\s/g,''))
-            .map(r => r.brandName).includes(brand)
+            .filter(i => i.brandName.toLowerCase().replace(/\s/g,'') == brand)
+            .map(r => r.brandName.toLowerCase().replace(/\s/g,'')).includes(brand)
     }
 }
