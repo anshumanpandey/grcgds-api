@@ -7,7 +7,7 @@ $url='<OTA_VehAvailRateRQ xmlns="https://www.opentravel.org/OTA/2003/05" xmlns:x
     </Source>
   </POS>
   <VehAvailRQCore Status="Available">
-    <VehRentalCore PickUpDateTime="2021-01-26T11:00:00" ReturnDateTime="2021-01-27T11:00:00">
+    <VehRentalCore PickUpDateTime="2021-03-26T11:00:00" ReturnDateTime="2021-03-27T11:00:00">
       <PickUpLocation LocationCode="MIAA02"/>
       <ReturnLocation LocationCode="MIAA02"/>
     </VehRentalCore>

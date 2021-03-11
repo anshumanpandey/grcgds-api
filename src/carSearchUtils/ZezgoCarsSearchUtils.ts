@@ -23,11 +23,22 @@ const getDataUser = async (body: any) => {
     return r && r.length != 0 ? r[0] : null
 }
 
-const generateXmlBody = (body: any) => {
+const getCodeForGrcCode = async (grcCode: string) => {
+    const r = await DB?.select().from("companies_locations")
+        .where("GRCGDSlocatincode", grcCode)
+        .where("clientId", 10)
+    return r && r.length != 0 ? r[0].internal_code : null
+}
+
+const generateXmlBody = async (body: any) => {
+    const [pickCode, dropCode] = await Promise.all([
+        getCodeForGrcCode(body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
+        getCodeForGrcCode(body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
+    ])
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
     const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
-    const pickLocation = body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode
-    const dropLocation = body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode
+    const pickLocation = pickCode
+    const dropLocation = dropCode
     const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
@@ -63,7 +74,7 @@ export default async (body: any) => {
     const t = await getDataUser(body);
 
     const grc = await getGrcgds()
-    const xml = generateXmlBody({ ...body, account_code: t?.account_code});
+    const xml = await generateXmlBody({ ...body, account_code: t?.account_code});
 
     const { data } = await axios.post(ZEZGO_URL, xml, {
         headers: {

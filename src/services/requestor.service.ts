@@ -18,11 +18,12 @@ export const getGrcgdsClient = async ({ ClientId }: { ClientId: string }) => {
 }
 
 export const getDataSuppliers = async ({ RequestorID }: { RequestorID: string }) => {
-    const r = await DB?.select(["data_suppliers_user.clientId", "clients.clientname", "data_suppliers_user.account_code"])
+    const query = DB?.select(["data_suppliers_user.clientId", "clients.clientname", "data_suppliers_user.account_code"])
         .from("data_suppliers_user")
         .innerJoin('clients', 'clients.id', 'data_suppliers_user.clientId')
         .where({ brokerId: RequestorID })
         .where("active", 1)
+    const r = await query
     return r || []
 }
 
