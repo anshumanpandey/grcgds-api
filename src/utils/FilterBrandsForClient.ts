@@ -8,7 +8,7 @@ export const FilterBrandsForClient = async (grcCode: string) => {
 
         const brand = result.VehAvailCore[0].Vehicle[0].$.Brand
         return !blockedBrands
-            .filter(i => i.supplierId == result.VehAvailCore[0].$.Supplier_ID)
+            .filter(i => i.brandName.toLowerCase().replace(/\s/g,'') == result.VehAvailCore[0].$.Supplier_Name.toLowerCase().replace(/\s/g,''))
             .map(r => r.brandName).includes(brand)
     }
 }
