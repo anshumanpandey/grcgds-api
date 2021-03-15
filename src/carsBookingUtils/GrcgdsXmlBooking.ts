@@ -89,6 +89,7 @@ export default async (body: any) => {
             dropLocation,
             POS,
             xml,
+            price: RentalPaymentPref.Voucher.PaymentCard.AmountPaid,
             hannkUser: await getHannkUserByEmail({ email: Email }),
             grcgdsClient: "36",
             resNumber: reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0],

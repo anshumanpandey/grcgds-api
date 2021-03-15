@@ -1,12 +1,15 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 
+const URL_PATH = "https://webapi.rent.it/api-ri/Quote/CreateAndLoad/"
+export const RENTI_URL = URL_PATH
+
 const getUrl = async (params: any) => {
     const [pickCode, dropCode ] = await Promise.all([
         getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
         getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
     ])
-    return `https://webapi.rent.it/api-ri/Quote/CreateAndLoad/?ClientId=35&APIKey=30995a94-bc9b-f1ba-b47e-21a0091c24c4&Language=EN&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=IT&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
+    return `${URL_PATH}?ClientId=35&APIKey=30995a94-bc9b-f1ba-b47e-21a0091c24c4&Language=EN&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=IT&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
 }
 
 
@@ -28,7 +31,7 @@ const getCodeForGrcCode = async (grcCode: string) => {
     const r = await DB?.select().from("companies_locations")
         .where("GRCGDSlocatincode", grcCode)
         .where("clientId", 11)
-    return r && r.length != 0 ? r[0].internal_code : null
+    return r && r.length != 0 ? r.sort((a,b) => a.internal_code.slice(3) - b.internal_code.slice(3))[0].internal_code : null
 }
 
 export default async (params: any) => {
@@ -76,9 +79,9 @@ export default async (params: any) => {
                     "VehTerms": []
                 }],
                 "RentalRate": [],
-                "VehicleCharge": {
-                    "CurrencyCode": rate.TotalRate.TotalAmount.Currency,
-                },
+                "VehicleCharges": [{
+                    "VehicleCharge": [{"CurrencyCode": rate.TotalRate.TotalAmount.Currency,}]
+                }],
                 "TotalCharge": [{
                     $: {
                         "RateTotalAmount": Number(rate.TotalRate.TotalAmount.Amount).toFixed(2),

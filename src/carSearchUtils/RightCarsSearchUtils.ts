@@ -30,21 +30,20 @@ const generateXmlBody = (body: any, id: string) => {
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
 
-    return `<?xml version="1.0"?>
-    <OTA_VehAvailRateRQDeep xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2010-11-12T11:00:00" Target="Test" Version="1.002">
+    return `<OTA_VehAvailRateRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2014-09-08-T16:38:24" EchoToken="$ttoken" Target="Production" Version="1.002">
     <POS>
         <Source>
-            <RequestorID Type="5" ID="Mobile001"/>
+            <RequestorID Type="5" ID="mobile001"/>
         </Source>
     </POS>
     <VehAvailRQCore Status="Available">
-        <Currency Code="${currency || "EUR"}"/>
+    <Currency Code="${currency || "EUR"}"/>
         <VehRentalCore PickUpDateTime="${PickUpDateTime}" ReturnDateTime="${ReturnDateTime}">
-        
-        <PickUpLocation LocationCode="${pickLocation}"/>
-
-        <ReturnLocation LocationCode="${dropLocation}"/>
+            <PickUpLocation LocationCode="${pickLocation}"/>
+    
+            <ReturnLocation LocationCode="${dropLocation}"/>
         </VehRentalCore>
+    <DriverType Age="35"/>
     </VehAvailRQCore>
     <VehAvailRQInfo>
         <Customer>
@@ -54,12 +53,14 @@ const generateXmlBody = (body: any, id: string) => {
         </Primary>
         </Customer>
         <TPA_Extensions>
-        <ConsumerIP>192.168.102.14</ConsumerIP>
+            <ConsumerIP>188.39.95.93</ConsumerIP>
         </TPA_Extensions>
     </VehAvailRQInfo>
-    </OTA_VehAvailRateRQDeep>
+    </OTA_VehAvailRateRQ>
 `
 }
+
+export const RC_URL = 'https://ota.right-cars.com'
 
 export default async (body: any) => {
 
@@ -70,7 +71,7 @@ export default async (body: any) => {
 
     const xml = generateXmlBody(body, "1000022");
 
-    const { data } = await axios.post('https://ota.right-cars.com', xml, {
+    const { data } = await axios.post(RC_URL, xml, {
         headers: {
             'Content-Type': 'text/plain; charset=UTF8',
         }
@@ -87,7 +88,8 @@ export default async (body: any) => {
                     ...r.VehAvailCore[0],
                     $: {
                         ...r.VehAvailCore[0].$,
-                        "Supplier_ID": `GRC-${rc.id}0000`,
+                        Deeplink: r.VehAvailCore[0].$.deeplink,
+                        "Supplier_ID": `GRC-${rc.clientId}0000`,
                         "Supplier_Name": rc.clientname,
                     },
                     Vehicle: [{

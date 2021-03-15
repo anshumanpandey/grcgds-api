@@ -96,7 +96,7 @@ export const getCompanyLocations = async () => {
     return c || []
 }
 
-export const getGrcgdsLocations = async ({ whereFilters, orWhereFilters  }: Params) => {
+export const getGrcgdsLocations = async ({ whereFilters, orWhereFilters }: Params) => {
     const columns = {
         Id: "grcgds_locations.id",
         InternalCode: "grcgds_locations.internalcode",

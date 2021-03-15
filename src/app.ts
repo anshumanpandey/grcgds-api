@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({
 app.use('/', routes)
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log(err)
     if (err instanceof XmlError) {
         xmlToJson(err.message)
             .then((r) => {

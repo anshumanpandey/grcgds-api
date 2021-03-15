@@ -1,30 +1,35 @@
 <?php
 
-$url='<OTA_VehAvailRateRQ xmlns="https://www.opentravel.org/OTA/2003/05" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRQ.xsd" TimeStamp="2018-12-04T17:00:16" Target="Production" Version="1.002">
+$url='<?xml version="1.0" encoding="UTF-8"?>
+<OTA_VehAvailRateRQDeep xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2010-11-12T11:00:00" Target="Test" Version="1.002">
   <POS>
     <Source>
-      <RequestorID Type="5" ID="Mobile002"/>
+      <RequestorID Type="5" ID="Mobile001"/>
     </Source>
   </POS>
   <VehAvailRQCore Status="Available">
-    <VehRentalCore PickUpDateTime="2021-03-26T11:00:00" ReturnDateTime="2021-03-27T11:00:00">
-      <PickUpLocation LocationCode="MIAA02"/>
-      <ReturnLocation LocationCode="MIAA02"/>
+  	<Currency Code="EUR"/>
+    <VehRentalCore PickUpDateTime="2021-02-15T12:00:00" ReturnDateTime="2021-02-17T10:00:00">
+      <PickUpLocation LocationCode="RAKA01"/>
+      <ReturnLocation LocationCode="RAKA01"/>
     </VehRentalCore>
-    <DriverType Age="33"/>
   </VehAvailRQCore>
   <VehAvailRQInfo>
     <Customer>
       <Primary>
-        <CitizenCountryName Code="US"/>
+        <CitizenCountryName Code="GB"/>
+        <DriverType Age="30"/>
       </Primary>
     </Customer>
+    <TPA_Extensions>
+      <ConsumerIP>192.168.102.14</ConsumerIP>
+    </TPA_Extensions>
   </VehAvailRQInfo>
-</OTA_VehAvailRateRQ>';
+</OTA_VehAvailRateRQDeep>';
 
 //var_dump($url);
 
-$gg="https://ota.zezgo.com/";
+$gg="https://ota.right-cars.com/";
 
 $ch = curl_init();    // initialize curl handle
 curl_setopt($ch, CURLOPT_URL,$gg); // set url to post to

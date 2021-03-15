@@ -60,7 +60,7 @@ const generateXmlBody = (body: any) => {
     </OTA_VehAvailRateRQ>`
 }
 
-export default async ({ reqBody, rateId, grcgdsClientId, requestorID ,url = 'https://www.grcgds.com/XML/' }: { reqBody: any, rateId: string, grcgdsClientId: string, requestorID?: string, url?: string }) => {
+export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'https://www.grcgds.com/XML/' }: { reqBody: any, rateId: string, requestorID?: string,grcgdsClientId: string, url?: string }) => {
 
     const t = await getDataUser(reqBody);
 

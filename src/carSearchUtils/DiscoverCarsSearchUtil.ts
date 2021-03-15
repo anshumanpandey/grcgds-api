@@ -85,9 +85,9 @@ export default async (params: any) => {
                     "VehTerms": []
                 }],
                 "RentalRate": [],
-                "VehicleCharge": {
-                    "CurrencyCode": $VehAvail["Currency"],
-                },
+                "VehicleCharges": [{
+                    "VehicleCharge": [{"CurrencyCode": $VehAvail["Currency"] }]
+                }],
                 "TotalCharge": [{
                     $: {
                         "RateTotalAmount": Number($VehAvail["Price"]).toFixed(2),

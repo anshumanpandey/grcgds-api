@@ -12,7 +12,7 @@ const getGrcgds = async () => {
     return r && r.length != 0 ? r[0] : null
 }
 
-const getDataUser = async (body: any, req: any) => {
+const getDataUser = async (body: any) => {
     const query = DB?.select()
     .from("client_broker_locations_accountype")
     .where("clientId",body.POS.Source.RequestorID.ID.slice(4,6))
@@ -60,14 +60,16 @@ const generateXmlBody = (body: any) => {
     </OTA_VehAvailRateRQ>`
 }
 
-export default async (body: any, req: any) => {
+export const GRCGDS_URL = 'https://www.grcgds.com/XML'
 
-    const t = await getDataUser(body, req);
+export default async (body: any) => {
+
+    const t = await getDataUser(body);
 
     const grc = await getGrcgds()
     const xml = generateXmlBody({ ...body, account_code: t?.account_code});
 
-    const { data } = await axios.post('https://www.grcgds.com/XML/', xml, {
+    const { data } = await axios.post(GRCGDS_URL, xml, {
         headers: {
             'Content-Type': 'text/plain; charset=UTF8',
         }

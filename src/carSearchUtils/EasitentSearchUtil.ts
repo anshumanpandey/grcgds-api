@@ -2,7 +2,7 @@ import Axios from "axios"
 import { DB } from "../utils/DB"
 import { xmlToJson } from '../utils/XmlConfig';
 
-const URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
+export const EASIRENT_URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
 const getDateTime = (fullDate: string) => {
     const [date, time] = fullDate.split('T')
     return [date, time.slice(0, 5)]
@@ -21,7 +21,7 @@ const getCodeForGrcCode = async (grcCode: string) => {
     const r = await DB?.select().from("companies_locations")
         .where("GRCGDSlocatincode", grcCode)
         .where("clientId", 57)
-    return r && r.length != 0 ? r[0].internal_code : null
+    return r && r.length != 0 ? r[0] : null
 }
 
 export default async (params: any) => {
@@ -33,26 +33,31 @@ export default async (params: any) => {
 
     if(!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
 
+    let bcode = "$BRO166"
+    if (params.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code.toLowerCase() == "us" && pickupCodeObj.country.toLowerCase() == "us") {
+        bcode = "$USA166A"
+    }
+
     const body = `<?xml version="1.0" encoding="utf-8"?>
     <GetVehicles>
-        <bcode>$BRO166</bcode>
+        <bcode>${bcode}</bcode>
         <vtype>1</vtype>
         <estmiles>10000</estmiles>
         <currency>${params?.POS?.Source?.ISOCurrency}</currency>
         <pickup>
-            <location>${pickupCodeObj}</location>
+            <location>${pickupCodeObj.internal_code}</location>
             <date>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)[0]}</date>
             <time>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)[1]}</time>
         </pickup>
         <dropoff>
-            <location>${returnCodeObj}</location>
+            <location>${returnCodeObj.internal_code}</location>
             <date>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)[0]}</date>
             <time>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)[1]}</time>
         </dropoff>
     </GetVehicles>`
 
     const [{ data }, u, ] = await Promise.all([
-        Axios.post(URL, body, {}),
+        Axios.post(EASIRENT_URL, body, {}),
         getDiscoverCarsUser()
     ])
 
@@ -95,9 +100,9 @@ export default async (params: any) => {
                     "VehTerms": []
                 }],
                 "RentalRate": [],
-                "VehicleCharge": {
-                    "CurrencyCode": $VehAvail.currency[0],
-                },
+                "VehicleCharges": [{
+                    "VehicleCharge": [{"CurrencyCode": $VehAvail.currency[0] }]
+                }],
                 "TotalCharge": [{
                     $: {
                         "RateTotalAmount": Number($VehAvail.price[0]).toFixed(2),

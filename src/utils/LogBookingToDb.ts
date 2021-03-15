@@ -1,4 +1,6 @@
+import { getGrcgdsLocations } from "../services/locations.service"
 import { DB } from "./DB"
+import { logger } from "./Logger"
 
 type Params = {
     pickupDate: string,
@@ -7,6 +9,7 @@ type Params = {
     dropoffTime: string,
     pickLocation: string,
     dropLocation: string,
+    price: string,
     POS: any,
     xml: string
     grcgdsClient: string,
@@ -22,6 +25,7 @@ export default async ({
     dropoffTime,
     pickLocation,
     dropLocation,
+    price,
     POS,
     xml,
     grcgdsClient,
@@ -29,12 +33,19 @@ export default async ({
     extras,
     hannkUser
 }: Params) => {
+    const [pickupFullAddress, dropoffFullAddress] = await Promise.all([
+        getGrcgdsLocations({ whereFilters: [{ columnName: 'internalcode', op: '=', val: pickLocation }]}),
+        getGrcgdsLocations({ whereFilters: [{ columnName: 'internalcode', op: '=', val: dropLocation }]}),
+    ])
     const toInsert = {
         pickupDate,
         pickupTime,
         dropoffDate,
         dropoffTime,
         pickLocation,
+        carPrice: price,
+        pickupFullAddress: pickupFullAddress[0].Location,
+        dropoffFullAddress: dropoffFullAddress[0].Location,
         dropoffLocation: dropLocation,
         requestorId: POS.Source.RequestorID.ID,
         requestBody: xml,
@@ -44,12 +55,17 @@ export default async ({
         updatedAt: new Date(),
         customerId : hannkUser?.id
     }
+    logger.info(`Login booking to DB ${JSON.stringify(toInsert)}`)
+    if (hannkUser) {
+        logger.info(`For mobile app user ${JSON.stringify(hannkUser)}`)
+    }
+
 
     await DB?.insert(toInsert).into('Bookings')
     const bookings = await DB?.select(DB?.raw('LAST_INSERT_ID()'))
     if (!bookings) return Promise.resolve()
 
-    const extrasToInsert = extras.map(e => {
+    const extrasToInsert = extras?.map(e => {
         return {
             'vendorEquipId': e["vendorEquipID"],
             'quantity': e["Quantity"],
@@ -57,5 +73,16 @@ export default async ({
         }
     })
 
-    return DB?.insert(extrasToInsert).into('BookingsExtras')
+    return DB?.insert(extrasToInsert || [] ).into('BookingsExtras')
+}
+
+export const bookingExistOnDd = async (params: { resNumber: string, appUser: any }) => {
+    const result = await DB?.table('Bookings')
+    .where({ resNumber: params.resNumber })
+    .where({ customerId: params.appUser.id })
+    .select()
+
+    if (!result) return false
+    if (result.length == 0) return false 
+    return true
 }

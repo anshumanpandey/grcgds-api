@@ -1,23 +1,24 @@
 import { validateFor } from '../utils/JsonValidator';
 import { ApiError } from '../utils/ApiError';
-import GrcgdsSearchUtils from '../carSearchUtils/GrcgdsSearchUtils';
-import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
-import DiscoverCarsSearchUtil from '../carSearchUtils/DiscoverCarsSearchUtil';
-import MergeResults, { getUserOfResults, wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
+import { wrapCarsResponseIntoXml } from '../carSearchUtils/MergeResults';
 import { increaseCounterFor, sortClientsBySearch } from '../services/searchHistory.service';
 import { SearchHistoryEnum } from '../utils/SearchHistoryEnum';
 import { GetSerchForClients } from '../utils/GetSerchForClients';
-import { getDataSuppliers } from '../services/requestor.service';
+import { getBrokersOwners, getDataSuppliers, getDataUsersForUserId, getGrcgdsClient, getHannkUserByEmail, SUPORTED_URL } from '../services/requestor.service';
 import { FilterBrandsForClient } from '../utils/FilterBrandsForClient';
 import { GetSearchServices } from '../utils/GetSearchServices';
-import RightCarsSearchUtils from '../carSearchUtils/RightCarsSearchUtils';
-import RentitCarsSearchUtil from '../carSearchUtils/RentitCarsSearchUtil';
-import RetajSearchUtils from '../carSearchUtils/RetajSearchUtils';
-import ZezgoCarsSearchUtils from '../carSearchUtils/ZezgoCarsSearchUtils';
+import RightCarsSearchUtils, { RC_URL } from '../carSearchUtils/RightCarsSearchUtils';
+import RentitCarsSearchUtil, { RENTI_URL } from '../carSearchUtils/RentitCarsSearchUtil';
+import SurpriceCarsSearchUtil from '../carSearchUtils/SurpriceCarsSearchUtil';
+import UnitedCarsSearchUtil from '../carSearchUtils/UnitedCarsSearchUtil';
 import LocalcarsSearchUtils from '../carSearchUtils/LocalcarsSearchUtils';
+import ZezgoCarsSearchUtils from '../carSearchUtils/ZezgoCarsSearchUtils';
+import RetajSearchUtils from '../carSearchUtils/RetajSearchUtils';
 import JimpsoftSearchUtil from '../carSearchUtils/JimpsoftSearchUtil';
+import { LogCarSearchToDb } from '../utils/LogCarSearch';
 import MexrentacarSearchUtil from '../carSearchUtils/MexrentacarSearchUtil';
 import EasyRentSearchUtils from '../carSearchUtils/EasyRentSearchUtils';
+import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -334,39 +335,52 @@ const schema = {
     "additionalProperties": true
 }
 
-const DATA_POPULATORS = new Map();
-DATA_POPULATORS.set(17, (body: any) => DiscoverCarsSearchUtil(body))
+const SUPORTED_CLIENT_SERVICES = new Map();
+SUPORTED_CLIENT_SERVICES.set(1, (body: any) => RightCarsSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(11, (body: any) => RentitCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(37, (body: any) => SurpriceCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(58, (body: any) => UnitedCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(57, (body: any) => EasitentSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(32, (body: any) => LocalcarsSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(10, (body: any) => ZezgoCarsSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(36, (body: any) => RetajSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(16, (body: any) => JimpsoftSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(62, (body: any) => MexrentacarSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(65, (body: any) => EasyRentSearchUtils(body))
+
 
 export const searchCars = async (body: any, req: any) => {
     const validator = validateFor(schema)
     validator(body)
 
     const { CONTEXT, POS } = body
+    const clientId = body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4)
 
     try {
-        const suppliers = await getDataSuppliers({ RequestorID: body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4) });
-        const searchServices = await GetSearchServices(body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4))
-        const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
+        const [grcgdsClient, searchServices, suppliers, /*dataUsers*/] = await Promise.all([
+            getGrcgdsClient({ ClientId: clientId }),
+            GetSearchServices(clientId),
+            getDataSuppliers({ RequestorID: clientId }),
+            //getDataUsersForUserId({ id: clientId }),
+        ])
 
-        const services = [
-            GrcgdsSearchUtils(body, req),
-            RightCarsSearchUtils(body),
-            EasitentSearchUtil(body),
-            RentitCarsSearchUtil(body),
-            MexrentacarSearchUtil(body),
-            RetajSearchUtils(body),
-            ZezgoCarsSearchUtils(body),
-            LocalcarsSearchUtils(body),
-            JimpsoftSearchUtil(body),
-            EasyRentSearchUtils(body),
-            ...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)),
-        ]
+    const servicesToCall = []
 
-        if (sorted[0]?.clientId) {
-            services.push(DATA_POPULATORS.get(sorted[0].clientId)(body))
+        if (grcgdsClient) {
+            if (grcgdsClient.integrationEndpointUrl && SUPORTED_URL.has(grcgdsClient.integrationEndpointUrl)) {
+                servicesToCall.push(SUPORTED_URL.get(grcgdsClient.integrationEndpointUrl)(body))
+            } else {
+                const servicesToAdd = Array.from(SUPORTED_CLIENT_SERVICES.entries())
+                .filter(entry => suppliers.find(suppliers => suppliers.clientId == entry[0]))
+                .map(entry => entry[1]);
+                servicesToCall.push(...servicesToAdd.map(service => service(body)))
+            }
         }
 
-        const [ fromGrcgds, ...r ] = await allSettled(services)
+        const sorted = await sortClientsBySearch({ clients: searchServices, searchType: SearchHistoryEnum.Availability })
+        servicesToCall.push(...GetSerchForClients(sorted.map(s => s.clientId)).map(f => f(body)))
+
+        const [ fromGrcgds = [], ...r ] = await allSettled(servicesToCall)
         .then((promises: any) => {
             return promises.filter((p: any) => p.status == "fulfilled")
         })
@@ -385,6 +399,19 @@ export const searchCars = async (body: any, req: any) => {
         const filterBrands = await FilterBrandsForClient(body.POS.Source.RequestorID.ID)
         filteredResponse = filteredResponse.concat(...r)
             .filter(filterBrands)
+
+        const [pickDate, pickTime] = body.VehAvailRQCore.VehRentalCore.PickUpDateTime.split('T')
+        const [returnDate, returnTime] = body.VehAvailRQCore.VehRentalCore.ReturnDateTime.split('T')
+
+        await LogCarSearchToDb({
+            pickupDate: pickDate,
+            pickupTime: pickTime,
+            dropoffDate: returnDate,
+            dropoffTime: returnTime,
+            pickLocation: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode,
+            dropoffLocation: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode,
+            hannkClientData: { id: clientId }
+        })
 
         const response = wrapCarsResponseIntoXml(filteredResponse, body)
 

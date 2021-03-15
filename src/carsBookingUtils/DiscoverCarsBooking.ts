@@ -76,6 +76,7 @@ export default async (body: any) => {
             dropoffTime,
             pickLocation,
             dropLocation,
+            price: body.RentalPaymentPref.Voucher.PaymentCard.AmountPaid,
             POS,
             hannkUser: await getHannkUserByEmail({ email: Email }),
             xml: JSON.stringify(axiosBody),

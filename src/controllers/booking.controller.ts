@@ -3,11 +3,13 @@ import { validateFor } from '../utils/JsonValidator';
 import axios from "axios"
 import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
-import RightCarsBooking, { cancelRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
+import RightCarsBooking, { cancelRightCarsBooking, getRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
 import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
 import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
+import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
+import { logger } from '../utils/Logger';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -72,16 +74,7 @@ const schema = {
                     "price": ""
                 },
                 "SpecialEquipPrefs": {
-                    "SpecialEquipPref": [
-                        {
-                            "vendorEquipID": "BSIT",
-                            "Quantity": "2"
-                        },
-                        {
-                            "vendorEquipID": "GPS",
-                            "Quantity": "1"
-                        }
-                    ]
+                    "SpecialEquipPref": []
                 },
                 "PromoDesc": ""
             },
@@ -254,10 +247,8 @@ const schema = {
         },
         "VehResRQCore": {
             "$id": "#/properties/VehResRQCore",
-            "type": "object",
-            "title": "The VehResRQCore schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": {},
+            "description": "An explanation about the purpose of this instance.",
             "examples": [
                 {
                     "VehRentalCore": {
@@ -300,16 +291,7 @@ const schema = {
                         "price": ""
                     },
                     "SpecialEquipPrefs": {
-                        "SpecialEquipPref": [
-                            {
-                                "vendorEquipID": "BSIT",
-                                "Quantity": "2"
-                            },
-                            {
-                                "vendorEquipID": "GPS",
-                                "Quantity": "1"
-                            }
-                        ]
+                        "SpecialEquipPref": []
                     },
                     "PromoDesc": ""
                 }
@@ -319,9 +301,10 @@ const schema = {
                 "Customer",
                 "VendorPref",
                 "VehPref",
-                "SpecialEquipPrefs",
                 "PromoDesc"
             ],
+            "title": "The VehResRQCore schema",
+            "type": "object",
             "properties": {
                 "VehRentalCore": {
                     "$id": "#/properties/VehResRQCore/properties/VehRentalCore",
@@ -761,26 +744,20 @@ const schema = {
                 },
                 "SpecialEquipPrefs": {
                     "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs",
-                    "type": "object",
-                    "title": "The SpecialEquipPrefs schema",
-                    "description": "An explanation about the purpose of this instance.",
                     "default": {},
+                    "description": "An explanation about the purpose of this instance.",
                     "examples": [
                         {
-                            "SpecialEquipPref": [
-                                {
-                                    "vendorEquipID": "BSIT",
-                                    "Quantity": "2"
-                                },
-                                {
-                                    "vendorEquipID": "GPS",
-                                    "Quantity": "1"
-                                }
-                            ]
+                            "SpecialEquipPref": []
                         }
                     ],
                     "required": [
-                        "SpecialEquipPref"
+                        ""
+                    ],
+                    "title": "The SpecialEquipPrefs schema",
+                    "type": [
+                        "object",
+                        "string"
                     ],
                     "properties": {
                         "SpecialEquipPref": {
@@ -790,62 +767,11 @@ const schema = {
                             "description": "An explanation about the purpose of this instance.",
                             "default": [],
                             "examples": [
-                                [
-                                    {
-                                        "vendorEquipID": "BSIT",
-                                        "Quantity": "2"
-                                    },
-                                    {
-                                        "vendorEquipID": "GPS",
-                                        "Quantity": "1"
-                                    }
-                                ]
+                                []
                             ],
                             "additionalItems": true,
                             "items": {
-                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items",
-                                "anyOf": [
-                                    {
-                                        "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0",
-                                        "type": "object",
-                                        "title": "The first anyOf schema",
-                                        "description": "An explanation about the purpose of this instance.",
-                                        "default": {},
-                                        "examples": [
-                                            {
-                                                "vendorEquipID": "BSIT",
-                                                "Quantity": "2"
-                                            }
-                                        ],
-                                        "required": [
-                                            "vendorEquipID",
-                                            "Quantity"
-                                        ],
-                                        "properties": {
-                                            "vendorEquipID": {
-                                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0/properties/vendorEquipID",
-                                                "type": "string",
-                                                "title": "The vendorEquipID schema",
-                                                "description": "An explanation about the purpose of this instance.",
-                                                "default": "",
-                                                "examples": [
-                                                    "BSIT"
-                                                ]
-                                            },
-                                            "Quantity": {
-                                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items/anyOf/0/properties/Quantity",
-                                                "type": "string",
-                                                "title": "The Quantity schema",
-                                                "description": "An explanation about the purpose of this instance.",
-                                                "default": "",
-                                                "examples": [
-                                                    "2"
-                                                ]
-                                            }
-                                        },
-                                        "additionalProperties": true
-                                    }
-                                ]
+                                "$id": "#/properties/VehResRQCore/properties/SpecialEquipPrefs/properties/SpecialEquipPref/items"
                             }
                         }
                     },
@@ -1042,25 +968,23 @@ const schema = {
                                 },
                                 "AmountPaid": {
                                     "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/AmountPaid",
-                                    "default": "",
+                                    "type": "string",
+                                    "title": "The AmountPaid schema",
                                     "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
                                     "examples": [
                                         ""
-                                    ],
-                                    "title": "The AmountPaid schema",
-                                    "minLength": 1,
-                                    "type": "string"
+                                    ]
                                 },
                                 "CurrencyUsed": {
                                     "$id": "#/properties/RentalPaymentPref/properties/Voucher/properties/PaymentCard/properties/CurrencyUsed",
-                                    "default": "",
+                                    "type": "string",
+                                    "title": "The CurrencyUsed schema",
                                     "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
                                     "examples": [
                                         ""
-                                    ],
-                                    "title": "The CurrencyUsed schema",
-                                    "minLength": 1,
-                                    "type": "string"
+                                    ]
                                 }
                             },
                             "additionalProperties": true
@@ -1161,6 +1085,8 @@ export const createBooking = async (body: any) => {
 
         if (CONTEXT.Filter.content == "GRC-170000") {
             json = await DiscoverCarsBooking(body)
+        } else if (CONTEXT.Filter.content == "GRC-580000") {
+            json = await UnitedCarsBooking(body)
         } else {
             json = await GrcgdsXmlBooking(body)
         }
@@ -1183,13 +1109,17 @@ export const createBooking = async (body: any) => {
 export const searchBookings = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
-    const { POS: { Source: { RequestorID } } } = body
+    const { VehRetResRQCore: { Email }, CONTEXT: { Filter = [] } } = body
 
     try {
 
-        const xml = await createBookingsXmlResponse(await getBookings())
+        const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
+
+        const bookings = await getBookings({ RequestorIDs, appUserEmail: Email })
+        const xml = await createBookingsXmlResponse(bookings)
         const response = await xmlToJson(xml)
 
+        logger.info("Sending OTA_VehRetResRQ response")
         return [
             response.OTA_VehRetResRS,
             200,
@@ -1211,12 +1141,13 @@ export const cancelBooking = async (body: any) => {
     const { VehCancelRQCore, POS: { Source: { RequestorID } } } = body
 
     const supportedServices = [
-        cancelGrcBooking
+        cancelGrcBooking,
+        cancelUnitedCarBooking
     ];
 
     try {
 
-        let xml = null;
+        let json = null;
 
         await allSettled(supportedServices.map(s => s(body)))
             .then((promises: any) => {
@@ -1226,23 +1157,57 @@ export const cancelBooking = async (body: any) => {
                 return cancelBookingByResNumber(VehCancelRQCore.ResNumber.Number)
             })
             .then(() => {
-                xml = `<OTA_VehCancelRS xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehCancelRS.xsd" Version="2.001">
+                json = {
+                    VehRetResRSCore: {
+                        VehReservation: {
+                            Status: "Cancelled",
+                            Resnumber: VehCancelRQCore.ResNumber.Number,
+                        }
+                    }
+                }
+                /*`<OTA_VehCancelRS xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehCancelRS.xsd" Version="2.001">
                     <VehRetResRSCore>
                     <VehReservation>
                         <Status>Cancelled</Status>
                         <Resnumber>${VehCancelRQCore.ResNumber.Number}</Resnumber>
                     </VehReservation>
                     </VehRetResRSCore>
-                </OTA_VehCancelRS>`
+                </OTA_VehCancelRS>`*/
             })
 
         return [
-            xml,
+            json,
             200,
             "OTA_VehCancelRS",
             { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd" }
         ]
 
+    } catch (error) {
+        if (error.response) {
+            throw new ApiError(error.response.data.error)
+        } else {
+            throw error
+        }
+    }
+}
+
+export const getSingleBooking = async (body: any) => {
+    //const validator = validateFor(schema)
+    //validator(body)
+
+    try {
+        const booking = await getRightCarsBooking(body)
+        if (!booking) throw new ApiError('Booking now found')
+        const xml = await createBookingsXmlResponse([booking])
+        const response = await xmlToJson(xml)
+
+        logger.info("Sending OTA_VehRetResRQ response")
+        return [
+            response.OTA_VehRetResRS,
+            200,
+            "OTA_VehRetResRS",
+            { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehRetResRS.xsd" }
+        ]
     } catch (error) {
         if (error.response) {
             throw new ApiError(error.response.data.error)

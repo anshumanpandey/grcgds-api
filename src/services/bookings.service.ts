@@ -1,9 +1,27 @@
 import { DB, getDbFor } from "../utils/DB";
-import { getCompanyLocations, getGrcgsCode, getGrcgsCodes } from "./locations.service";
+import { logger } from "../utils/Logger";
+import { getCompanyLocations } from "./locations.service";
+import { getHannkUserByEmail } from "./requestor.service";
 
-export const getBookings = async () => {
+type GetBookingsParams = { RequestorIDs? : string[], appUserEmail?: string }
+export const getBookings = async ({ RequestorIDs = [], appUserEmail }: GetBookingsParams ) => {
+    logger.info("Getting bookings")
+    const getBookingQuery = DB?.select().from("Bookings").whereNot('customerId', null)
+    if (appUserEmail) {
+        const hannkUser = await getHannkUserByEmail({ email: appUserEmail })
+        if (hannkUser) {
+            getBookingQuery?.where("customerId", hannkUser.id)
+        }
+    }
+    if (RequestorIDs && RequestorIDs.length != 0) {
+        getBookingQuery?.andWhere(function() {
+            RequestorIDs.forEach(id => {
+                this.orWhere("requestorId", id)
+            })
+        })
+    }
     const [r, extras ] = await Promise.all([
-        DB?.select().from("Bookings").whereNot('customerId', null),
+        getBookingQuery,
         DB?.select().from("BookingsExtras")
     ]);
 
@@ -34,6 +52,7 @@ export const cancelBookingByResNumber = async (resNumber: string) => {
 }
 
 export const createBookingsXmlResponse = async (bookings: any[]) => {
+    logger.info('Creating booking response')
     const codes = await getCompanyLocations()
     return `
     <?xml version="1.0"?>
@@ -124,14 +143,14 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <CountryName>
                     <Name/>
                     <Code/>
-                    <CountryCode>${codes.find(c => c.internal_code == b.pickLocation).country}</CountryCode>
+                    <CountryCode>${codes.find(c => c.internal_code == b.pickLocation)?.country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.pickLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.pickLocation).location}</Name>
+                <Name>${codes.find(c => c.internal_code == b.pickLocation)?.location || b.pickupFullAddress}</Name>
                 <CodeContext>Pickup Location</CodeContext>
                 </LocationDetails>
                 <LocationDetails>
@@ -142,14 +161,14 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <CountryName>
                         <Name/>
                         <Code/>
-                        <CountryCode>${codes.find(c => c.internal_code == b.dropoffLocation).country}</CountryCode>
+                        <CountryCode>${codes.find(c => c.internal_code == b.dropoffLocation)?.country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
                 <Code>${b.dropoffLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.dropoffLocation).location}</Name>
+                <Name>${codes.find(c => c.internal_code == b.dropoffLocation)?.location || b.dropoffFullAddress}</Name>
                 <CodeContext>Return Location</CodeContext>
                 </LocationDetails>
             </VehSegmentInfo>

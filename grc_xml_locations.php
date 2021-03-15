@@ -1,32 +1,6 @@
 <?php
-/*
-$curl = curl_init();
-
-curl_setopt_array($curl, array(
-  CURLOPT_URL => "https://www.grcgds.com/ota/",
-  CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_ENCODING => "",
-  CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 0,
-  CURLOPT_FOLLOWLOCATION => true,
-  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => "POST",
-  CURLOPT_POSTFIELDS =>"<?xml version=\"1.0\"?>\n<OTA_VehLocSearchRQ xmlns=\"http://www.opentravel.org/OTA/2003/05\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opentravel.org/OTA/2003/05    VehLocSearchRQ.xsd\" TimeStamp=\"2010-10-12T11:00:00\" Target=\"Test\" Version=\"1.002\">\n  <POS>\n    <Source>\n      <RequestorID Type=\"5\" ID=\"GRC-300000\" ID_NAME=\"Acme Rent A Car\"/>\n    </Source>\n  </POS>\n  <VehLocSearchCriterion>\n    <CONTEXT>\n      <Filter content=\"\" Language=\"EN\"/>\n    </CONTEXT>\n    <Address>\n      <CountryName Code=\"RO\"/>\n    </Address>\n  </VehLocSearchCriterion>\n</OTA_VehLocSearchRQ>\n",
-  CURLOPT_HTTPHEADER => array(
-    "Content-Type: application/xml"
-  ),
-));
-
-$response = curl_exec($curl);
-
-curl_close($curl);
-header('Content-type: text/xml');
-echo $response;
-*/
-
 
 //LEGACY IMPLEMENTATION
-
 //include("nusoap.php");
 function xml2array($contents, $get_attributes=1) {
     if(!$contents) return array();
@@ -69,7 +43,7 @@ function xml2array($contents, $get_attributes=1) {
             if(isset($attributes)) {
                 foreach($attributes as $attr => $val) {
                     if($get_attributes == 1) $result['attr'][$attr] = $val; //Set all the attributes in a array called 'attr'
-                    /**  :TODO: should we change the key name to '_attr'? Someone may use the tagname 'attr'. Same goes for 'value' too */
+                    //  :TODO: should we change the key name to '_attr'? Someone may use the tagname 'attr'. Same goes for 'value' too 
                 }
             }
         } elseif(isset($value)) {
@@ -116,15 +90,10 @@ function xml2array($contents, $get_attributes=1) {
     return($xml_array);
 }
 
+$url='<OTA_VehLocSearchRQ xmlns="http://www.opentravel.org/OTA/2003/05"                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"                xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05                VehLocSearchRQ.xsd" TimeStamp="2010-10-12T11:00:00" Target="Production" Version="1.002">                <POS>                <Source><RequestorID Type="5" ID="GRC-500000" RATEID="JO-6-1"/></Source></POS>                <VehLocSearchCriterion ExactMatch="true" >                <Address>                <AddressLine></AddressLine>                <CityName></CityName>                <PostalCode></PostalCode>                <CountryName Code="AM" />                </Address>                </VehLocSearchCriterion>                </OTA_VehLocSearchRQ>';
 
-$url = '<?xml version="1.0"?><OTA_VehLocSearchRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05    VehLocSearchRQ.xsd" TimeStamp="2010-10-12T11:00:00" Target="Test" Version="1.002">  <POS>    
-<Source>      <RequestorID Type="5" ID="GRC-300000" ID_NAME="Acme Rent A Car"/>    </Source>  </POS>  <VehLocSearchCriterion>    <CONTEXT>      
-<Filter content="" Language="EN"/>    </CONTEXT>    <Address>      <CountryName Code=""/>    </Address>  </VehLocSearchCriterion></OTA_VehLocSearchRQ>';
+//var_dump($url);
 
-//$gg="http://www.right-cars.com/OTATEST/";
-
-//$gg="https://www.grcgds.com/ota/";
 $gg="https://www.grcgds.com/XML/";
 
 $ch = curl_init();    // initialize curl handle
@@ -142,6 +111,3 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array (
 $result = curl_exec($ch); // run the whole process
 $resultarray = xml2array($result,1); //contains response from server
 var_dump($resultarray);
-//print_r($result);
-
-?>

@@ -1,6 +1,7 @@
 const requestIp = require('request-ip');
 import express from 'express';
 import { DB, getDbFor } from '../utils/DB';
+import { logger } from './Logger';
 const md5 = require('md5');
 
 export default () => {
@@ -8,37 +9,42 @@ export default () => {
         const ip = requestIp.getClientIp(req)
         console.log(ip)
         console.log(md5(ip))
+        let pos: any = null;
+        if (req.body.OTA_VehLocSearchRQ) {
+            pos = req.body.OTA_VehLocSearchRQ.POS
+        } else if (req.body.OTA_CountryListRQ) {
+            pos = req.body.OTA_CountryListRQ.POS
+        } else if (req.body.OTA_VehAvailRateRQ) {
+            pos = req.body.OTA_VehAvailRateRQ.POS
+        } else if (req.body.OTA_VehResRQ) {
+            pos = req.body.OTA_VehResRQ.POS
+        } else if (req.body.OTA_VehRetResRQ) {
+            pos = req.body.OTA_VehRetResRQ.POS
+        } else if (req.body.OTA_VehCancelRQ) {
+            pos = req.body.OTA_VehCancelRQ.POS
+        } else if (req.body.OTA_VehRetSingleResRQ) {
+            pos = req.body.OTA_VehRetSingleResRQ.POS
+        }
         DB?.select().where('pall', md5(ip)).table("white")
             .then((r) => {
                 if (r.length == 0) {
-                    n({ name: "UnauthorizedError" });
+                    logger.info("Whitelisted IP NOT found!")
+                    return getDbFor("grcgds_gateway_db")?.select()
+                        .from("api_key")
+                        .where({
+                            'key': pos.Source.ApiKey,
+                        })
+                } else {
+                    return [1]
                 }
-                let pos = null;
-                if (req.body.OTA_VehLocSearchRQ) {
-                    pos = req.body.OTA_VehLocSearchRQ.POS
-                } else if (req.body.OTA_CountryListRQ) {
-                    pos = req.body.OTA_CountryListRQ.POS
-                } else if (req.body.OTA_VehAvailRateRQ) {
-                    pos = req.body.OTA_VehAvailRateRQ.POS
-                } else if (req.body.OTA_VehResRQ) {
-                    pos = req.body.OTA_VehResRQ.POS
-                } else if (req.body.OTA_VehRetResRQ) {
-                    pos = req.body.OTA_VehRetResRQ.POS
-                } else if (req.body.OTA_VehCancelRQ) {
-                    pos = req.body.OTA_VehCancelRQ.POS
-                }
-                return getDbFor("grcgds_gateway_db")?.select()
-                    .from("clients")
-                    .innerJoin('BackOfficeUsers', 'BackOfficeUsers.id', 'clients.BackOfficeUserId')
-                    .where({
-                        'clients.id': pos.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4),
-                    })
             })
             .then((r) => {
-                if (r.length != 0) {
+                if (r && r.length != 0) {
+                    logger.info(`VALID API KEY ${pos.Source.ApiKey}!`)
                     n();
                 } else {
-                    n({ name: "RequestorIDError" });
+                    logger.info(`INVALID API KEY ${pos.Source.ApiKey}!`)
+                    n({ name: "UnauthorizedError" });
                 }
             })
             .catch((err) => {
