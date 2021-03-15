@@ -3,5 +3,6 @@ import BaseGrcgdsSearchUtils from "./BaseGrcgdsSearchUtils";
 export const LOCALCARS_URL = 'https://www.grcgds.com/XML/'
 
 export default async (body: any) => {
-    return BaseGrcgdsSearchUtils({ reqBody: body, rateId: "GRC-560000", grcgdsClientId: "52" })
+    const r = await BaseGrcgdsSearchUtils({ reqBody: body, requestorID: 'GRC-560000',rateId: "GRC-1450001", grcgdsClientId: "56", })
+    return r
 } 

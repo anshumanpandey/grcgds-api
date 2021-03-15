@@ -97,11 +97,11 @@ xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRQ.xsd
 TimeStamp="2020-06-04T19:32:01" Target="Production" Version="1.002">
 <POS>
 <Source>
-<RequestorID Type="5" ID="GRC-560000" RATEID="GRC-930001" RATETYPES=""/>
+<RequestorID Type="5" ID="GRC-560000" RATEID="GRC-1450001" RATETYPES=""/>
 </Source>
 </POS>
 <VehAvailRQCore Status="Available">
-<VehRentalCore PickUpDateTime="2021-03-20T12:00:00" ReturnDateTime="2021-03-29T10:00:00">
+<VehRentalCore PickUpDateTime="2021-03-20T12:00:00" ReturnDateTime="2021-05-29T10:00:00">
 <PickUpLocation LocationCode="NYCC01" />
 <ReturnLocation LocationCode="NYCC01" />
 </VehRentalCore>
