@@ -83,25 +83,28 @@ export default async (body: any) => {
         return []
     } else {
         return json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
-            .map((r: any) => ({
-                VehAvailCore: [{
-                    ...r.VehAvailCore[0],
-                    $: {
-                        ...r.VehAvailCore[0].$,
-                        Deeplink: r.VehAvailCore[0].$.deeplink,
-                        "Supplier_ID": `GRC-${rc.clientId}0000`,
-                        "Supplier_Name": rc.clientname,
-                    },
-                    Vehicle: [{
-                        ...r.VehAvailCore[0].Vehicle[0],
+            .map((r: any) => {
+                const { deeplink, ...vehCoreMeta } = r.VehAvailCore[0].$
+                return {
+                    VehAvailCore: [{
+                        ...r.VehAvailCore[0],
                         $: {
-                            ...r.VehAvailCore[0].Vehicle[0].$,
-                            "Brand": rc.clientname,
-                            "BrandPicURL": "https://supplierimages.rent.it/rightcars.jpg",
+                            ...vehCoreMeta,
+                            Deeplink: deeplink,
+                            "Supplier_ID": `GRC-${rc.clientId}0000`,
+                            "Supplier_Name": rc.clientname,
                         },
-                    }]
-                }],
-            }))
+                        Vehicle: [{
+                            ...r.VehAvailCore[0].Vehicle[0],
+                            $: {
+                                ...r.VehAvailCore[0].Vehicle[0].$,
+                                "Brand": rc.clientname,
+                                "BrandPicURL": "https://supplierimages.rent.it/rightcars.jpg",
+                            },
+                        }]
+                    }],
+                }
+            })
     }
 
 }
