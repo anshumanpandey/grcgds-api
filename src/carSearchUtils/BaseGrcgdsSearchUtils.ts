@@ -23,11 +23,22 @@ const getDataUser = async (body: any) => {
     return r && r.length != 0 ? r[0] : null
 }
 
-const generateXmlBody = (body: any) => {
+const getCodeForGrcCode = async ({ grcCode, clientId }: { grcCode: string, clientId: string}) => {
+    const r = await DB?.select().from("companies_locations")
+        .where("GRCGDSlocatincode", grcCode)
+        .where("clientId", clientId)
+    return r && r.length != 0 ? r[0].internal_code : null
+}
+
+const generateXmlBody = async (body: any) => {
+    const [pickCode, dropCode] = await Promise.all([
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, clientId: body.grcgdsClientId }),
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, clientId: body.grcgdsClientId }),
+    ])
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
     const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
-    const pickLocation = body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode
-    const dropLocation = body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode
+    const pickLocation = pickCode
+    const dropLocation = dropCode
     const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
@@ -60,12 +71,12 @@ const generateXmlBody = (body: any) => {
     </OTA_VehAvailRateRQ>`
 }
 
-export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'https://www.grcgds.com/XML/' }: { reqBody: any, rateId: string, requestorID?: string,grcgdsClientId: string, url?: string }) => {
+export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'https://www.grcgds.com/XML/', }: { reqBody: any, rateId: string, requestorID?: string,grcgdsClientId: string, url?: string }) => {
 
     const t = await getDataUser(reqBody);
 
     const grc = await getGrcgds({ clientId: grcgdsClientId })
-    const xml = generateXmlBody({ ...reqBody, rateId, requestorID, account_code: t?.account_code});
+    const xml = await generateXmlBody({ ...reqBody, rateId, requestorID, account_code: t?.account_code, grcgdsClientId });
 
     const { data } = await axios.post(url, xml, {
         headers: {

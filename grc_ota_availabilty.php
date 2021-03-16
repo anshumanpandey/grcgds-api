@@ -26,9 +26,9 @@ curl_setopt_array($curl, array(
   </CONTEXT>
   <VehAvailRQCore Status="Available">
     <Currency Code="EUR"/>
-    <VehRentalCore PickUpDateTime="2021-03-17T08:00:00" ReturnDateTime="2021-03-29T19:00:00">
-      <PickUpLocation LocationCode="3267"/>
-      <ReturnLocation LocationCode="3267"/>
+    <VehRentalCore PickUpDateTime="2021-04-20T12:00:00" ReturnDateTime="2021-04-29T10:00:00">
+      <PickUpLocation LocationCode="JFKC01"/>
+      <ReturnLocation LocationCode="JFKC01"/>
     </VehRentalCore>
   </VehAvailRQCore>
   <VehAvailRQInfo>

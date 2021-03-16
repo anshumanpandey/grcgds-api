@@ -26,9 +26,9 @@ curl_setopt_array($curl, array(
                 </Source>
             </POS>
             <VehAvailRQCore Status="Available">
-                <VehRentalCore PickUpDateTime="2021-05-08T10:00:00" ReturnDateTime="2021-05-20T10:00:00">
-                    <PickUpLocation LocationCode="CHC01" PointCode="1"/>
-                    <ReturnLocation LocationCode="CHC01" PointCode="1"/>
+                <VehRentalCore PickUpDateTime="2021-07-08T10:00:00" ReturnDateTime="2021-07-20T10:00:00">
+                    <PickUpLocation LocationCode="AUC2874S" PointCode="1"/>
+                    <ReturnLocation LocationCode="AUC2874S" PointCode="1"/>
                 </VehRentalCore>
                 <VendorPrefs>
                     <VendorPref Code="yesaway"/>
