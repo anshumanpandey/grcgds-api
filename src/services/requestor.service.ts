@@ -1,4 +1,5 @@
 import EasitentSearchUtil, { EASIRENT_URL } from "../carSearchUtils/EasitentSearchUtil"
+import EasyRentSearchUtils from "../carSearchUtils/EasyRentSearchUtils"
 import GrcgdsSearchUtils, { GRCGDS_URL } from "../carSearchUtils/GrcgdsSearchUtils"
 import JimpsoftSearchUtil, { JIMPSOFT_URL } from "../carSearchUtils/JimpsoftSearchUtil"
 import LocalcarsSearchUtils, { LOCALCARS_URL } from "../carSearchUtils/LocalcarsSearchUtils"
@@ -73,12 +74,22 @@ export const getHannkUserByEmail = async ({ email }: { email: string }) => {
 }
 
 export const SUPORTED_URL = new Map();
-SUPORTED_URL.set(GRCGDS_URL, (body: any) => GrcgdsSearchUtils(body))
+SUPORTED_URL.set(GRCGDS_URL, (body: any) => {
+    if (body.POS.Source.RequestorID.ID.slice(4, 6) == "65") {
+        return EasyRentSearchUtils(body)
+    } else if (body.POS.Source.RequestorID.ID.slice(4, 6) == "32") {
+        return LocalcarsSearchUtils(body)
+    } else if (body.POS.Source.RequestorID.ID.slice(4, 6) == "36") {
+        return LocalcarsSearchUtils(body)
+    } else if (body.POS.Source.RequestorID.ID.slice(4, 6) == "56") {
+        return LocalcarsSearchUtils(body)
+    }
+    return GrcgdsSearchUtils(body)
+})
 SUPORTED_URL.set(RC_URL, (body: any) => RightCarsSearchUtils(body))
 SUPORTED_URL.set(EASIRENT_URL, (body: any) => EasitentSearchUtil(body))
 SUPORTED_URL.set(RENTI_URL, (body: any) => RentitCarsSearchUtil(body))
 SUPORTED_URL.set(UNITEDCAR_URL, (body: any) => UnitedCarsSearchUtil(body))
-SUPORTED_URL.set(LOCALCARS_URL, (body: any) => LocalcarsSearchUtils(body))
 SUPORTED_URL.set(LOCALCARS_URL, (body: any) => LocalcarsSearchUtils(body))
 SUPORTED_URL.set(RETAJ_URL, (body: any) => RetajSearchUtils(body))
 SUPORTED_URL.set(ZEZGO_URL, (body: any) => ZezgoCarsSearchUtils(body))
