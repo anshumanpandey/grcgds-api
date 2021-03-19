@@ -7,6 +7,7 @@ import JwtMiddleware from '../utils/JwtMiddleware';
 import { searchCars } from '../controllers/carsearch.controller';
 import { cancelBooking, createBooking, getSingleBooking, searchBookings } from '../controllers/booking.controller';
 import { logger } from '../utils/Logger';
+import { createInspection } from '../controllers/inspection.controller';
 
 export const routes = express();
 
@@ -38,6 +39,11 @@ routes.post('/', XmlMiddleware(), JwtMiddleware(),expressAsyncHandler(async (req
       BuildXmlResponse(res,...r)
     } else if (req.body.OTA_VehRetSingleResRQ) {
       const r = await getSingleBooking(req.body.OTA_VehRetSingleResRQ)
+      //@ts-expect-error
+      BuildXmlResponse(res,...r)
+    } else if (req.body.OTA_VehInspectionRQ) {
+      logger.info(`Resolving OTA_VehInspectionRQ`)
+      const r = await createInspection()
       //@ts-expect-error
       BuildXmlResponse(res,...r)
     } else {
