@@ -95,7 +95,7 @@ export default async (body: any) => {
         POS,
         xml,
         price: RentalPaymentPref.Voucher.PaymentCard.AmountPaid,
-        grcgdsClient: "1",
+        grcgdsClient: "10",
         hannkUser: await getHannkUserByEmail({ email: Email }),
         extras: [],
         resNumber: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]

@@ -14,11 +14,11 @@ curl_setopt_array($curl, array(
   CURLOPT_POSTFIELDS =>'<OTA_VehCancelRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 VehCancelRQ.xsd">
     <POS>
         <Source>
-            <RequestorID Type="5" ID="GRC-580000" ID_NAME="Acme Rent A Car"/>
+            <RequestorID Type="5" ID="GRC-660000" RATEID="GRC-10000" />
         </Source>
     </POS>
     <VehCancelRQCore>
-        <ResNumber Number="'. $_GET["resnumber"].'" />
+        <ResNumber Number="'.$_GET["resnumber"].'" />
     </VehCancelRQCore>
     <VehCancelRQInfo>
     </VehCancelRQInfo>
