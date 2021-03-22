@@ -48,7 +48,7 @@ export default async (body: any) => {
     <VehPref Code="${VehPref.Code}" />
     <SpecialEquipPrefs>
     </SpecialEquipPrefs><PromoDesc></PromoDesc></VehResRQCore><VehResRQInfo/>
-    
+    <VehResRQInfo>
     <ArrivalDetails FlightNo="IB3154"/>
     <RentalPaymentPref>
     <Voucher Identifier="${RentalPaymentPref.Voucher.Identifier}">
@@ -61,7 +61,9 @@ export default async (body: any) => {
     
     </PaymentCard>
     </Voucher>
-    </RentalPaymentPref></OTA_VehResRQ>`;
+    </RentalPaymentPref>
+    <VehResRQInfo>
+    </OTA_VehResRQ>`;
 
 
     const { data } = await axios.post('https://OTA.right-cars.com/', xml, {
@@ -69,6 +71,11 @@ export default async (body: any) => {
             "Content-Type": "application/soap+xml;charset=utf-8"
         }
     })
+
+    if (data == "") {
+        throw new ApiError("Could not create the booking")
+    }
+
 
     if (data.includes("Error")) {
         throw new XmlError(data)
