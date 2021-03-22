@@ -10,7 +10,7 @@ import { isGrcgdsLocations } from '../services/locations.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
 import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
 import { logger } from '../utils/Logger';
-import ZezgoBooking from '../carsBookingUtils/ZezgoBooking';
+import ZezgoBooking, { cancelZezgoBooking } from '../carsBookingUtils/ZezgoBooking';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1146,8 +1146,9 @@ export const cancelBooking = async (body: any) => {
     const { VehCancelRQCore, POS: { Source: { RequestorID } } } = body
 
     const supportedServices = [
-        cancelGrcBooking,
-        cancelUnitedCarBooking
+        cancelZezgoBooking,
+        cancelUnitedCarBooking,
+        cancelRightCarsBooking
     ];
 
     try {

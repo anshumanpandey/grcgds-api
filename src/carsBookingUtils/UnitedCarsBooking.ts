@@ -106,6 +106,11 @@ export const cancelUnitedCarBooking = async (body: any) => {
     try {
         const { data } = await axios.post('http://ws.karveinformatica.com:186/Union5/soap/RentaCarPort', xml)
 
+        if (data.contains('Not Exist')) {
+            throw new ApiError("UnitedCars Booking not cancelled")
+        }
+        
+
         return true
     } catch (error) {
         if (error.response) {

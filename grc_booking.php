@@ -15,26 +15,26 @@ curl_setopt_array($curl, array(
     <OTA_VehResRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd">
       <POS>
         <Source>
-          <RequestorID Type="5" ID="GRC-580000" RATEID="GRC-880001" />
+          <RequestorID Type="5" ID="GRC-660000" RATEID="GRC-100000" />
             <ApiKey>
                 c32419e4-d316-4a54-b20d-296eb2dcf7a2
             </ApiKey>
         </Source>
       </POS>
       <VehResRQCore>
-        <VehRentalCore PickUpDateTime="2021-03-25T10:30" ReturnDateTime="2021-03-29T10:30">
-            <PickUpLocation LocationCode="RAKA01" />
-            <ReturnLocation LocationCode="RAKA01" />
+        <VehRentalCore PickUpDateTime="2021-05-25T10:30" ReturnDateTime="2021-05-29T10:30">
+            <PickUpLocation LocationCode="DBVC01" />
+            <ReturnLocation LocationCode="DBVC01" />
         </VehRentalCore>
         <Customer>
           <Primary>
             <PersonName>
               <NamePrefix>Sr</NamePrefix>
-                <GivenName>Leonardo</GivenName>
-                <Surname></Surname>
+                <GivenName>Rick</GivenName>
+                <Surname>Little</Surname>
             </PersonName>
             <Telephone> 
-                <PhoneNumber>+58 4169943464</PhoneNumber> 
+                <PhoneNumber>+44 4169943464</PhoneNumber> 
             </Telephone> 
             <Email>test25@test.com</Email>
             <Address>
@@ -46,7 +46,7 @@ curl_setopt_array($curl, array(
           </Primary>
         </Customer>
         <VendorPref/>
-        <VehPref RateId="RATE OCT" SearchId="" Code="MCMR" Acriss="MCMR" price="" />
+        <VehPref RateId="RATE OCT" SearchId="" Code="MDMR-8-3493" Acriss="MCMR" price="" />
         <SpecialEquipPrefs>
     
     </SpecialEquipPrefs>
