@@ -5,7 +5,7 @@ import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
 import RightCarsBooking, { cancelRightCarsBooking, getRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
 import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
-import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings } from '../services/bookings.service';
+import { BOOKING_STATUS_ENUM, cancelBookingByResNumber, createBookingsXmlResponse, getBookings, getBookingsBy } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
 import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
@@ -1145,6 +1145,13 @@ export const cancelBooking = async (body: any) => {
     //validator(body)
     const { VehCancelRQCore, POS: { Source: { RequestorID } } } = body
 
+    const resNumber = VehCancelRQCore.ResNumber.Number
+
+    const bookings = await getBookingsBy({ requestorId: RequestorID.ID, resNumber, grcgdsClientId: RequestorID.RATEID.slice(4).slice(0,-4) })
+
+    if (bookings.length === 0) throw new ApiError("Booking not found")
+    if (bookings.every(b => b.reservationStatus === BOOKING_STATUS_ENUM.CANCELLED)) throw new ApiError("Booking not found")
+
     const supportedServices = [
         cancelZezgoBooking,
         cancelUnitedCarBooking,
@@ -1160,7 +1167,7 @@ export const cancelBooking = async (body: any) => {
                 const successfullCalls = promises.filter((p: any) => p.status == "fulfilled")
                 if (successfullCalls.length == 0) throw new ApiError("Could not cancell the booking")
 
-                return cancelBookingByResNumber(VehCancelRQCore.ResNumber.Number)
+                return cancelBookingByResNumber(resNumber)
             })
             .then(() => {
                 json = {
@@ -1171,14 +1178,6 @@ export const cancelBooking = async (body: any) => {
                         }
                     }
                 }
-                /*`<OTA_VehCancelRS xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05 OTA_VehCancelRS.xsd" Version="2.001">
-                    <VehRetResRSCore>
-                    <VehReservation>
-                        <Status>Cancelled</Status>
-                        <Resnumber>${VehCancelRQCore.ResNumber.Number}</Resnumber>
-                    </VehReservation>
-                    </VehRetResRSCore>
-                </OTA_VehCancelRS>`*/
             })
 
         return [

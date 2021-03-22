@@ -3,6 +3,10 @@ import { logger } from "../utils/Logger";
 import { getCompanyLocations } from "./locations.service";
 import { getHannkUserByEmail } from "./requestor.service";
 
+export enum BOOKING_STATUS_ENUM {
+    CANCELLED = "Cancelled"
+}
+
 type GetBookingsParams = { RequestorIDs? : string[], appUserEmail?: string }
 export const getBookings = async ({ RequestorIDs = [], appUserEmail }: GetBookingsParams ) => {
     logger.info("Getting bookings")
@@ -47,8 +51,19 @@ export const cancelBookingByResNumber = async (resNumber: string) => {
     return DB?.select().from("Bookings")
     .where('resNumber', resNumber)
     .update({
-        reservationStatus: 'Cancelled',
+        reservationStatus: BOOKING_STATUS_ENUM.CANCELLED,
     })
+}
+
+export const getBookingsBy = async ({ requestorId, grcgdsClientId, resNumber }: { requestorId: string, grcgdsClientId: string, resNumber: string }) => {
+    const bookings = await DB?.select().from("Bookings")
+    .where('requestorId', requestorId)
+    .where('grcgdsClient', grcgdsClientId)
+    .where('resNumber', resNumber)
+
+    if (!bookings) return []
+
+    return bookings
 }
 
 export const createBookingsXmlResponse = async (bookings: any[]) => {
