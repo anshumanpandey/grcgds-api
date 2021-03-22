@@ -123,11 +123,11 @@ xmlns="http://www.opentravel.org/OTA/2003/05"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation = "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd" >
 <POS>
     <Source>
-        <RequestorID Type="5" ID="GRC-300000" RATEID="GRC-930001" RATETYPES=""/>
+        <RequestorID Type="5" ID="GRC-360000" RATEID="GRC-930005"/>
     </Source>
 </POS>
 <VehResRQCore>
-    <VehRentalCore PickUpDateTime="2020-11-01T12:00:00" ReturnDateTime="2020-11-10T10:00:00">
+    <VehRentalCore PickUpDateTime="2021-04-17T09:00" ReturnDateTime="2021-04-18T09:00">
         <PickUpLocation LocationCode="AMMA01" />
         <ReturnLocation LocationCode="AMMA01" />
     </VehRentalCore>
@@ -149,7 +149,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation = "http
         </Primary>
     </Customer>
     <VendorPref></VendorPref>
-    <VehPref Code="ECAR-8-10319" Acriss="FVMR" price="59.99"/>
+    <VehPref Code="FVMR-8-8486" Acriss="FVMR" price="59.99"/>
     <SpecialEquipPrefs></SpecialEquipPrefs>
     <PromoDesc></PromoDesc>
 </VehResRQCore>

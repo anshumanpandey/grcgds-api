@@ -80,7 +80,8 @@ export default async (body: any) => {
 
         const reservation = await xmlToJson(data);
 
-        if (reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0] === "000001") {
+        const resNumber = reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
+        if (resNumber === "000001") {
             throw new ApiError("Your booking could not be created")
         }
 
@@ -96,7 +97,7 @@ export default async (body: any) => {
             price: RentalPaymentPref.Voucher.PaymentCard.AmountPaid,
             hannkUser: await getHannkUserByEmail({ email: Email }),
             grcgdsClient: "36",
-            resNumber: reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0],
+            resNumber: resNumber,
             extras: VehResRQCore.SpecialEquipPrefs.SpecialEquipPref
         }
         await LogBookingToDb(toInsert)
