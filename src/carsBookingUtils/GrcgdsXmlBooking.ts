@@ -80,6 +80,10 @@ export default async (body: any) => {
 
         const reservation = await xmlToJson(data);
 
+        if (reservation.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0] === "000001") {
+            throw new ApiError("Your booking could not be created")
+        }
+
         const toInsert = {
             pickupDate,
             pickupTime,
