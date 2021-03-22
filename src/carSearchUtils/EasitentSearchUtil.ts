@@ -69,7 +69,7 @@ export default async (params: any) => {
                 $: {
                     "VehID": "",
                     "Deeplink": $VehAvail.deeplink[0].replace(/\s/g, "").replace(/[\r]/g, "").replace(/[\n]/g, ""),
-                    "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
+                    "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
                 },
                 "Vehicle": [{

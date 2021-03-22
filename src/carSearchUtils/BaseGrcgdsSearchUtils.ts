@@ -94,7 +94,7 @@ export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'htt
                     ...r.VehAvailCore[0],
                     $: {
                         ...r.VehAvailCore[0].$,
-                        "Supplier_ID": `GRC-${grc.clientAccountCode}`,
+                        "Supplier_ID": `GRC-${grc.clientId}0000`,
                         "Supplier_Name": grc.clientname,
                     },
                 }],

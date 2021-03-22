@@ -58,7 +58,7 @@ export default async (params: any) => {
                     "SearchUID": $VehAvail["SearchUID"],
                     "VehID": $VehAvail["CarUID"],
                     "Deeplink": $VehAvail["BookingPageUrl"],
-                    "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
+                    "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
                 },
                 "Vehicle": [{

@@ -40,7 +40,7 @@ export default async (params: any) => {
                 $: {
                     "VehID": "",
                     "Deeplink": car.deeplink,
-                    "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
+                    "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
                 },
                 "Vehicle": [{

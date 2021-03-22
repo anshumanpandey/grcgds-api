@@ -83,7 +83,7 @@ export default async (params: any) => {
                     "VehID": "",
                     //missing booking url on response
                     "Deeplink": "",
-                    "Supplier_ID": u.clientAccountCode ? `GRC-${u.clientAccountCode}` : `GRC-${u.clientId}0001`,
+                    "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
                 },
                 "Vehicle": [{
