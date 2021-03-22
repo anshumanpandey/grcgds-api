@@ -1,9 +1,12 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://apigwtest.click-ins.com:57453/rest/v2/inspections?key=56ff54d7-7045-4415-9f1c-60e5601e0b92&upload_type=MULTIPART',
+  CURLOPT_URL => 'http://34.89.158.132:57453/rest/v2/inspections?key=56ff54d7-7045-4415-9f1c-60e5601e0b92&upload_type=multipart',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -53,5 +56,9 @@ curl_setopt_array($curl, array(
 $response = curl_exec($curl);
 
 curl_close($curl);
-header('Content-Type: application/json');
-echo $response;
+if($response === false) {
+  echo 'Curl error: ' . curl_error($curl);
+}
+else {
+  var_dump($response);
+}
