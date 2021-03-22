@@ -10,6 +10,7 @@ import { isGrcgdsLocations } from '../services/locations.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
 import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
 import { logger } from '../utils/Logger';
+import ZezgoBooking from '../carsBookingUtils/ZezgoBooking';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1089,6 +1090,8 @@ export const createBooking = async (body: any) => {
             json = await UnitedCarsBooking(body)
         } else if (RequestorID.RATEID == "GRC-10000") {
             json = await RightCarsBooking(body)
+        } else if (RequestorID.RATEID == "GRC-100000") {
+            json = await ZezgoBooking(body)
         } else {
             json = await GrcgdsXmlBooking(body)
         }
