@@ -694,7 +694,6 @@ const schema = {
                         }
                     ],
                     "required": [
-                        "SearchId",
                         "Code",
                         "Acriss",
                         "price"

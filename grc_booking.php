@@ -16,9 +16,6 @@ curl_setopt_array($curl, array(
       <POS>
         <Source>
           <RequestorID Type="5" ID="GRC-660000" RATEID="GRC-100000" />
-            <ApiKey>
-                c32419e4-d316-4a54-b20d-296eb2dcf7a2
-            </ApiKey>
         </Source>
       </POS>
       <VehResRQCore>
