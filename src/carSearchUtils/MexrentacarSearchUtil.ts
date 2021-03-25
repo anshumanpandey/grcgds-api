@@ -3,6 +3,7 @@ import { parse } from 'date-fns'
 import { format } from 'date-fns'
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
+import { getPaypalCredentials } from "../utils/getPaypalCredentials"
 
 const URL_PATH = "https://mexrentacar.com/api/v1/rateRequest"
 export const MEXRENT_URL = URL_PATH
@@ -84,6 +85,7 @@ export default async (params: any) => {
                     "Deeplink": "",
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
+                    ...getPaypalCredentials(u)
                 },
                 "Vehicle": [{
                     $: {

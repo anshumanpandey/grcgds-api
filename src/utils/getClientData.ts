@@ -1,7 +1,13 @@
 import { DB } from "../utils/DB"
 
 export const getClientData = async ({ id }: { id: string | number }) => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
+    const r = await DB?.select({
+        clientId: "clients.id",
+        clientname: "clients.clientname",
+        clientAccountCode: "data_suppliers_user.account_code",
+        paypalClientId: "paypalClientId",
+        paypalSecretKey: "paypalSecretKey",
+    })
         .from("clients")
         .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
         .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')

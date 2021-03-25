@@ -73,12 +73,7 @@ export const wrapCarsResponseIntoXml = (cars: any[], params: any) => {
               {
                 VehAvails: [
                   {
-                    VehAvail: cars.map(r => {
-                      r.VehAvailCore[0].$.PaymentClientID = "AULf9Sl8sTQh_qg1YdRivkb25yh04L8npaWCinbQYI-rXAI_FHjySNWwhqgC3l2co2v3UVZOTe4Ut3s2"
-                      r.VehAvailCore[0].$.PaymentKey = "EBvmJupOC4USrlufwkkSvtEWifz_KQmpbpX4Rap57Vw-_uU6PHdufZpzCHbjbmS9z2fpH_dSWEN6IFea"
-                      r.VehAvailCore[0].$.PaymentMethod = "Paypal"
-                      return r
-                    }),
+                    VehAvail: cars,
                   },
                 ],
               },

@@ -1,16 +1,8 @@
 import axios from "axios"
-import { getDataUsersForUserId } from "../services/requestor.service";
 import { DB } from "../utils/DB";
+import { getClientData } from "../utils/getClientData";
+import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
-
-const getGrcgds = async ({ clientId }: { clientId: string }) => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
-        .from("clients")
-        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
-        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", clientId)
-    return r && r.length != 0 ? r[0] : null
-}
 
 const getDataUser = async (body: any) => {
     const query = DB?.select()
@@ -75,7 +67,7 @@ export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'htt
 
     const t = await getDataUser(reqBody);
 
-    const grc = await getGrcgds({ clientId: grcgdsClientId })
+    const grc = await getClientData({ id: grcgdsClientId })
     const xml = await generateXmlBody({ ...reqBody, rateId, requestorID, account_code: t?.account_code, grcgdsClientId });
 
     const { data } = await axios.post(url, xml, {
@@ -96,6 +88,7 @@ export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'htt
                         ...r.VehAvailCore[0].$,
                         "Supplier_ID": `GRC-${grc.clientId}0000`,
                         "Supplier_Name": grc.clientname,
+                        ...getPaypalCredentials(grc)
                     },
                 }],
             }))

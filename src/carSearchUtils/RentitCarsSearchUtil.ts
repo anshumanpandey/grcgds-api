@@ -1,6 +1,7 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
+import { getPaypalCredentials } from "../utils/getPaypalCredentials"
 
 const URL_PATH = "https://webapi.rent.it/api-ri/Quote/CreateAndLoad/"
 export const RENTI_URL = URL_PATH
@@ -37,6 +38,7 @@ export default async (params: any) => {
                     "Deeplink": rate.BookUrl,
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
+                    ...getPaypalCredentials(u)
                 },
                 "Vehicle": [{
                     $: {

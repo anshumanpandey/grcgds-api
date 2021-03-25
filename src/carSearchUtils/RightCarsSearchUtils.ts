@@ -1,6 +1,7 @@
 import axios from "axios"
 import { DB } from "../utils/DB";
 import { getClientData } from "../utils/getClientData";
+import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
 const allSettled = require('promise.allsettled');
 
@@ -85,6 +86,7 @@ export default async (body: any) => {
                             Deeplink: deeplink,
                             "Supplier_ID": `GRC-${rc.clientId}0000`,
                             "Supplier_Name": rc.clientname,
+                            ...getPaypalCredentials(rc)
                         },
                         Vehicle: [{
                             ...r.VehAvailCore[0].Vehicle[0],

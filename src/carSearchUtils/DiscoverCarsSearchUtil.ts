@@ -1,6 +1,7 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
+import { getPaypalCredentials } from "../utils/getPaypalCredentials"
 
 const URL = 'https://api-partner.discovercars.com/api/Aggregator/GetCars?access_token=yHjjy7XZVTsVTb4zP3HLc3uQP3ZJEvBkKBuwWhSwNCkafCXx5ykRmhJdnqW2UJT3'
 const formatDate = (fullDate: string) => {
@@ -53,6 +54,7 @@ export default async (params: any) => {
                     "Deeplink": $VehAvail["BookingPageUrl"],
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
+                    ...getPaypalCredentials(u)
                 },
                 "Vehicle": [{
                     $: {

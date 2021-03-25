@@ -1,6 +1,7 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData";
+import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
 
 export const EASIRENT_URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
@@ -63,6 +64,7 @@ export default async (params: any) => {
                     "Deeplink": $VehAvail.deeplink[0].replace(/\s/g, "").replace(/[\r]/g, "").replace(/[\n]/g, ""),
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
+                    ...getPaypalCredentials(u)
                 },
                 "Vehicle": [{
                     $: {
