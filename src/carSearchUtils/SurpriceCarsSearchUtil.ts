@@ -1,5 +1,6 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
+import { getClientData } from "../utils/getClientData"
 
 const getUrl = async (params: any) => {
     const [pickCode, dropCode ] = await Promise.all([
@@ -10,16 +11,6 @@ const getUrl = async (params: any) => {
     const [dropDate, dropTime] = params.VehAvailRQCore.VehRentalCore.PickUpDateTime.split("T")
     return `https://www.grcgds.com/surprice_api/available_api.php?pickuplocationcode=${pickCode}&pickupdate=${pickDate}&pickuptime=${pickTime}&returnlocationcode=${dropCode}&returndate=${dropDate}&returntime=${dropTime}&age=30`
 }
-
-const getDiscoverCarsUser = async () => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
-        .from("clients")
-        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
-        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", 37)
-    return r && r.length != 0 ? r[0] : null
-}
-
 const getCodeForGrcCode = async (grcCode: string) => {
     const r = await DB?.select().from("companies_locations")
         .where("GRCGDSlocatincode", grcCode)
@@ -32,7 +23,7 @@ export default async (params: any) => {
     const url = await getUrl(params)
     const { data } = await Axios.get(url, {})
 
-    const u = await getDiscoverCarsUser()
+    const u = await getClientData({ id: 37 })
 
     return data.map((car: any) => {
         return {

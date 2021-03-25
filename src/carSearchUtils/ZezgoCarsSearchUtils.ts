@@ -1,16 +1,8 @@
 import axios from "axios"
 import { getDataUsersForUserId } from "../services/requestor.service";
 import { DB } from "../utils/DB";
+import { getClientData } from "../utils/getClientData";
 import { xmlToJson } from '../utils/XmlConfig';
-
-const getGrcgds = async () => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
-        .from("clients")
-        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
-        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", 10)
-    return r && r.length != 0 ? r[0] : null
-}
 
 const getDataUser = async (body: any) => {
     const query = DB?.select()
@@ -73,7 +65,8 @@ export default async (body: any) => {
 
     const t = await getDataUser(body);
 
-    const grc = await getGrcgds()
+    const grc = await getClientData({ id: 10 })
+
     const xml = await generateXmlBody({ ...body, account_code: t?.account_code});
 
     const { data } = await axios.post(ZEZGO_URL, xml, {

@@ -1,20 +1,12 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
+import { getClientData } from "../utils/getClientData";
 import { xmlToJson } from '../utils/XmlConfig';
 
 export const EASIRENT_URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
 const getDateTime = (fullDate: string) => {
     const [date, time] = fullDate.split('T')
     return [date, time.slice(0, 5)]
-}
-
-const getDiscoverCarsUser = async () => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
-        .from("clients")
-        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
-        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", 57)
-    return r && r.length != 0 ? r[0] : null
 }
 
 const getCodeForGrcCode = async (grcCode: string) => {
@@ -58,7 +50,7 @@ export default async (params: any) => {
 
     const [{ data }, u, ] = await Promise.all([
         Axios.post(EASIRENT_URL, body, {}),
-        getDiscoverCarsUser()
+        getClientData({ id: 57 })
     ])
 
     const json = await xmlToJson(data, { charkey: "" });

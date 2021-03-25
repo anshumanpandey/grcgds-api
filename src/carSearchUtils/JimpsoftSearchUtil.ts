@@ -1,5 +1,6 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
+import { getClientData } from "../utils/getClientData";
 import { xmlToJson } from '../utils/XmlConfig';
 const https = require('https');
 
@@ -8,15 +9,6 @@ const getDateTime = (fullDate: string) => {
     //2021-02-02 10:00
     const [date, time] = fullDate.split('T')
     return `${date} ${time.slice(0, 5)}`
-}
-
-const getDiscoverCarsUser = async () => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
-        .from("clients")
-        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
-        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", 16)
-    return r && r.length != 0 ? r[0] : null
 }
 
 
@@ -72,7 +64,7 @@ export default async (params: any) => {
         data: body
     })
 
-    const u = await getDiscoverCarsUser()
+    const u = await getClientData({ id: 16 })
 
     const json = await xmlToJson(data, { charkey: "" });
 

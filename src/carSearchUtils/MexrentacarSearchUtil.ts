@@ -2,6 +2,7 @@ import Axios from "axios"
 import { parse } from 'date-fns'
 import { format } from 'date-fns'
 import { DB } from "../utils/DB"
+import { getClientData } from "../utils/getClientData"
 
 const URL_PATH = "https://mexrentacar.com/api/v1/rateRequest"
 export const MEXRENT_URL = URL_PATH
@@ -34,15 +35,6 @@ const getDateTime = (fullDate: string) => {
     const [date] = fullDate.split('T')
     
     return [date, format(dateObj, `hh:mm aaaaa'm'`)]
-}
-
-const getDiscoverCarsUser = async () => {
-    const r = await DB?.select({ brandUrl: "clients.logo_name",clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
-        .from("clients")
-        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
-        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", 62)
-    return r && r.length != 0 ? r[0] : null
 }
 
 const getCodeForGrcCode = async (grcCode: string) => {
@@ -81,8 +73,7 @@ export default async (params: any) => {
         }
     })
 
-    const u = await getDiscoverCarsUser()
-    
+    const u = await getClientData({ id: 62 })    
 
     return data.data.map((rate: any) => {
         return {

@@ -1,16 +1,8 @@
 import axios from "axios"
 import { DB } from "../utils/DB";
+import { getClientData } from "../utils/getClientData";
 import { xmlToJson } from '../utils/XmlConfig';
 const allSettled = require('promise.allsettled');
-
-const getRightCars = async () => {
-    const r = await DB?.select({ clientId: "clients.id", clientname: "clients.clientname", clientAccountCode: "data_suppliers_user.account_code" })
-        .from("clients")
-        .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
-        .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
-        .where("clients.id", 1)
-    return r && r.length != 0 ? r[0] : null
-}
 
 const getRightCarsDataUsers = async () => {
     const r = await DB?.select()
@@ -65,7 +57,7 @@ export const RC_URL = 'https://ota.right-cars.com'
 export default async (body: any) => {
 
     const [rc, dataUsers] = await Promise.all([
-        getRightCars(),
+        getClientData({ id: 1 }),
         getRightCarsDataUsers()
     ]);
 
