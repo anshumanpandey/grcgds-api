@@ -3,6 +3,9 @@ export const getPaypalCredentials = (user: any) => {
         "PaymentClientID": "",
         "PaymentKey": "",
         "PaymentMethod": "",
+        ElectronicAgreements: user.electronic_agreement || "",
+        AgreementFormat: user.agreement_format || "",
+        CancellationPeriod: user.cancellation_period || "",
     }
 
     if (!user.paypalClientId || !user.paypalSecretKey) return res
