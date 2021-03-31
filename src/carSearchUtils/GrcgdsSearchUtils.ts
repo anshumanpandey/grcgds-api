@@ -80,7 +80,7 @@ export default async (body: any) => {
                         ...r.VehAvailCore[0].$,
                         "Supplier_ID": `GRC-${grc.clientId}0000`,
                         "Supplier_Name": grc.clientname,
-                        ...getPaypalCredentials(body.requestorClientData)
+                        ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: grc })
                     },
                 }],
             }))

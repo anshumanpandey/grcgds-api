@@ -86,7 +86,7 @@ export default async (body: any) => {
                             Deeplink: deeplink,
                             "Supplier_ID": `GRC-${rc.clientId}0000`,
                             "Supplier_Name": rc.clientname,
-                            ...getPaypalCredentials(body.requestorClientData)
+                            ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: rc })
                         },
                         Vehicle: [{
                             ...r.VehAvailCore[0].Vehicle[0],

@@ -1,18 +1,18 @@
-export const getPaypalCredentials = (user: any) => {
-    if (user.user_type != "mobileuser") return {}
+export const getPaypalCredentials = ({ requetorClient, supplier }: { requetorClient: any, supplier: any }) => {
+    if (requetorClient.user_type != "mobileuser") return {}
     const res = {
         "PaymentClientID": "",
         "PaymentKey": "",
         "PaymentMethod": "",
-        ElectronicAgreements: user.electronic_agreement || "",
-        AgreementFormat: user.agreement_format || "",
-        CancellationPeriod: user.cancellation_period || "",
+        ElectronicAgreements: supplier.electronic_agreement || "",
+        AgreementFormat: supplier.agreement_format || "",
+        CancellationPeriod: supplier.cancellation_period || "",
     }
 
-    if (!user.paypalClientId || !user.paypalSecretKey) return res
+    if (!supplier.paypalClientId || !supplier.paypalSecretKey) return res
 
-    res.PaymentClientID = user.paypalClientId
-    res.PaymentKey = user.paypalSecretKey
+    res.PaymentClientID = supplier.paypalClientId
+    res.PaymentKey = supplier.paypalSecretKey
     res.PaymentMethod = "Paypal"
 
     return res
