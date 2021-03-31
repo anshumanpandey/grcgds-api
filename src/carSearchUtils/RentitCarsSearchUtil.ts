@@ -38,7 +38,7 @@ export default async (params: any) => {
                     "Deeplink": rate.BookUrl,
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
-                    ...getPaypalCredentials(u)
+                    ...getPaypalCredentials(params.requestorClientData)
                 },
                 "Vehicle": [{
                     $: {

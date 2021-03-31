@@ -20,6 +20,7 @@ import MexrentacarSearchUtil from '../carSearchUtils/MexrentacarSearchUtil';
 import EasyRentSearchUtils from '../carSearchUtils/EasyRentSearchUtils';
 import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
 import WheelsForCarsSearchUtil from '../carSearchUtils/WheelsForCarsSearchUtil';
+import { getClientData } from '../utils/getClientData';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -355,8 +356,9 @@ export const searchCars = async (body: any, req: any) => {
     const validator = validateFor(schema)
     validator(body)
 
-    const { CONTEXT, POS } = body
     const clientId = body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4)
+    body.requestorClientData = await getClientData({ id: clientId })
+    const { CONTEXT, POS } = body
 
     try {
         const [grcgdsClient, searchServices, suppliers, /*dataUsers*/] = await Promise.all([

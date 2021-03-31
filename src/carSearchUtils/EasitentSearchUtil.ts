@@ -64,7 +64,7 @@ export default async (params: any) => {
                     "Deeplink": $VehAvail.deeplink[0].replace(/\s/g, "").replace(/[\r]/g, "").replace(/[\n]/g, ""),
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
-                    ...getPaypalCredentials(u)
+                    ...getPaypalCredentials(params.requestorClientData)
                 },
                 "Vehicle": [{
                     $: {

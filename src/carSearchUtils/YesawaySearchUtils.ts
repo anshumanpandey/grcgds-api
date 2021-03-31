@@ -77,7 +77,7 @@ export default async (params: any) => {
                     "Deeplink": "",
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
-                    ...getPaypalCredentials(u)
+                    ...getPaypalCredentials(params.requestorClientData)
                 },
                 "Vehicle": [{
                     $: {
