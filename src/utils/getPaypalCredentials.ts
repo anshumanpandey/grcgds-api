@@ -1,4 +1,5 @@
 export const getPaypalCredentials = (user: any) => {
+    if (user.user_type != "mobileuser") return {}
     const res = {
         "PaymentClientID": "",
         "PaymentKey": "",

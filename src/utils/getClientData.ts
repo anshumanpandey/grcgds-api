@@ -10,6 +10,7 @@ export const getClientData = async ({ id }: { id: string | number }) => {
         cancellation_period: "cancellation_period",
         electronic_agreement: "electronic_agreement",
         agreement_format: "agreement_format",
+        user_type: "user_type",
     })
         .from("clients")
         .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
