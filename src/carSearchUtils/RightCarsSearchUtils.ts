@@ -41,7 +41,7 @@ const generateXmlBody = (body: any, id: string) => {
     <VehAvailRQInfo>
         <Customer>
         <Primary>
-            <CitizenCountryName Code="${Code || "UK"}"/>
+            <CitizenCountryName Code="${Code || "US"}"/>
             <DriverType Age="${Age || 35}"/>
         </Primary>
         </Customer>
