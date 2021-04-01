@@ -3,6 +3,7 @@ import { parse } from 'date-fns'
 import { format } from 'date-fns'
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
+import { getCodeForGrcCode } from "../utils/getCodeForGrcCode"
 import { getPaypalCredentials } from "../utils/getPaypalCredentials"
 
 const URL_PATH = "https://mexrentacar.com/api/v1/rateRequest"
@@ -14,14 +15,14 @@ const formUrlEncoded = (x: any) =>
 const getBody = async (params: any) => {
     const body: {[k: string]: any} = {};
     const [pickCode, dropCode ] = await Promise.all([
-        getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
-        getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 62}),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 62}),
     ])
     const t1 = getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)
     const t2 = getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)
     body.email_client_service = 'admin@bookingclik.com'
-    body.pickup_code = pickCode
-    body.dropoff_code = pickCode
+    body.pickup_code = pickCode.internal_code
+    body.dropoff_code = dropCode.internal_code
     body.date_pickup = t1[0]
     body.date_dropoff = t2[0]
     body.hour_pickup = t1[1]
@@ -36,13 +37,6 @@ const getDateTime = (fullDate: string) => {
     const [date] = fullDate.split('T')
     
     return [date, format(dateObj, `hh:mm aaaaa'm'`)]
-}
-
-const getCodeForGrcCode = async (grcCode: string) => {
-    const r = await DB?.select().from("companies_locations")
-        .where("GRCGDSlocatincode", grcCode)
-        .where("clientId", 62)
-    return r && r.length != 0 ? r.sort((a,b) => a.internal_code.slice(3) - b.internal_code.slice(3))[0].internal_code : null
 }
 
 const getSessionToken = async () => {

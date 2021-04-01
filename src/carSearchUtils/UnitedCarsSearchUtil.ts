@@ -1,6 +1,7 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData";
+import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
 
@@ -10,18 +11,11 @@ const getDateTime = (fullDate: string) => {
     return [date, time.slice(0, 5)]
 }
 
-const getCodeForGrcCode = async (grcCode: string) => {
-    const r = await DB?.select().from("companies_locations")
-        .where("GRCGDSlocatincode", grcCode)
-        .where("clientId", 58)
-    return r && r.length != 0 ? r[0].internal_code : null
-}
-
 export default async (params: any) => {
 
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
-        getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
-        getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 58}),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 58}),
     ])
 
     if (!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
@@ -38,10 +32,10 @@ export default async (params: any) => {
             <req:RetrieveQuotationRequest>
                 <PickUpDate>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)[0]}</PickUpDate>
                 <PickUpTime>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)[1]}</PickUpTime>
-                <PickUpOfficeId>${pickupCodeObj}</PickUpOfficeId>
+                <PickUpOfficeId>${pickupCodeObj.internal_code}</PickUpOfficeId>
                 <DropOffDate>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)[0]}</DropOffDate>
                 <DropOffTime>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)[1]}</DropOffTime>
-                <DropOffOfficeId>${returnCodeObj}</DropOffOfficeId>
+                <DropOffOfficeId>${returnCodeObj.internal_code}</DropOffOfficeId>
                 <CurrencyCode>${CurrencyCode}</CurrencyCode>
             </req:RetrieveQuotationRequest>
         </soap:Body>

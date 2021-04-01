@@ -1,6 +1,7 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData";
+import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
 const https = require('https');
@@ -12,19 +13,12 @@ const getDateTime = (fullDate: string) => {
     return `${date} ${time.slice(0, 5)}`
 }
 
-const getCodeForGrcCode = async (grcCode: string) => {
-    const r = await DB?.select().from("companies_locations")
-        .where("GRCGDSlocatincode", grcCode)
-        .where("clientId", 64)
-    return r && r.length != 0 ? r[0].internal_code : null
-}
-
 export default async (params: any) => {
 
     const currency = params.VehAvailRQCore.Currency.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
-        getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
-        getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 64 }),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 64 }),
     ])
 
     if (!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
@@ -37,11 +31,11 @@ export default async (params: any) => {
                 <currency>${currency}</currency>
                 <pickUp>
                 <Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)}</Date>
-                <rentalStation>${pickupCodeObj}</rentalStation>
+                <rentalStation>${pickupCodeObj.internal_code}</rentalStation>
                 </pickUp>
                 <dropOff>
                 <Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)}</Date>
-                <rentalStation>${returnCodeObj}</rentalStation>
+                <rentalStation>${returnCodeObj.internal_code}</rentalStation>
                 </dropOff>
                 <Date_of_Birth>1990-01-30</Date_of_Birth>
                 <companyCode>9948</companyCode>

@@ -2,6 +2,7 @@ import axios from "axios"
 import { getDataUsersForUserId } from "../services/requestor.service";
 import { DB } from "../utils/DB";
 import { getClientData } from "../utils/getClientData";
+import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
 
@@ -16,22 +17,15 @@ const getDataUser = async (body: any) => {
     return r && r.length != 0 ? r[0] : null
 }
 
-const getCodeForGrcCode = async (grcCode: string) => {
-    const r = await DB?.select().from("companies_locations")
-        .where("GRCGDSlocatincode", grcCode)
-        .where("clientId", 10)
-    return r && r.length != 0 ? r[0].internal_code : null
-}
-
 const generateXmlBody = async (body: any) => {
     const [pickCode, dropCode] = await Promise.all([
-        getCodeForGrcCode(body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
-        getCodeForGrcCode(body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode ,id: 10}),
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode ,id: 10}),
     ])
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
     const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
-    const pickLocation = pickCode
-    const dropLocation = dropCode
+    const pickLocation = pickCode.internal_code
+    const dropLocation = dropCode.internal_code
     const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
@@ -53,7 +47,7 @@ const generateXmlBody = async (body: any) => {
     <VehAvailRQInfo>
       <Customer>
         <Primary>
-            <CitizenCountryName Code="${Code || "UK"}"/>
+            <CitizenCountryName Code="${Code || pickCode.country || dropCode.country || "UK"}"/>
         </Primary>
       </Customer>
     </VehAvailRQInfo>

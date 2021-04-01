@@ -1,9 +1,9 @@
 import axios from "axios"
 import { DB } from "../utils/DB";
 import { getClientData } from "../utils/getClientData";
+import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
-const allSettled = require('promise.allsettled');
 
 const getRightCarsDataUsers = async () => {
     const r = await DB?.select()
@@ -14,11 +14,13 @@ const getRightCarsDataUsers = async () => {
     return r || []
 }
 
-const generateXmlBody = (body: any, id: string) => {
+const generateXmlBody = async (body: any, id: string) => {
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
     const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
-    const pickLocation = body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode
-    const dropLocation = body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode
+    const [pickCode, dropCode] = await Promise.all([
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 1 }),
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 1 }),
+    ])
     const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
@@ -32,16 +34,16 @@ const generateXmlBody = (body: any, id: string) => {
     <VehAvailRQCore Status="Available">
     <Currency Code="${currency || "EUR"}"/>
         <VehRentalCore PickUpDateTime="${PickUpDateTime}" ReturnDateTime="${ReturnDateTime}">
-            <PickUpLocation LocationCode="${pickLocation}"/>
+            <PickUpLocation LocationCode="${pickCode.GRCGDSlocatincode}"/>
     
-            <ReturnLocation LocationCode="${dropLocation}"/>
+            <ReturnLocation LocationCode="${dropCode.GRCGDSlocatincode}"/>
         </VehRentalCore>
     <DriverType Age="35"/>
     </VehAvailRQCore>
     <VehAvailRQInfo>
         <Customer>
         <Primary>
-            <CitizenCountryName Code="${Code || "US"}"/>
+            <CitizenCountryName Code="${Code || pickCode.country || dropCode.country || "US"}"/>
             <DriverType Age="${Age || 35}"/>
         </Primary>
         </Customer>
@@ -62,7 +64,7 @@ export default async (body: any) => {
         getRightCarsDataUsers()
     ]);
 
-    const xml = generateXmlBody(body, "1000022");
+    const xml = await generateXmlBody(body, "1000022");
 
     const { data } = await axios.post(RC_URL, xml, {
         headers: {

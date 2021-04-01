@@ -1,6 +1,7 @@
 import Axios from "axios"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
+import { getCodeForGrcCode } from "../utils/getCodeForGrcCode"
 import { getPaypalCredentials } from "../utils/getPaypalCredentials"
 
 const URL = 'https://api-partner.discovercars.com/api/Aggregator/GetCars?access_token=yHjjy7XZVTsVTb4zP3HLc3uQP3ZJEvBkKBuwWhSwNCkafCXx5ykRmhJdnqW2UJT3'
@@ -9,22 +10,14 @@ const formatDate = (fullDate: string) => {
     return `${date.split('-').reverse().join(".")}T${time.slice(0, -3)}`
 }
 
-
-const getCodeForGrcCode = async (grcCode: string) => {
-    const r = await DB?.select().from("companies_locations")
-        .where("GRCGDSlocatincode", grcCode)
-        .where("clientId", 17)
-    return r && r.length != 0 ? r[0].internal_code : null
-}
-
 export default async (params: any) => {
 
     const body = {
         //04.08.2020T09:00
         "DateFrom": formatDate(params.VehAvailRQCore.VehRentalCore.PickUpDateTime),
         "DateTo": formatDate(params.VehAvailRQCore.VehRentalCore.ReturnDateTime),
-        "PickupLocationID": await getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode),
-        "DropOffLocationID": await getCodeForGrcCode(params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode),
+        "PickupLocationID": (await getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 17})).internal_code,
+        "DropOffLocationID": (await getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 17})).internal_code,
         "CurrencyCode": params?.POS?.Source?.ISOCurrency || "GBP",
         "Age": "35",
         "UserIP": "192.168.1.1",
