@@ -25,18 +25,17 @@ const generateXmlBody = async (body: any, id: string) => {
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
 
-    return `<OTA_VehAvailRateRQDeep xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2014-09-08-T16:38:24" EchoToken="$ttoken" Target="Production" Version="1.002">
+    return `<OTA_VehAvailRateRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2014-09-08-T16:38:24" EchoToken="$ttoken" Target="Production" Version="1.002">
     <POS>
         <Source>
-            <RequestorID Type="5" ID="mobile001"/>
+            <RequestorID Type="5" ID="RightCars264"/>
         </Source>
     </POS>
     <VehAvailRQCore Status="Available">
     <Currency Code="${currency || "EUR"}"/>
         <VehRentalCore PickUpDateTime="${PickUpDateTime}" ReturnDateTime="${ReturnDateTime}">
-            <PickUpLocation LocationCode="${pickCode.GRCGDSlocatincode}"/>
-    
-            <ReturnLocation LocationCode="${dropCode.GRCGDSlocatincode}"/>
+            <PickUpLocation LocationCode="${pickCode.internal_code}"/>
+            <ReturnLocation LocationCode="${dropCode.internal_code}"/>
         </VehRentalCore>
     <DriverType Age="35"/>
     </VehAvailRQCore>
@@ -51,7 +50,7 @@ const generateXmlBody = async (body: any, id: string) => {
             <ConsumerIP>188.39.95.93</ConsumerIP>
         </TPA_Extensions>
     </VehAvailRQInfo>
-    </OTA_VehAvailRateRQDeep>
+    </OTA_VehAvailRateRQ>
 `
 }
 
@@ -68,7 +67,7 @@ export default async (body: any) => {
 
     const { data } = await axios.post(RC_URL, xml, {
         headers: {
-            'Content-Type': 'text/plain; charset=UTF8',
+            'Content-Type': 'application/soap+xml;charset=utf-8',
         }
     })
 
@@ -79,13 +78,13 @@ export default async (body: any) => {
     } else {
         return json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
             .map((r: any) => {
-                const { Deeplink, ...vehCoreMeta } = r.VehAvailCore[0].$
+                const { deeplink, ...vehCoreMeta } = r.VehAvailCore[0].$
                 return {
                     VehAvailCore: [{
                         ...r.VehAvailCore[0],
                         $: {
                             ...vehCoreMeta,
-                            Deeplink: Deeplink,
+                            Deeplink: deeplink.replace(/(&amp;)/g, '&'),
                             "Supplier_ID": `GRC-${rc.clientId}0000`,
                             "Supplier_Name": rc.clientname,
                             ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: rc })
