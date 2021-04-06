@@ -79,13 +79,13 @@ export default async (body: any) => {
     } else {
         return json.OTA_VehAvailRateRS.VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail
             .map((r: any) => {
-                const { deeplink, ...vehCoreMeta } = r.VehAvailCore[0].$
+                const { Deeplink, ...vehCoreMeta } = r.VehAvailCore[0].$
                 return {
                     VehAvailCore: [{
                         ...r.VehAvailCore[0],
                         $: {
                             ...vehCoreMeta,
-                            Deeplink: deeplink,
+                            Deeplink: Deeplink,
                             "Supplier_ID": `GRC-${rc.clientId}0000`,
                             "Supplier_Name": rc.clientname,
                             ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: rc })
