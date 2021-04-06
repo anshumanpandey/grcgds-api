@@ -85,7 +85,7 @@ export default async (body: any) => {
                         ...r.VehAvailCore[0],
                         $: {
                             ...vehCoreMeta,
-                            Deeplink: encodeURIComponent(Deeplink),
+                            Deeplink: Deeplink,
                             "Supplier_ID": `GRC-${rc.clientId}0000`,
                             "Supplier_Name": rc.clientname,
                             ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: rc })
