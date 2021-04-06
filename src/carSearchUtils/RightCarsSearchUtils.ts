@@ -25,7 +25,7 @@ const generateXmlBody = async (body: any, id: string) => {
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
 
-    return `<OTA_VehAvailRateRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2014-09-08-T16:38:24" EchoToken="$ttoken" Target="Production" Version="1.002">
+    return `<OTA_VehAvailRateRQDeep xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2014-09-08-T16:38:24" EchoToken="$ttoken" Target="Production" Version="1.002">
     <POS>
         <Source>
             <RequestorID Type="5" ID="mobile001"/>
@@ -51,7 +51,7 @@ const generateXmlBody = async (body: any, id: string) => {
             <ConsumerIP>188.39.95.93</ConsumerIP>
         </TPA_Extensions>
     </VehAvailRQInfo>
-    </OTA_VehAvailRateRQ>
+    </OTA_VehAvailRateRQDeep>
 `
 }
 
