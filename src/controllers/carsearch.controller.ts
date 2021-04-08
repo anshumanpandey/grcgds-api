@@ -403,6 +403,9 @@ export const searchCars = async (body: any, req: any) => {
         const filterBrands = await FilterBrandsForClient(body.POS.Source.RequestorID.ID)
         filteredResponse = filteredResponse.concat(...r)
             .filter(filterBrands)
+            .sort((a: any, b: any) => {
+                return a.VehAvailCore[0].TotalCharge[0].$.RateTotalAmount - b.VehAvailCore[0].TotalCharge[0].$.RateTotalAmount
+            })
 
         const [pickDate, pickTime] = body.VehAvailRQCore.VehRentalCore.PickUpDateTime.split('T')
         const [returnDate, returnTime] = body.VehAvailRQCore.VehRentalCore.ReturnDateTime.split('T')
