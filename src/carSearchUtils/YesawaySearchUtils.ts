@@ -1,4 +1,5 @@
 import Axios from "axios"
+import { ApiError } from "../utils/ApiError";
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
@@ -6,63 +7,78 @@ import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
 const https = require('https');
 
-export const JIMPSOFT_URL = `https://62.28.221.122/Rentway_WS/getMultiplePrices_GroupDetails.asmx`
-const getDateTime = (fullDate: string) => {
-    //2021-02-02 10:00
-    const [date, time] = fullDate.split('T')
-    return `${date} ${time.slice(0, 5)}`
-}
+export const YESAWAY_URL = `http://javelin-api.yesaway.com/services`
+const yesAwayClientId = 67
 
 export default async (params: any) => {
 
     const currency = params.VehAvailRQCore.Currency.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 64 }),
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 64 }),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: yesAwayClientId }),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: yesAwayClientId }),
     ])
 
     if (!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
 
-    const body = `<?xml version="1.0" encoding="utf-8"?>
-        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-        <soap:Body>
-        <MultiplePrices_GroupDetails xmlns="http://www.jimpisoft.pt/Rentway_Reservations_WS/getMultiplePrices_GroupDetails">
-            <objRequest>
-                <currency>${currency}</currency>
-                <pickUp>
-                <Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)}</Date>
-                <rentalStation>${pickupCodeObj.internal_code}</rentalStation>
-                </pickUp>
-                <dropOff>
-                <Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)}</Date>
-                <rentalStation>${returnCodeObj.internal_code}</rentalStation>
-                </dropOff>
-                <Date_of_Birth>1990-01-30</Date_of_Birth>
-                <companyCode>9948</companyCode>
-                <customerCode>23247</customerCode>
-            </objRequest>
-            </MultiplePrices_GroupDetails>
-        </soap:Body>
-        </soap:Envelope>`
+    const body = `<?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:ns="http://www.opentravel.org/OTA/2003/05">
+         <soap:Body>
+             <OTA_VehAvailRateMoreRQ
+    xmlns="http://www.opentravel.org/OTA/2003/05"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" PrimaryLangID="EN"
+    MaxResponses="50" Target="Production" Version="3.0"
+    TransactionIdentifier="100000002"
+    xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05">
+                 <POS>
+                     <Source ISOCountry="US">
+                         <RequestorID Type="4" ID="W_NZ_ORDER_COM_RR_FULLPREPAID" >
+                             <CompanyName Code="bookingclik"
+    CompanyShortName="bookingclik"/>
+                         </RequestorID>
+                     </Source>
+                     <Source>
+                         <RequestorID ID="00000000" ID_Context="IATA" Type="4"/>
+                     </Source>
+                 </POS>
+                 <VehAvailRQCore Status="Available">
+                     <VehRentalCore PickUpDateTime="${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}"
+    ReturnDateTime="${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}">
+                         <PickUpLocation LocationCode="${pickupCodeObj.internal_code}"/>
+                         <ReturnLocation LocationCode="${returnCodeObj.internal_code}"/>
+                     </VehRentalCore>
+                     <VendorPrefs>
+                         <VendorPref Code="yesaway"/>
+                     </VendorPrefs>
+                     <DriverType Age="35"/>
+                     <TPA_Extensions>
+                         <TPA_Extension_Flags EnhancedTotalPrice="true"/>
+                     </TPA_Extensions>
+                 </VehAvailRQCore>
+             </OTA_VehAvailRateMoreRQ>
+         </soap:Body>
+    </soap:Envelope>`
 
     const { data } = await Axios({
         method: 'POST',
         httpsAgent: new https.Agent({
             rejectUnauthorized: false
         }),
-        url: `https://62.28.221.122/Rentway_WS/getMultiplePrices_GroupDetails.asmx`,
+        url: YESAWAY_URL,
         headers: {
-            "Content-Type": "text/xml;charset=UTF-8",
-            "SOAPAction": "http://www.jimpisoft.pt/Rentway_Reservations_WS/getMultiplePrices_GroupDetails/MultiplePrices_GroupDetails"
+            'Authorization': 'Basic Ym9va2luZ2NsaWs6MWFiNzQ3NmFmM2U2NmM4ODAzOTdkNGM5OWUzMDA0NzI=',
+            'Content-Type': 'application/xml'
         },
         data: body
     })
 
-    const u = await getClientData({ id: 64 })    
+    if (data.includes('Error')) throw new ApiError(data)
+
+    const u = await getClientData({ id: yesAwayClientId })
 
     const json = await xmlToJson(data, { charkey: "" });
-
-    return json["soap:Envelope"]["soap:Body"][0].MultiplePrices_GroupDetailsResponse[0].MultiplePrices_GroupDetailsResult[0].getMultiplePrices_GroupDetails[0]["diffgr:diffgram"][0].NewDataSet[0].MultiplePrices_GroupDetails.map(($VehAvail: any) => {
+    
+    return json["env:Envelope"]["env:Body"][0].OTA_VehAvailRateMoreRS[0].VehAvailRSCore[0].VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map(($VehAvail: any) => {
         return {
             VehAvailCore: [{
                 $: {
@@ -76,38 +92,38 @@ export default async (params: any) => {
                 "Vehicle": [{
                     $: {
                         //missing property on response
-                        "AirConditionInd": $VehAvail.AC[0] == 'false' ? "No" : "Yes",
+                        "AirConditionInd": $VehAvail.VehAvailCore[0].Vehicle[0].$.AirConditionInd == true ? "Yes": "No",
                         //missing property on response
-                        "TransmissionType": $VehAvail.automaticTransmission[0] == 'true' ? "Automatic" : 'Manual',
-                        "BrandPicURL": $VehAvail.imageURL[0],
+                        "TransmissionType": $VehAvail.VehAvailCore[0].Vehicle[0].$.TransmissionType,
+                        "BrandPicURL": "https://media-exp1.licdn.com/dms/image/C4E0BAQFGAUu5D1WzFA/company-logo_200_200/0/1530081319521?e=2159024400&v=beta&t=fWdI82aTTGYW4rbJJ9I7jLps0esHqEpBZGchjRem9gA",
                         "Brand": u.clientname,
                     },
                     "VehMakeModel": [{
                         $: {
-                            "Name": $VehAvail.brand[0],
-                            "PictureURL": $VehAvail.imageURL[0],
+                            "Name": $VehAvail.VehAvailCore[0].Vehicle[0].VehMakeModel[0].$.Name,
+                            "PictureURL": $VehAvail.VehAvailCore[0].Vehicle[0].PictureURL || "https://media-exp1.licdn.com/dms/image/C4E0BAQFGAUu5D1WzFA/company-logo_200_200/0/1530081319521?e=2159024400&v=beta&t=fWdI82aTTGYW4rbJJ9I7jLps0esHqEpBZGchjRem9gA",
                         }
                     }],
                     "VehType": [{
                         $: {
-                            "VehicleCategory": $VehAvail.SIPP[0],
-                            "DoorCount": $VehAvail.doors[0],
-                            "Baggage": $VehAvail.handBags[0],
+                            "VehicleCategory": $VehAvail.VehAvailCore[0].Vehicle[0].VehMakeModel[0].$.Code,
+                            "DoorCount": $VehAvail.VehAvailCore[0].Vehicle[0].VehType[0].$.DoorCount,
+                            "Baggage": $VehAvail.VehAvailCore[0].Vehicle[0].$.BaggageQuantity,
                         }
                     }],
                     "VehClass": [{
-                        $: { "Size": $VehAvail.passangers[0] }
+                        $: { "Size": $VehAvail.VehAvailCore[0].Vehicle[0].$.PassengerQuantity }
                     }],
                     "VehTerms": []
                 }],
                 "RentalRate": [],
                 "VehicleCharges": [{
-                    "VehicleCharge": [{ "CurrencyCode": currency }]
+                    "VehicleCharge": [{ "CurrencyCode": $VehAvail.VehAvailCore[0].TotalCharge[0].$.CurrencyCode }]
                 }],
                 "TotalCharge": [{
                     $: {
-                        "RateTotalAmount": Number($VehAvail.previewValue[0]).toFixed(2),
-                        "CurrencyCode": currency,
+                        "RateTotalAmount": Number($VehAvail.VehAvailCore[0].TotalCharge[0].$.RateTotalAmount).toFixed(2),
+                        "CurrencyCode": $VehAvail.VehAvailCore[0].TotalCharge[0].$.CurrencyCode,
                     }
                 }],
                 "PricedEquips": []

@@ -21,6 +21,7 @@ import EasyRentSearchUtils from '../carSearchUtils/EasyRentSearchUtils';
 import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
 import WheelsForCarsSearchUtil from '../carSearchUtils/WheelsForCarsSearchUtil';
 import { getClientData } from '../utils/getClientData';
+import YesawaySearchUtils from '../carSearchUtils/YesawaySearchUtils';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -350,6 +351,7 @@ SUPORTED_CLIENT_SERVICES.set(16, (body: any) => JimpsoftSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(62, (body: any) => MexrentacarSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(65, (body: any) => EasyRentSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(56, (body: any) => WheelsForCarsSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(67, (body: any) => YesawaySearchUtils(body))
 
 
 export const searchCars = async (body: any, req: any) => {
@@ -368,7 +370,7 @@ export const searchCars = async (body: any, req: any) => {
             //getDataUsersForUserId({ id: clientId }),
         ])
 
-    const servicesToCall = []
+        const servicesToCall = []
 
         if (grcgdsClient) {
             if (grcgdsClient.integrationEndpointUrl && SUPORTED_URL.has(grcgdsClient.integrationEndpointUrl)) {
