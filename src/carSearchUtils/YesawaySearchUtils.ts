@@ -12,7 +12,7 @@ const yesAwayClientId = 67
 
 export default async (params: any) => {
 
-    const currency = params.VehAvailRQCore.Currency.Code || 'GBP'
+    const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: yesAwayClientId }),
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: yesAwayClientId }),
