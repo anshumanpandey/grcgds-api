@@ -14,6 +14,7 @@ import UnitedCarsSearchUtil from '../carSearchUtils/UnitedCarsSearchUtil';
 import LocalcarsSearchUtils from '../carSearchUtils/LocalcarsSearchUtils';
 import ZezgoCarsSearchUtils from '../carSearchUtils/ZezgoCarsSearchUtils';
 import RetajSearchUtils from '../carSearchUtils/RetajSearchUtils';
+import AceRentSearchUtils from '../carSearchUtils/AceRentSearchUtils';
 import JimpsoftSearchUtil from '../carSearchUtils/JimpsoftSearchUtil';
 import { LogCarSearchToDb } from '../utils/LogCarSearch';
 import MexrentacarSearchUtil from '../carSearchUtils/MexrentacarSearchUtil';
@@ -352,6 +353,7 @@ SUPORTED_CLIENT_SERVICES.set(62, (body: any) => MexrentacarSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(65, (body: any) => EasyRentSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(56, (body: any) => WheelsForCarsSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(67, (body: any) => YesawaySearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(75, (body: any) => AceRentSearchUtils(body))
 
 
 export const searchCars = async (body: any, req: any) => {
