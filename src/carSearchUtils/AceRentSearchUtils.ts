@@ -72,7 +72,7 @@ export default async (params: any) => {
                     $: {
                         "AirConditionInd": $VehAvail.VehAvailCore[0].Vehicle[0].$.AirConditionInd == true ? "Yes" : "No",
                         "TransmissionType": $VehAvail.VehAvailCore[0].Vehicle[0].$.TransmissionType,
-                        "BrandPicURL": "https://media-exp1.licdn.com/dms/image/C4E0BAQFGAUu5D1WzFA/company-logo_200_200/0/1530081319521?e=2159024400&v=beta&t=fWdI82aTTGYW4rbJJ9I7jLps0esHqEpBZGchjRem9gA",
+                        "BrandPicURL": "https://www.acerentacar.com/Images/AceLogo.jpg",
                         "Brand": u.clientname,
                     },
                     "VehMakeModel": [{
