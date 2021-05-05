@@ -32,7 +32,6 @@ const generateXmlBody = async (body: any, id: string) => {
         </Source>
     </POS>
     <VehAvailRQCore Status="Available">
-    <Currency Code="${currency || "EUR"}"/>
         <VehRentalCore PickUpDateTime="${PickUpDateTime}" ReturnDateTime="${ReturnDateTime}">
             <PickUpLocation LocationCode="${pickCode.internal_code}"/>
             <ReturnLocation LocationCode="${dropCode.internal_code}"/>

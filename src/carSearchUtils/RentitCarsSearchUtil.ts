@@ -12,7 +12,7 @@ const getUrl = async (params: any) => {
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 11}),
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 11}),
     ])
-    return `${URL_PATH}?ClientId=35&APIKey=30995a94-bc9b-f1ba-b47e-21a0091c24c4&Language=EN&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode.internal_code}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode.internal_code}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=${pickCode.country || dropCode.country || "IT"}&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
+    return `${URL_PATH}?ClientId=222&APIKey=4a3fa5f2-2df6-2f97-13ef-e8c0bd075917&Language=EN&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode.internal_code}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode.internal_code}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=${pickCode.country || dropCode.country || "IT"}&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
 }
 
 export default async (params: any) => {
