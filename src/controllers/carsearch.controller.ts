@@ -353,6 +353,8 @@ SUPORTED_CLIENT_SERVICES.set(62, (body: any) => MexrentacarSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(65, (body: any) => EasyRentSearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(56, (body: any) => WheelsForCarsSearchUtil(body))
 SUPORTED_CLIENT_SERVICES.set(67, (body: any) => YesawaySearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(73, (body: any) => YesawaySearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(74, (body: any) => YesawaySearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(75, (body: any) => AceRentSearchUtils(body))
 
 
