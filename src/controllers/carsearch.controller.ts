@@ -23,6 +23,7 @@ import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
 import WheelsForCarsSearchUtil from '../carSearchUtils/WheelsForCarsSearchUtil';
 import { getClientData } from '../utils/getClientData';
 import YesawaySearchUtils from '../carSearchUtils/YesawaySearchUtils';
+import RoutesRezWorldSearchUtil from '../carSearchUtils/RoutesRezWorldSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -356,6 +357,8 @@ SUPORTED_CLIENT_SERVICES.set(67, (body: any) => YesawaySearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(73, (body: any) => YesawaySearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(74, (body: any) => YesawaySearchUtils(body))
 SUPORTED_CLIENT_SERVICES.set(75, (body: any) => AceRentSearchUtils(body))
+SUPORTED_CLIENT_SERVICES.set(72, (body: any) => RoutesRezWorldSearchUtil(body))
+
 
 
 export const searchCars = async (body: any, req: any) => {
