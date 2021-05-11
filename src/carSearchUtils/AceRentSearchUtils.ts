@@ -23,7 +23,7 @@ export default async (params: any) => {
     const body = `<?xml version="1.0" encoding="utf-8"?>
         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs-d="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
             <soap:Body>
-                <OTA_VehAvailRateRQ xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" TimeStamp="2015-12-02T11:53:13.2885909-05:00" Target="Test" Version="5.0" xmlns="http://www.opentravel.org/OTA/2003/05">
+                <OTA_VehAvailRateRQ xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" TimeStamp="2015-12-02T11:53:13.2885909-05:00" Target="Production" Version="5.0" xmlns="http://www.opentravel.org/OTA/2003/05">
                     <POS>
                         <Source>
                             <RequestorID Type="22" ID="RezPower" />
@@ -54,8 +54,6 @@ export default async (params: any) => {
     const u = await getClientData({ id: aceRentCarClientId })
 
     const json = await xmlToJson(data, { charkey: "" });
-
-    const dataS = JSON.stringify(json)
 
     return json["soap:Envelope"]["soap:Body"][0].OTA_VehAvailRateRS[0].VehAvailRSCore[0].VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map(($VehAvail: any) => {
         return {
