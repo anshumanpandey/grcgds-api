@@ -92,25 +92,22 @@ export default ({ yesAwayClientId, zoneLocation }: YesAwayBaseConfig) => async (
             VehAvailCore: [{
                 $: {
                     "VehID": "",
-                    //missing booking url on response
-                    "Deeplink": "",
+                    "Deeplink": `https://javelin-api.yesaway.com/jump?id=${json["env:Envelope"]["env:Body"][0].OTA_VehAvailRateMoreRS[0].VehAvailRSCore[0].VehRentalCore[0].$.JavelinServiceId}&package=${$VehAvail.$.package_code}`,
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },
                 "Vehicle": [{
                     $: {
-                        //missing property on response
                         "AirConditionInd": $VehAvail.VehAvailCore[0].Vehicle[0].$.AirConditionInd == true ? "Yes": "No",
-                        //missing property on response
                         "TransmissionType": $VehAvail.VehAvailCore[0].Vehicle[0].$.TransmissionType,
-                        "BrandPicURL": "https://media-exp1.licdn.com/dms/image/C4E0BAQFGAUu5D1WzFA/company-logo_200_200/0/1530081319521?e=2159024400&v=beta&t=fWdI82aTTGYW4rbJJ9I7jLps0esHqEpBZGchjRem9gA",
+                        "BrandPicURL": "https://www.grcgds.com/yesaway_logo.png",
                         "Brand": u.clientname,
                     },
                     "VehMakeModel": [{
                         $: {
                             "Name": $VehAvail.VehAvailCore[0].Vehicle[0].VehMakeModel[0].$.Name,
-                            "PictureURL": $VehAvail.VehAvailCore[0].Vehicle[0].PictureURL || "https://media-exp1.licdn.com/dms/image/C4E0BAQFGAUu5D1WzFA/company-logo_200_200/0/1530081319521?e=2159024400&v=beta&t=fWdI82aTTGYW4rbJJ9I7jLps0esHqEpBZGchjRem9gA",
+                            "PictureURL": $VehAvail.VehAvailCore[0].Vehicle[0].PictureURL || "https://www.grcgds.com/yesaway_logo.png",
                         }
                     }],
                     "VehType": [{
