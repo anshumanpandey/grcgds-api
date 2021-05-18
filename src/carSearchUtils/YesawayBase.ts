@@ -88,11 +88,14 @@ export default ({ yesAwayClientId, zoneLocation }: YesAwayBaseConfig) => async (
     const json = await xmlToJson(data, { charkey: "" });
     
     return json["env:Envelope"]["env:Body"][0].OTA_VehAvailRateMoreRS[0].VehAvailRSCore[0].VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map(($VehAvail: any) => {
+        const VehGroupID = $VehAvail.VehAvailCore[0].Vehicle[0].VehMakeModel[0].$.VehGroupID
+        const serviceID = json["env:Envelope"]["env:Body"][0].OTA_VehAvailRateMoreRS[0].VehAvailRSCore[0].VehRentalCore[0].$.JavelinServiceId;
+        const urlPckage = $VehAvail.$.package_code
         return {
             VehAvailCore: [{
                 $: {
                     "VehID": "",
-                    "Deeplink": `https://javelin-api.yesaway.com/jump?id=${json["env:Envelope"]["env:Body"][0].OTA_VehAvailRateMoreRS[0].VehAvailRSCore[0].VehRentalCore[0].$.JavelinServiceId}&package=${$VehAvail.$.package_code}`,
+                    "Deeplink": `https://javelin-api.yesaway.com/jump?id=${serviceID}&package=${urlPckage}_${VehGroupID}`,
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
