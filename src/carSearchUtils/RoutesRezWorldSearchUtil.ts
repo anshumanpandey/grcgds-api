@@ -1,18 +1,27 @@
 import Axios from "axios"
+import { setHours, setMinutes, format } from "date-fns";
 import { ApiError } from "../utils/ApiError";
-import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
 import { xmlToJson } from '../utils/XmlConfig';
-const https = require('https');
 
 export const ROUTEREZ_URL = `https://routesrezworld.com/api/service/`
 const rouresrezWorldClientId = 72
 
+const formatDate = (dateString: string) => {
+    const [date, time] = dateString.split('T')
+    const hours = setMinutes(setHours(new Date(), parseInt(time.slice(0,2))), parseInt(time.slice(3,5)))
+    const str = `${date.split('-').reverse().join('')} ${format(hours, 'kk:mm aaa')}`.toLocaleLowerCase()
+    return str
+}
+
 export default async (params: any) => {
 
     const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
+    const PickUpDateTime = params.VehAvailRQCore.VehRentalCore.PickUpDateTime
+    const ReturnDateTime = params.VehAvailRQCore.VehRentalCore.ReturnDateTime
+
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: rouresrezWorldClientId }),
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: rouresrezWorldClientId }),
@@ -40,10 +49,10 @@ export default async (params: any) => {
         <MessageDesc>Request Rates</MessageDesc>
     </Message>
     <Payload>
-        <RentalLocationID>DEN</RentalLocationID>
-        <ReturnLocationID>DEN</ReturnLocationID>
-        <PickupDateTime>06062021 08:00 am</PickupDateTime>
-        <ReturnDateTime>06072021 08:00 am</ReturnDateTime>
+        <RentalLocationID>${pickupCodeObj.internal_code}</RentalLocationID>
+        <ReturnLocationID>${returnCodeObj.internal_code}</ReturnLocationID>
+        <PickupDateTime>${formatDate(PickUpDateTime)}</PickupDateTime>
+        <ReturnDateTime>${formatDate(ReturnDateTime)}</ReturnDateTime>
         <RateSource>WebLink</RateSource>
         <ClassCode></ClassCode>
         <CompanyNumber>RCR</CompanyNumber>
@@ -74,7 +83,7 @@ export default async (params: any) => {
             VehAvailCore: [{
                 $: {
                     "VehID": "",
-                    "Deeplink": "",
+                    "Deeplink": $VehAvail.LandingUrl[0],
                     "Supplier_ID": `GRC-${u.clientId}0000`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
