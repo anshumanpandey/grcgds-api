@@ -12,7 +12,8 @@ const rouresrezWorldClientId = 72
 const formatDate = (dateString: string) => {
     const [date, time] = dateString.split('T')
     const hours = setMinutes(setHours(new Date(), parseInt(time.slice(0,2))), parseInt(time.slice(3,5)))
-    const str = `${date.split('-').reverse().join('')} ${format(hours, 'kk:mm aaa')}`.toLocaleLowerCase()
+    const [year, month, day] = date.split('-')
+    const str = `${month}${day}${year} ${format(hours, 'kk:mm aaa')}`.toLocaleLowerCase()
     return str
 }
 
