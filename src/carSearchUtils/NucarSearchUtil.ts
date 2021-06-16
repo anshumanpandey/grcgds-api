@@ -15,7 +15,7 @@ const getDateTime = (fullDate: string) => {
 
 export default async (params: any) => {
 
-    const currency = params.VehAvailRQCore.Currency.Code || 'GBP'
+    const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 76 }),
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 76 }),
