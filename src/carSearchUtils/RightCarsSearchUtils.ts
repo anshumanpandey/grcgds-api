@@ -28,7 +28,7 @@ const generateXmlBody = async (body: any, id: string) => {
     return `<OTA_VehAvailRateRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2014-09-08-T16:38:24" EchoToken="$ttoken" Target="Production" Version="1.002">
     <POS>
         <Source>
-            <RequestorID Type="5" ID="RightCars264"/>
+            <RequestorID Type="5" ID="BookingClik228"/>
         </Source>
     </POS>
     <VehAvailRQCore Status="Available">
