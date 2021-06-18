@@ -51,7 +51,7 @@ export default async (params: any) => {
 
     if (data.includes('Error')) throw new ApiError(data)
 
-    const u = await getClientData({ id: aceRentCarClientId })
+    const u = await getClientData({ id: aceRentCarClientId, brokerId: params.requestorClientData.clientId })
 
     const json = await xmlToJson(data, { charkey: "" });
 
@@ -62,7 +62,7 @@ export default async (params: any) => {
                     "VehID": "",
                     //missing booking url on response
                     "Deeplink": $VehAvail.VehAvailCore[0].Reference[0].$.URL,
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}0000`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

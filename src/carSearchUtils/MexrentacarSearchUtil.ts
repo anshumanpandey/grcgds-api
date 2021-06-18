@@ -68,7 +68,7 @@ export default async (params: any) => {
         }
     })
 
-    const u = await getClientData({ id: 62 })    
+    const u = await getClientData({ id: 62, brokerId: params.requestorClientData.clientId })    
 
     return data.data.map((rate: any) => {
         return {
@@ -77,7 +77,7 @@ export default async (params: any) => {
                     "VehID": rate.RateID,
                     //missing deeplink property
                     "Deeplink": "",
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

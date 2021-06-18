@@ -58,7 +58,7 @@ export const RC_URL = 'https://ota.right-cars.com'
 export default async (body: any) => {
 
     const [rc, dataUsers] = await Promise.all([
-        getClientData({ id: 1 }),
+        getClientData({ id: 1, brokerId: body.requestorClientData.clientId }),
         getRightCarsDataUsers()
     ]);
 
@@ -84,7 +84,7 @@ export default async (body: any) => {
                         $: {
                             ...vehCoreMeta,
                             Deeplink: deeplink.replace(/(&amp;)/g, '&'),
-                            "Supplier_ID": `GRC-${rc.clientId}0000`,
+                            "Supplier_ID": `GRC-${rc.clientAccountCode}`,
                             "Supplier_Name": rc.clientname,
                             ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: rc })
                         },

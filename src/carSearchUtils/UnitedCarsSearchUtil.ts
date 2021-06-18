@@ -43,7 +43,7 @@ export default async (params: any) => {
 
     const [{ data }, u,] = await Promise.all([
         Axios.post(UNITEDCAR_URL, body, {}),
-        getClientData({ id: 58 })
+        getClientData({ id: 58, brokerId: params.requestorClientData.clientId })
     ])
 
     const json = await xmlToJson(data, { charkey: "" });
@@ -54,7 +54,7 @@ export default async (params: any) => {
                 $: {
                     "VehID": $VehAvail.carTypeId[0],
                     "Deeplink": "",
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

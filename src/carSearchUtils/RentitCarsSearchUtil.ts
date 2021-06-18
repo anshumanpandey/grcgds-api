@@ -20,7 +20,7 @@ export default async (params: any) => {
     const url = await getUrl(params)
     const { data } = await Axios.get(url, {})
 
-    const u = await getClientData({ id: 11 })
+    const u = await getClientData({ id: 11, brokerId: params.requestorClientData.clientId })
 
     return data.Rates.map((rate: any) => {
         const doorsRegexp = /[0-9].*[0-9]/gim
@@ -30,7 +30,7 @@ export default async (params: any) => {
                 $: {
                     "VehID": rate.Reference.RequestID,
                     "Deeplink": rate.BookUrl,
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

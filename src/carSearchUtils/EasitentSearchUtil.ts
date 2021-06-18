@@ -45,7 +45,7 @@ export default async (params: any) => {
 
     const [{ data }, u, ] = await Promise.all([
         Axios.post(EASIRENT_URL, body, {}),
-        getClientData({ id: 57 })
+        getClientData({ id: 57, brokerId: params.requestorClientData.clientId })
     ])
 
     const json = await xmlToJson(data, { charkey: "" });
@@ -56,7 +56,7 @@ export default async (params: any) => {
                 $: {
                     "VehID": "",
                     "Deeplink": $VehAvail.deeplink[0].replace(/\s/g, "").replace(/[\r]/g, "").replace(/[\n]/g, ""),
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

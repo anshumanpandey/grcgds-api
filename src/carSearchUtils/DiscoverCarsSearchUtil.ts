@@ -36,7 +36,7 @@ export default async (params: any) => {
         }
     })
 
-    const u = await getClientData({ id: 17 })
+    const u = await getClientData({ id: 17, brokerId: params.requestorClientData.clientId })
 
     return data.map(($VehAvail: any) => {
         return {
@@ -45,7 +45,7 @@ export default async (params: any) => {
                     "SearchUID": $VehAvail["SearchUID"],
                     "VehID": $VehAvail["CarUID"],
                     "Deeplink": $VehAvail["BookingPageUrl"],
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

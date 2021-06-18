@@ -1,7 +1,7 @@
 import { DB } from "../utils/DB"
 
-export const getClientData = async ({ id }: { id: string | number }) => {
-    const r = await DB?.select({
+export const getClientData = async ({ id, brokerId }: { id: string | number, brokerId?: string | number }) => {
+    const query = DB?.select({
         clientId: "clients.id",
         clientname: "clients.clientname",
         clientAccountCode: "data_suppliers_user.account_code",
@@ -16,5 +16,9 @@ export const getClientData = async ({ id }: { id: string | number }) => {
         .leftJoin('data_suppliers_user', 'data_suppliers_user.clientId', 'clients.id')
         .joinRaw('LEFT JOIN broker_account_type on data_suppliers_user.account_type_code and broker_account_type.name = "Prepaid Standard" ')
         .where("clients.id", id)
+    if (brokerId) query?.where("data_suppliers_user.brokerId", brokerId)
+
+    const r = await query;
+
     return r && r.length != 0 ? r[0] : null
 }

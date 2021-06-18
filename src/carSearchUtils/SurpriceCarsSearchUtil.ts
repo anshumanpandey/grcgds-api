@@ -19,7 +19,7 @@ export default async (params: any) => {
     const url = await getUrl(params)
     const { data } = await Axios.get(url, {})
 
-    const u = await getClientData({ id: 37 })
+    const u = await getClientData({ id: 37, brokerId: params.requestorClientData.clientId })
 
     return data.map((car: any) => {
         return {
@@ -27,7 +27,7 @@ export default async (params: any) => {
                 $: {
                     "VehID": "",
                     "Deeplink": car.deeplink,
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

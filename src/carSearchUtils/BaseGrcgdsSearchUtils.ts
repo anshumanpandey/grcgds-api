@@ -61,7 +61,7 @@ export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'htt
 
     const t = await getDataUser(reqBody);
 
-    const grc = await getClientData({ id: grcgdsClientId })
+    const grc = await getClientData({ id: grcgdsClientId, brokerId: reqBody.requestorClientData.clientId })
     const xml = await generateXmlBody({ ...reqBody, rateId, requestorID, account_code: t?.account_code, grcgdsClientId });
 
     const { data } = await axios.post(url, xml, {
@@ -80,7 +80,7 @@ export default async ({ reqBody, rateId, grcgdsClientId, requestorID, url = 'htt
                     ...r.VehAvailCore[0],
                     $: {
                         ...r.VehAvailCore[0].$,
-                        "Supplier_ID": `GRC-${grc.clientId}0000`,
+                        "Supplier_ID": `GRC-${grc.clientAccountCode}`,
                         "Supplier_Name": grc.clientname,
                         ...getPaypalCredentials({ requetorClient: reqBody.requestorClientData, supplier: grc })
                     },

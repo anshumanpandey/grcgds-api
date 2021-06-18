@@ -73,7 +73,7 @@ export default async (params: any) => {
 
     if (data.includes('Error')) throw new ApiError(data)
 
-    const u = await getClientData({ id: rouresrezWorldClientId })
+    const u = await getClientData({ id: rouresrezWorldClientId, brokerId: params.requestorClientData.clientId })
 
     const json = await xmlToJson(data, { charkey: "" });
 
@@ -85,7 +85,7 @@ export default async (params: any) => {
                 $: {
                     "VehID": "",
                     "Deeplink": $VehAvail.LandingUrl[0],
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

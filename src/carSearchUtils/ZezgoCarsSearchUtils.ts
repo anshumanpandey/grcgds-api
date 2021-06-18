@@ -60,7 +60,7 @@ export default async (body: any) => {
 
     const t = await getDataUser(body);
 
-    const grc = await getClientData({ id: 10 })
+    const grc = await getClientData({ id: 10, brokerId: body.requestorClientData.clientId })
 
     const xml = await generateXmlBody({ ...body, account_code: t?.account_code});
 
@@ -81,7 +81,7 @@ export default async (body: any) => {
                     $: {
                         ...r.VehAvailCore[0].$,
                         Deeplink: r.VehAvailCore[0].$.deeplink,
-                        "Supplier_ID": `GRC-${grc.clientId}0000`,
+                        "Supplier_ID": `GRC-${grc.clientAccountCode}`,
                         "Supplier_Name": grc.clientname,
                         ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: grc })
                     },

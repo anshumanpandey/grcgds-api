@@ -58,7 +58,7 @@ export default async (params: any) => {
         data: body
     })
 
-    const u = await getClientData({ id: 64 })
+    const u = await getClientData({ id: 64, brokerId: params.requestorClientData.clientId })
 
     const json = await xmlToJson(data, { charkey: "" });
 
@@ -69,7 +69,7 @@ export default async (params: any) => {
                     "VehID": "",
                     //missing booking url on response
                     "Deeplink": "",
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },

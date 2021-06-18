@@ -83,7 +83,7 @@ export default ({ yesAwayClientId, zoneLocation }: YesAwayBaseConfig) => async (
 
     if (data.includes('Error')) throw new ApiError(data)
 
-    const u = await getClientData({ id: yesAwayClientId })
+    const u = await getClientData({ id: yesAwayClientId, brokerId: params.requestorClientData.clientId })
 
     const json = await xmlToJson(data, { charkey: "" });
     
@@ -96,7 +96,7 @@ export default ({ yesAwayClientId, zoneLocation }: YesAwayBaseConfig) => async (
                 $: {
                     "VehID": "",
                     "Deeplink": `https://javelin-api.yesaway.com/jump?id=${serviceID}&package=${urlPckage}_${VehGroupID}`,
-                    "Supplier_ID": `GRC-${u.clientId}0000`,
+                    "Supplier_ID": `GRC-${u.clientAccountCode}`,
                     "Supplier_Name": u.clientname,
                     ...getPaypalCredentials({ requetorClient: params.requestorClientData, supplier: u })
                 },
