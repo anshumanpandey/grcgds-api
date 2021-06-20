@@ -1087,9 +1087,9 @@ export const createBooking = async (body: any) => {
             json = await DiscoverCarsBooking(body)
         } else if (RequestorID.RATEID == "GRC-580000") {
             json = await UnitedCarsBooking(body)
-        } else if (RequestorID.RATEID == "GRC-10000") {
+        } else if (RequestorID.RATEID == "GRC-20004") {
             json = await RightCarsBooking(body)
-        } else if (RequestorID.RATEID == "GRC-100000") {
+        } else if (RequestorID.RATEID == "GRC-200002") {
             json = await ZezgoBooking(body)
         } else {
             json = await GrcgdsXmlBooking(body)
