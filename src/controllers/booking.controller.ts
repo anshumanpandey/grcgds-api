@@ -11,6 +11,7 @@ import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
 import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
 import { logger } from '../utils/Logger';
 import ZezgoBooking, { cancelZezgoBooking } from '../carsBookingUtils/ZezgoBooking';
+import { getClientData } from '../utils/getClientData';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1073,27 +1074,29 @@ const schema = {
     "additionalProperties": true
 }
 
+const clientBookingsMaps: {[k: number]: (p: any) => void } = {
+    17: DiscoverCarsBooking,
+    58: UnitedCarsBooking,
+    1: RightCarsBooking,
+    10: ZezgoBooking,
+}
 
 export const createBooking = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
     const { CONTEXT, POS: { Source: { RequestorID } } } = body
 
-    try {
+    try {   
+        const cliendData = await getClientData({
+            brokerId: RequestorID.ID.slice(4,6),
+            clientAccountCode: RequestorID.RATEID.slice(4)
+        })
 
-        let json = ""
+        const bookingFn = clientBookingsMaps[parseInt(cliendData.clientId.toString() || "0")]
 
-        if (RequestorID.RATEID == "GRC-170000") {
-            json = await DiscoverCarsBooking(body)
-        } else if (RequestorID.RATEID == "GRC-580000") {
-            json = await UnitedCarsBooking(body)
-        } else if (RequestorID.RATEID == "GRC-20004") {
-            json = await RightCarsBooking(body)
-        } else if (RequestorID.RATEID == "GRC-200002") {
-            json = await ZezgoBooking(body)
-        } else {
-            json = await GrcgdsXmlBooking(body)
-        }
+        if (!bookingFn) throw new ApiError('We could not find the requested booking supplier')
+
+        let json = await bookingFn(body)
 
         return [
             json,

@@ -33,7 +33,7 @@ export default async (params: any) => {
                 },
                 "Vehicle": [{
                     $: {
-                        "BrandPicURL": u.logo_name,
+                        "BrandPicURL": `https://www.grcgds.com/surprice_logo.png`,
                         "Brand": "Surprice",
                         "AirConditionInd": car.model.aircondition == 1 ? "Yes" : "No",
                         "TransmissionType": car.model.TransmissionType == "M" ? "Manual" : "Automatic" ,
