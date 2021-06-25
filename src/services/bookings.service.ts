@@ -167,6 +167,7 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                 <Code>${b.pickLocation}</Code>
                 <Name>${codes.find(c => c.internal_code == b.pickLocation)?.location || b.pickupFullAddress}</Name>
                 <CodeContext>Pickup Location</CodeContext>
+                <Pickupinst>${b.pickupInstructions}</Pickupinst>
                 </LocationDetails>
                 <LocationDetails>
                 <Address>
@@ -185,6 +186,7 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                 <Code>${b.dropoffLocation}</Code>
                 <Name>${codes.find(c => c.internal_code == b.dropoffLocation)?.location || b.dropoffFullAddress}</Name>
                 <CodeContext>Return Location</CodeContext>
+				<Returninst>${b.returninstructions || ""}</Returninst>
                 </LocationDetails>
             </VehSegmentInfo>
             </VehReservation>`;

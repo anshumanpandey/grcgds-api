@@ -2,13 +2,15 @@ import { getGrcgdsLocations } from "../services/locations.service"
 import { DB } from "./DB"
 import { logger } from "./Logger"
 
-type Params = {
+export type LogbookingParams = {
     pickupDate: string,
     pickupTime: string,
     dropoffDate: string,
     dropoffTime: string,
     pickLocation: string,
     dropLocation: string,
+    pickupInstructions?: string,
+    returninstructions?: string,
     price: string,
     POS: any,
     xml: string
@@ -31,8 +33,10 @@ export default async ({
     grcgdsClient,
     resNumber,
     extras,
-    hannkUser
-}: Params) => {
+    hannkUser,
+    pickupInstructions = "",
+    returninstructions = "",
+}: LogbookingParams) => {
     const [pickupFullAddress, dropoffFullAddress] = await Promise.all([
         getGrcgdsLocations({ whereFilters: [{ columnName: 'internalcode', op: '=', val: pickLocation }]}),
         getGrcgdsLocations({ whereFilters: [{ columnName: 'internalcode', op: '=', val: dropLocation }]}),
@@ -51,6 +55,8 @@ export default async ({
         requestBody: xml,
         grcgdsClient,
         resNumber,
+        pickupInstructions,
+        returninstructions,
         createdAt: new Date(),
         updatedAt: new Date(),
         customerId : hannkUser?.id

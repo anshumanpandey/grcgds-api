@@ -4,7 +4,7 @@ import { XmlError } from "../utils/XmlError"
 import { DB } from '../utils/DB';
 import { fromUnixTime, lightFormat } from 'date-fns'
 import { ApiError } from "../utils/ApiError";
-import LogBookingToDb, { bookingExistOnDd } from "../utils/LogBookingToDb";
+import LogBookingToDb, { bookingExistOnDd, LogbookingParams } from "../utils/LogBookingToDb";
 import { logger } from "../utils/Logger";
 import { getHannkUserByEmail } from "../services/requestor.service";
 import { getBookings } from "../services/bookings.service";
@@ -86,7 +86,7 @@ export default async (body: any) => {
 
     const res = await xmlToJson(data);
 
-    const toInsert = {
+    const toInsert: LogbookingParams = {
         pickupDate,
         pickupTime,
         dropoffDate,
@@ -99,6 +99,8 @@ export default async (body: any) => {
         grcgdsClient: "1",
         hannkUser: await getHannkUserByEmail({ email: Email }),
         extras: [],
+        pickupInstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Pickupinst[0],
+        returninstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[1].Returninst[0],
         resNumber: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
     }
 

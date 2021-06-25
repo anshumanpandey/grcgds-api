@@ -98,6 +98,8 @@ export default async (body: any) => {
         grcgdsClient: "10",
         hannkUser: await getHannkUserByEmail({ email: Email }),
         extras: [],
+        pickupInstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Pickupinst[0],
+        returninstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[1].Returninst[0],
         resNumber: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
     }
 
