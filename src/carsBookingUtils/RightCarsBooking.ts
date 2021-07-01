@@ -1,26 +1,28 @@
 import axios from "axios"
 import { xmlToJson } from "../utils/XmlConfig"
 import { XmlError } from "../utils/XmlError"
-import { DB } from '../utils/DB';
 import { fromUnixTime, lightFormat } from 'date-fns'
 import { ApiError } from "../utils/ApiError";
 import LogBookingToDb, { bookingExistOnDd, LogbookingParams } from "../utils/LogBookingToDb";
-import { logger } from "../utils/Logger";
 import { getHannkUserByEmail } from "../services/requestor.service";
 import { getBookings } from "../services/bookings.service";
+import { getBrokerData } from "../utils/getBrokerData";
 
 export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
+    const { Source: { RequestorID } } = POS
     const { VehPref, Customer } = VehResRQCore
     const { Primary: { Email, PersonName: { GivenName, Surname, NamePrefix } } } = Customer
 
     const pickLocation = VehResRQCore.VehRentalCore.PickUpLocation.LocationCode
     const dropLocation = VehResRQCore.VehRentalCore.ReturnLocation.LocationCode
 
+    const brokerData = await getBrokerData({ brokerAccountCode: RequestorID.RATEID.slice(4) })
+
     const xml = `<OTA_VehResRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation = "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd" >
     <POS>
     <Source>
-    <RequestorID Type="5" ID="MOBILE001" />
+    <RequestorID Type="5" ID="${brokerData.internalCode || "MOBILE001"}" />
     </Source>
     </POS><VehResRQCore>
     <VehRentalCore PickUpDateTime="${VehResRQCore.VehRentalCore.PickUpDateTime}" ReturnDateTime="${VehResRQCore.VehRentalCore.ReturnDateTime}">
