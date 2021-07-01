@@ -17,7 +17,8 @@ export type LogbookingParams = {
     grcgdsClient: string,
     resNumber: string,
     extras: any[],
-    hannkUser: any
+    hannkUser: any,
+    brokerInternalCode?: any
 }
 
 export default async ({
@@ -36,6 +37,7 @@ export default async ({
     hannkUser,
     pickupInstructions = "",
     returninstructions = "",
+    brokerInternalCode = null
 }: LogbookingParams) => {
     const [pickupFullAddress, dropoffFullAddress] = await Promise.all([
         getGrcgdsLocations({ whereFilters: [{ columnName: 'internalcode', op: '=', val: pickLocation }]}),
@@ -52,6 +54,7 @@ export default async ({
         dropoffFullAddress: dropoffFullAddress[0].Location,
         dropoffLocation: dropLocation,
         requestorId: POS.Source.RequestorID.ID,
+        brokerInternalCode,
         requestBody: xml,
         grcgdsClient,
         resNumber,

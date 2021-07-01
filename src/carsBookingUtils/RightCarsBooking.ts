@@ -103,7 +103,8 @@ export default async (body: any) => {
         extras: [],
         pickupInstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Pickupinst[0],
         returninstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[1].Returninst[0],
-        resNumber: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
+        resNumber: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0],
+        brokerInternalCode: brokerData.internalCode
     }
 
     await LogBookingToDb(toInsert)
@@ -156,7 +157,7 @@ export const getRightCarsBooking = async (body: any) => {
         const resNumber = reservationFound.VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0]
         const appUser = await getHannkUserByEmail({ email: VehRetSingleResRQ.Email.Address })
 
-        const toInsert = {
+        const toInsert: LogbookingParams = {
             pickupDate: lightFormat(pickDateTime, 'yyyy-MM-dd'),
             pickupTime: lightFormat(pickDateTime, 'HH:mm'),
             dropoffDate: lightFormat(returnDateTime, 'yyyy-MM-dd'),
