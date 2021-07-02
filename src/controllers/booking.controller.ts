@@ -12,6 +12,7 @@ import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/U
 import { logger } from '../utils/Logger';
 import ZezgoBooking, { cancelZezgoBooking } from '../carsBookingUtils/ZezgoBooking';
 import { getClientData } from '../utils/getClientData';
+import { getBrokerData } from '../utils/getBrokerData';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1142,6 +1143,11 @@ export const searchBookings = async (body: any) => {
     }
 }
 
+const clientCancelBookingsMaps: Record<string, (body: any) => Promise<any>> = {
+    58: cancelUnitedCarBooking,
+    1: cancelRightCarsBooking,
+    10: cancelZezgoBooking,
+}
 export const cancelBooking = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
@@ -1154,23 +1160,17 @@ export const cancelBooking = async (body: any) => {
     if (bookings.length === 0) throw new ApiError("Booking not found")
     if (bookings.every(b => b.reservationStatus === BOOKING_STATUS_ENUM.CANCELLED)) throw new ApiError("Booking not found")
 
-    const supportedServices = [
-        cancelZezgoBooking,
-        cancelUnitedCarBooking,
-        cancelRightCarsBooking
-    ];
+    const cliendData = await getBrokerData({
+        brokerId: RequestorID.ID.slice(4,6),
+        brokerAccountCode: RequestorID.RATEID.slice(4)
+    })
 
     try {
 
         let json = null;
 
-        await allSettled(supportedServices.map(s => s(body)))
-            .then((promises: any) => {
-                const successfullCalls = promises.filter((p: any) => p.status == "fulfilled")
-                if (successfullCalls.length == 0) throw new ApiError("Could not cancell the booking")
-
-                return cancelBookingByResNumber(resNumber)
-            })
+        clientCancelBookingsMaps[cliendData.clientId](body)
+            .then(() => cancelBookingByResNumber(resNumber))
             .then(() => {
                 json = {
                     VehRetResRSCore: {

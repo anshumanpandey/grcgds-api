@@ -195,6 +195,11 @@ export const getRightCarsBooking = async (body: any) => {
 
 export const cancelRightCarsBooking = async (body: any) => {
     const { VehCancelRQCore, POS } = body
+    const { Source: { RequestorID } } = POS
+
+    const brokerData = await getBrokerData({
+        brokerAccountCode: RequestorID.RATEID.slice(4),
+    })
 
     const xml = `<OTA_VehCancelRQ xmlns="http://www.opentravel.org/OTA/2003/05"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
