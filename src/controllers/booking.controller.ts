@@ -1170,7 +1170,6 @@ export const cancelBooking = async (body: any) => {
     if (bookings.every(b => b.reservationStatus === BOOKING_STATUS_ENUM.CANCELLED)) throw new ApiError("Booking not found")
 
     const cliendData = await getBrokerData({
-        brokerId: RequestorID.ID.slice(4,6),
         brokerAccountCode: RequestorID.RATEID.slice(4)
     })
 
