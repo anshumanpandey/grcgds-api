@@ -1125,9 +1125,9 @@ export const searchBookings = async (body: any) => {
         const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
 
         const params: GetBookingsParams = { RequestorIDs, appUserEmail: Email }
-        if (RequestorID.RATE_ID) {
+        if (RequestorID.RATEID) {
             const cliendData = await getBrokerData({
-                brokerAccountCode: RequestorID.RATE_ID.slice(4)
+                brokerAccountCode: RequestorID.RATEID.slice(4)
             })
             if (cliendData) params.clientId = cliendData.clientId
         }
