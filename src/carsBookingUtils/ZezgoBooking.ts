@@ -114,6 +114,10 @@ export default async (body: any) => {
 
 export const cancelZezgoBooking = async (body: any) => {
     const { VehCancelRQCore, POS } = body
+    const { Source: { RequestorID } } = POS
+    const brokerData = await getBrokerData({
+        brokerAccountCode: RequestorID.RATEID.slice(4),
+    })
 
     const xml = `<OTA_VehCancelRQ xmlns="http://www.opentravel.org/OTA/2003/05"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -121,7 +125,7 @@ export const cancelZezgoBooking = async (body: any) => {
     VehCancelRQ.xsd">
     <POS>
     <Source>
-    <RequestorID Type="5" ID="MOBILE002" />
+    <RequestorID Type="5" ID="${brokerData.internalCode}" />
     </Source>
     </POS>
     <VehCancelRQCore>
