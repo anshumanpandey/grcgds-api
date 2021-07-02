@@ -5,7 +5,7 @@ import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
 import RightCarsBooking, { cancelRightCarsBooking, getRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
 import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
-import { BOOKING_STATUS_ENUM, cancelBookingByResNumber, createBookingsXmlResponse, getBookings, getBookingsBy } from '../services/bookings.service';
+import { BOOKING_STATUS_ENUM, cancelBookingByResNumber, createBookingsXmlResponse, getBookings, getBookingsBy, GetBookingsParams } from '../services/bookings.service';
 import { isGrcgdsLocations } from '../services/locations.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
 import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
@@ -1118,12 +1118,22 @@ export const searchBookings = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
     const { VehRetResRQCore: { Email }, CONTEXT: { Filter = [] } } = body
+    const { POS: { Source: { RequestorID } } } = body
 
     try {
 
         const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
 
-        const bookings = await getBookings({ RequestorIDs, appUserEmail: Email })
+        const params: GetBookingsParams = { RequestorIDs, appUserEmail: Email }
+        if (RequestorID.RATEID) {
+            const cliendData = await getBrokerData({
+                brokerId: RequestorID.ID.slice(4,6),
+                brokerAccountCode: RequestorID.RATEID.slice(4)
+            })
+            if (cliendData) params.clientId = cliendData.clientId
+        }
+
+        const bookings = await getBookings(params)
         const xml = await createBookingsXmlResponse(bookings)
         const response = await xmlToJson(xml)
 
