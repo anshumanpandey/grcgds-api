@@ -1,8 +1,12 @@
 import axios from "axios"
 import { getDataUsersForUserId } from "../services/requestor.service";
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { DB } from "../utils/DB";
+import { getBrokerData } from "../utils/getBrokerData";
 import { getClientData } from "../utils/getClientData";
+import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 const getDataUser = async (body: any) => {
@@ -55,12 +59,21 @@ const generateXmlBody = (body: any) => {
 
 export const GRCGDS_URL = 'https://www.grcgds.com/XML'
 
-export default async (body: any) => {
+export default async (body: any, opt: SearchUtilsOptions) => {
 
     const t = await getDataUser(body);
 
     const grc = await getClientData({ id: 36, brokerId: body.requestorClientData.clientId })
     const xml = generateXmlBody({ ...body, account_code: t?.account_code});
+
+    const pickLocationCode = await getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 36 })
+
+    await saveServiceRequest({
+        requestBody: xml,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickLocationCode,
+        supplierData: opt.supplierData
+    })
 
     const { data } = await axios.post(GRCGDS_URL, xml, {
         headers: {

@@ -1,8 +1,10 @@
 import Axios from "axios"
-import { DB } from "../utils/DB"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
+import { getBrokerData } from "../utils/getBrokerData";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 export const EASIRENT_URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
@@ -11,8 +13,7 @@ const getDateTime = (fullDate: string) => {
     return [date, time.slice(0, 5)]
 }
 
-export default async (params: any) => {
-
+export default async (params: any, opt: SearchUtilsOptions) => {
     const [ pickupCodeObj, returnCodeObj ] = await Promise.all([
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 57}),
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 57}),
@@ -42,6 +43,13 @@ export default async (params: any) => {
             <time>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)[1]}</time>
         </dropoff>
     </GetVehicles>`
+
+    await saveServiceRequest({
+        requestBody: body,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj,
+        supplierData: opt.supplierData
+    })
 
     const [{ data }, u, ] = await Promise.all([
         Axios.post(EASIRENT_URL, body, {}),

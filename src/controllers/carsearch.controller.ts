@@ -25,6 +25,7 @@ import { getClientData } from '../utils/getClientData';
 import YesawaySearchUtils from '../carSearchUtils/YesawaySearchUtils';
 import RoutesRezWorldSearchUtil from '../carSearchUtils/RoutesRezWorldSearchUtil';
 import NucarSearchUtil from '../carSearchUtils/NucarSearchUtil';
+import { SearchUtilsOptions } from '../types/SearchUtilsOptions';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -342,24 +343,24 @@ const schema = {
 }
 
 const SUPORTED_CLIENT_SERVICES = new Map();
-SUPORTED_CLIENT_SERVICES.set(1, (body: any) => RightCarsSearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(11, (body: any) => RentitCarsSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(37, (body: any) => SurpriceCarsSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(58, (body: any) => UnitedCarsSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(57, (body: any) => EasitentSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(32, (body: any) => LocalcarsSearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(10, (body: any) => ZezgoCarsSearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(36, (body: any) => RetajSearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(16, (body: any) => JimpsoftSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(62, (body: any) => MexrentacarSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(65, (body: any) => EasyRentSearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(56, (body: any) => WheelsForCarsSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(67, (body: any) => YesawaySearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(73, (body: any) => YesawaySearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(74, (body: any) => YesawaySearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(75, (body: any) => AceRentSearchUtils(body))
-SUPORTED_CLIENT_SERVICES.set(72, (body: any) => RoutesRezWorldSearchUtil(body))
-SUPORTED_CLIENT_SERVICES.set(76, (body: any) => NucarSearchUtil(body))
+SUPORTED_CLIENT_SERVICES.set(1, (body: any, extras: SearchUtilsOptions) => RightCarsSearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(11, (body: any, extras: SearchUtilsOptions) => RentitCarsSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(37, (body: any, extras: SearchUtilsOptions) => SurpriceCarsSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(58, (body: any, extras: SearchUtilsOptions) => UnitedCarsSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(57, (body: any, extras: SearchUtilsOptions) => EasitentSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(32, (body: any, extras: SearchUtilsOptions) => LocalcarsSearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(10, (body: any, extras: SearchUtilsOptions) => ZezgoCarsSearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(36, (body: any, extras: SearchUtilsOptions) => RetajSearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(16, (body: any, extras: SearchUtilsOptions) => JimpsoftSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(62, (body: any, extras: SearchUtilsOptions) => MexrentacarSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(65, (body: any, extras: SearchUtilsOptions) => EasyRentSearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(56, (body: any, extras: SearchUtilsOptions) => WheelsForCarsSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(67, (body: any, extras: SearchUtilsOptions) => YesawaySearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(73, (body: any, extras: SearchUtilsOptions) => YesawaySearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(74, (body: any, extras: SearchUtilsOptions) => YesawaySearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(75, (body: any, extras: SearchUtilsOptions) => AceRentSearchUtils(body, extras))
+SUPORTED_CLIENT_SERVICES.set(72, (body: any, extras: SearchUtilsOptions) => RoutesRezWorldSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(76, (body: any, extras: SearchUtilsOptions) => NucarSearchUtil(body, extras))
 
 
 
@@ -368,16 +369,30 @@ export const searchCars = async (body: any, req: any) => {
     validator(body)
 
     const clientId = body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4)
+    const rateId = body.POS.Source.RequestorID?.RATE_ID?.replace('GRC-', "")
     body.requestorClientData = await getClientData({ id: clientId })
     const { CONTEXT, POS } = body
 
     try {
+        const [pickDate, pickTime] = body.VehAvailRQCore.VehRentalCore.PickUpDateTime.split('T')
+        const [returnDate, returnTime] = body.VehAvailRQCore.VehRentalCore.ReturnDateTime.split('T')
+
         const [grcgdsClient, searchServices, suppliers, /*dataUsers*/] = await Promise.all([
             getGrcgdsClient({ ClientId: clientId }),
             GetSearchServices(clientId),
-            getDataSuppliers({ RequestorID: clientId }),
+            getDataSuppliers({ RequestorID: clientId, rateId }),
             //getDataUsersForUserId({ id: clientId }),
         ])
+        
+        const searchRecord = await LogCarSearchToDb({
+            pickupDate: pickDate,
+            pickupTime: pickTime,
+            dropoffDate: returnDate,
+            dropoffTime: returnTime,
+            pickLocation: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode,
+            dropoffLocation: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode,
+            hannkClientData: { id: clientId }
+        })
 
         const servicesToCall = []
 
@@ -387,8 +402,11 @@ export const searchCars = async (body: any, req: any) => {
             } else {
                 const servicesToAdd = Array.from(SUPORTED_CLIENT_SERVICES.entries())
                 .filter(entry => suppliers.find(suppliers => suppliers.clientId == entry[0]))
-                .map(entry => entry[1]);
-                servicesToCall.push(...servicesToAdd.map(service => service(body)))
+                servicesToCall
+                    .push(...servicesToAdd.map(([id ,service]) => {
+                        const supplierData = suppliers.find(suppliers => suppliers.clientId == id)
+                        return service(body, { searchRecord, supplierData: supplierData })
+                    }))
             }
         }
 
@@ -417,19 +435,6 @@ export const searchCars = async (body: any, req: any) => {
             .sort((a: any, b: any) => {
                 return a.VehAvailCore[0].TotalCharge[0].$.RateTotalAmount - b.VehAvailCore[0].TotalCharge[0].$.RateTotalAmount
             })
-
-        const [pickDate, pickTime] = body.VehAvailRQCore.VehRentalCore.PickUpDateTime.split('T')
-        const [returnDate, returnTime] = body.VehAvailRQCore.VehRentalCore.ReturnDateTime.split('T')
-
-        await LogCarSearchToDb({
-            pickupDate: pickDate,
-            pickupTime: pickTime,
-            dropoffDate: returnDate,
-            dropoffTime: returnTime,
-            pickLocation: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode,
-            dropoffLocation: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode,
-            hannkClientData: { id: clientId }
-        })
 
         const response = wrapCarsResponseIntoXml(filteredResponse, body)
 

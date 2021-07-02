@@ -1,22 +1,30 @@
 import Axios from "axios"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode"
 import { getPaypalCredentials } from "../utils/getPaypalCredentials"
+import { saveServiceRequest } from "../utils/saveServiceRequest"
 
-const getUrl = async (params: any) => {
-    const [pickCode, dropCode ] = await Promise.all([
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode ,id: 37}),
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode ,id: 37}),
-    ])
+const getUrl = async (params: any, { pickCode, dropCode }: { pickCode: any, dropCode: any }) => {
+
     const [pickDate, pickTime] = params.VehAvailRQCore.VehRentalCore.PickUpDateTime.split("T")
     const [dropDate, dropTime] = params.VehAvailRQCore.VehRentalCore.PickUpDateTime.split("T")
     return `https://www.grcgds.com/surprice_api/available_api.php?pickuplocationcode=${pickCode.internal_code}&pickupdate=${pickDate}&pickuptime=${pickTime}&returnlocationcode=${dropCode.internal_code}&returndate=${dropDate}&returntime=${dropTime}&age=30`
 }
 
-export default async (params: any) => {
-
-    const url = await getUrl(params)
+export default async (params: any, opt: SearchUtilsOptions) => {
+    const [pickCode, dropCode ] = await Promise.all([
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode ,id: 37}),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode ,id: 37}),
+    ])
+    const url = await getUrl(params, { pickCode, dropCode })
+    await saveServiceRequest({
+        requestBody: url,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickCode,
+        supplierData: opt.supplierData
+    })
     const { data } = await Axios.get(url, {})
 
     const u = await getClientData({ id: 37, brokerId: params.requestorClientData.clientId })

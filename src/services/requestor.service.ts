@@ -9,6 +9,7 @@ import RetajSearchUtils, { RETAJ_URL } from "../carSearchUtils/RetajSearchUtils"
 import RightCarsSearchUtils, { RC_URL } from "../carSearchUtils/RightCarsSearchUtils"
 import UnitedCarsSearchUtil, { UNITEDCAR_URL } from "../carSearchUtils/UnitedCarsSearchUtil"
 import ZezgoCarsSearchUtils, { ZEZGO_URL } from "../carSearchUtils/ZezgoCarsSearchUtils"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions"
 import { DB, getDbFor } from "../utils/DB"
 
 export const getGrcgdsClient = async ({ ClientId }: { ClientId: string }) => {
@@ -18,12 +19,22 @@ export const getGrcgdsClient = async ({ ClientId }: { ClientId: string }) => {
     return r && r.length != 0 ? r[0] : null
 }
 
-export const getDataSuppliers = async ({ RequestorID }: { RequestorID: string }) => {
-    const query = DB?.select(["data_suppliers_user.clientId", "clients.clientname", "data_suppliers_user.account_code"])
+export type SupplierData = {
+    clientId: string | number,
+    clientname: string | number,
+    account_code: string | number,
+}
+export const getDataSuppliers = async ({ RequestorID, rateId, brokerInternalCode }: { RequestorID: string, brokerInternalCode?: string,rateId?: string }): Promise<SupplierData[]> => {
+    const query = DB?.select(["data_suppliers_user.clientId", "clients.clientname", "client_broker_locations_accountype.account_code"])
         .from("data_suppliers_user")
         .innerJoin('clients', 'clients.id', 'data_suppliers_user.clientId')
-        .where({ brokerId: RequestorID })
-        .where("active", 1)
+        .innerJoin('client_broker_locations_accountype', 'client_broker_locations_accountype.account_code', 'data_suppliers_user.account_code')
+        .where({ "data_suppliers_user.brokerId": RequestorID })
+        .where("client_broker_locations_accountype.active", 1)
+        .groupBy('clients.clientname')
+    if (brokerInternalCode) query?.where("client_broker_locations_accountype.brokerInternalCode", brokerInternalCode)
+    if (rateId) query?.where("client_broker_locations_accountype.account_code", rateId)
+    
     const r = await query
     return r || []
 }
@@ -74,25 +85,25 @@ export const getHannkUserByEmail = async ({ email }: { email: string }) => {
 }
 
 export const SUPORTED_URL = new Map();
-SUPORTED_URL.set(GRCGDS_URL, (body: any) => {
+SUPORTED_URL.set(GRCGDS_URL, (body: any, p: SearchUtilsOptions) => {
     if (body.POS.Source.RequestorID.ID.slice(4, 6) == "65") {
-        return EasyRentSearchUtils(body)
+        return EasyRentSearchUtils(body, p)
     } else if (body.POS.Source.RequestorID.ID.slice(4, 6) == "32") {
-        return LocalcarsSearchUtils(body)
+        return LocalcarsSearchUtils(body, p)
     } else if (body.POS.Source.RequestorID.ID.slice(4, 6) == "36") {
-        return LocalcarsSearchUtils(body)
+        return LocalcarsSearchUtils(body, p)
     } else if (body.POS.Source.RequestorID.ID.slice(4, 6) == "56") {
-        return LocalcarsSearchUtils(body)
+        return LocalcarsSearchUtils(body, p)
     }
-    return GrcgdsSearchUtils(body)
+    return GrcgdsSearchUtils(body, p)
 })
-SUPORTED_URL.set(RC_URL, (body: any) => RightCarsSearchUtils(body))
-SUPORTED_URL.set(EASIRENT_URL, (body: any) => EasitentSearchUtil(body))
-SUPORTED_URL.set(RENTI_URL, (body: any) => RentitCarsSearchUtil(body))
-SUPORTED_URL.set(UNITEDCAR_URL, (body: any) => UnitedCarsSearchUtil(body))
-SUPORTED_URL.set(LOCALCARS_URL, (body: any) => LocalcarsSearchUtils(body))
-SUPORTED_URL.set(RETAJ_URL, (body: any) => RetajSearchUtils(body))
-SUPORTED_URL.set(ZEZGO_URL, (body: any) => ZezgoCarsSearchUtils(body))
-SUPORTED_URL.set(JIMPSOFT_URL, (body: any) => JimpsoftSearchUtil(body))
-SUPORTED_URL.set(MEXRENT_URL, (body: any) => MexrentacarSearchUtil(body))
+SUPORTED_URL.set(RC_URL, (body: any, p: SearchUtilsOptions) => RightCarsSearchUtils(body, p))
+SUPORTED_URL.set(EASIRENT_URL, (body: any, p: SearchUtilsOptions) => EasitentSearchUtil(body, p))
+SUPORTED_URL.set(RENTI_URL, (body: any, p: SearchUtilsOptions) => RentitCarsSearchUtil(body, p))
+SUPORTED_URL.set(UNITEDCAR_URL, (body: any, p: SearchUtilsOptions) => UnitedCarsSearchUtil(body, p))
+SUPORTED_URL.set(LOCALCARS_URL, (body: any, p: SearchUtilsOptions) => LocalcarsSearchUtils(body, p))
+SUPORTED_URL.set(RETAJ_URL, (body: any, p: SearchUtilsOptions) => RetajSearchUtils(body, p))
+SUPORTED_URL.set(ZEZGO_URL, (body: any, p: SearchUtilsOptions) => ZezgoCarsSearchUtils(body, p))
+SUPORTED_URL.set(JIMPSOFT_URL, (body: any, p: SearchUtilsOptions) => JimpsoftSearchUtil(body, p))
+SUPORTED_URL.set(MEXRENT_URL, (body: any, p: SearchUtilsOptions) => MexrentacarSearchUtil(body, p))
 

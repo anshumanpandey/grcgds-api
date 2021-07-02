@@ -1,9 +1,11 @@
 import axios from "axios"
 import { getDataUsersForUserId } from "../services/requestor.service";
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { DB } from "../utils/DB";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 const getDataUser = async (body: any) => {
@@ -17,11 +19,8 @@ const getDataUser = async (body: any) => {
     return r && r.length != 0 ? r[0] : null
 }
 
-const generateXmlBody = async (body: any) => {
-    const [pickCode, dropCode] = await Promise.all([
-        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode ,id: 10}),
-        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode ,id: 10}),
-    ])
+const generateXmlBody = async (body: any, { pickCode, dropCode }: { pickCode: any, dropCode: any }) => {
+
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
     const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
     const pickLocation = pickCode.internal_code
@@ -56,14 +55,24 @@ const generateXmlBody = async (body: any) => {
 
 export const ZEZGO_URL = "https://ota.zezgo.com/"
 
-export default async (body: any) => {
+export default async (body: any,  opt: SearchUtilsOptions) => {
 
     const t = await getDataUser(body);
 
     const grc = await getClientData({ id: 10, brokerId: body.requestorClientData.clientId })
 
-    const xml = await generateXmlBody({ ...body, account_code: t?.account_code});
+    const [pickCode, dropCode] = await Promise.all([
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode ,id: 10}),
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode ,id: 10}),
+    ])
 
+    const xml = await generateXmlBody({ ...body, account_code: t?.account_code}, { pickCode, dropCode });
+    await saveServiceRequest({
+        requestBody: xml,
+        carsSearchId: opt.searchRecord.id,
+        supplierData: opt.supplierData,
+        pickupCodeObj: pickCode
+    })
     const { data } = await axios.post(ZEZGO_URL, xml, {
         headers: {
             'Content-Type': 'text/plain; charset=UTF8',

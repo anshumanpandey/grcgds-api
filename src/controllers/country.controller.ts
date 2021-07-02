@@ -98,7 +98,7 @@ export const getCountries = async (body: any) => {
 
     if (requestorDataSuppliers) {
         for (const supplier of requestorDataSuppliers) {
-            const records = await getCountriesByClientId({ ClientId: supplier.clientId, columns: { Country: `countries.${columnName}` } })
+            const records = await getCountriesByClientId({ ClientId: supplier.clientId.toString(), columns: { Country: `countries.${columnName}` } })
 
             if (!records || records.length == 0) continue;
 

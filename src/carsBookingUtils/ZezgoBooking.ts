@@ -15,12 +15,15 @@ export default async (body: any) => {
     const pickLocation = VehResRQCore.VehRentalCore.PickUpLocation.LocationCode
     const dropLocation = VehResRQCore.VehRentalCore.ReturnLocation.LocationCode
 
-    const brokerData = await getBrokerData({ brokerAccountCode: RequestorID.RATEID.slice(4) })
+    const brokerData = await getBrokerData({
+        brokerAccountCode: RequestorID.RATEID.slice(4),
+        locationCode: pickLocation
+    })
     
     const xml = `<OTA_VehResRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation = "http://www.opentravel.org/OTA/2003/05 VehResRQ.xsd" >
     <POS>
     <Source>
-    <RequestorID Type="5" ID="${brokerData.internalCode || "MOBILE002"}" />
+    <RequestorID Type="5" ID="${brokerData?.internalCode || "MOBILE002"}" />
     </Source>
     </POS><VehResRQCore>
     <VehRentalCore PickUpDateTime="${VehResRQCore.VehRentalCore.PickUpDateTime}" ReturnDateTime="${VehResRQCore.VehRentalCore.ReturnDateTime}">
@@ -101,7 +104,7 @@ export default async (body: any) => {
         pickupInstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Pickupinst[0],
         returninstructions: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[1].Returninst[0],
         resNumber: res.OTA_VehResRS.VehResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].Resnumber[0],
-        brokerInternalCode: brokerData.internalCode
+        brokerInternalCode: brokerData?.internalCode
     }
 
     await LogBookingToDb(toInsert)

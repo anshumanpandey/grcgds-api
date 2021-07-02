@@ -1,9 +1,11 @@
 import Axios from "axios"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { ApiError } from "../utils/ApiError";
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 const https = require('https');
 
@@ -19,7 +21,7 @@ type YesAwayBaseConfig = {
     yesAwayClientId: number
     zoneLocation: YESAWAY_ZONES
 }
-export default ({ yesAwayClientId, zoneLocation }: YesAwayBaseConfig) => async (params: any) => {
+export default ({ yesAwayClientId, zoneLocation }: YesAwayBaseConfig) => async (params: any, opt: SearchUtilsOptions) => {
 
     const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
@@ -67,6 +69,13 @@ export default ({ yesAwayClientId, zoneLocation }: YesAwayBaseConfig) => async (
              </OTA_VehAvailRateMoreRQ>
          </soap:Body>
     </soap:Envelope>`
+
+    await saveServiceRequest({
+        requestBody: body,
+        carsSearchId: opt.searchRecord.id,
+        supplierData: opt.supplierData,
+        pickupCodeObj: pickupCodeObj
+    })
 
     const { data } = await Axios({
         method: 'POST',

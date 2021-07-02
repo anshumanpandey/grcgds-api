@@ -1,9 +1,10 @@
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { CompanyLocation, getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import YesawayBase, { YESAWAY_ZONES } from "./YesawayBase";
 
 export const YESAWAY_URL = `http://javelin-api.yesaway.com/services`
 
-export default async (params: any) => {
+export default async (params: any, opt: SearchUtilsOptions) => {
     const Location = params.VehAvailRQInfo.Customer.Primary.DriverType.Location
 
     let yesAwayClientIds = [67, 73, 74]
@@ -41,6 +42,6 @@ export default async (params: any) => {
     }
 
     
-    const r = await YesawayBase({ yesAwayClientId, zoneLocation })(params)
+    const r = await YesawayBase({ yesAwayClientId, zoneLocation })(params, opt)
     return r
 }

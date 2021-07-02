@@ -1,16 +1,21 @@
 import Axios from "axios"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { ApiError } from "../utils/ApiError";
 import { DB } from "../utils/DB"
+import { getBrokerData } from "../utils/getBrokerData";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 const https = require('https');
 
 export const ACERENTCAR_URL = `https://ota.acerentacar.com/BookingClick/RateService.asmx`
 const aceRentCarClientId = 75
 
-export default async (params: any) => {
+export default async (params: any, opt: SearchUtilsOptions) => {
+    const { POS } = params
+    const { Source: { RequestorID } } = POS
 
     const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
@@ -39,6 +44,12 @@ export default async (params: any) => {
             </soap:Body>
         </soap:Envelope>`
 
+    await saveServiceRequest({
+        requestBody: body,
+        pickupCodeObj,
+        carsSearchId: opt.searchRecord.id,
+        supplierData: opt.supplierData
+    })
     const { data } = await Axios({
         method: 'POST',
         url: ACERENTCAR_URL,

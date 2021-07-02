@@ -1,9 +1,11 @@
 import Axios from "axios"
 import { setHours, setMinutes, format } from "date-fns";
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { ApiError } from "../utils/ApiError";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 export const ROUTEREZ_URL = `https://routesrezworld.com/api/service/`
@@ -17,7 +19,7 @@ const formatDate = (dateString: string) => {
     return str
 }
 
-export default async (params: any) => {
+export default async (params: any, opt: SearchUtilsOptions) => {
 
     const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
     const PickUpDateTime = params.VehAvailRQCore.VehRentalCore.PickUpDateTime
@@ -61,6 +63,13 @@ export default async (params: any) => {
         <TotalPricing>1</TotalPricing>
     </Payload>
 </TRNXML>`
+
+    await saveServiceRequest({
+        requestBody: body,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickupCodeObj,
+        supplierData: opt.supplierData
+    })
 
     const { data } = await Axios({
         method: 'POST',

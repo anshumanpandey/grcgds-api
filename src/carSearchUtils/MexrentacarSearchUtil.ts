@@ -1,10 +1,12 @@
 import Axios from "axios"
 import { parse } from 'date-fns'
 import { format } from 'date-fns'
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode"
 import { getPaypalCredentials } from "../utils/getPaypalCredentials"
+import { saveServiceRequest } from "../utils/saveServiceRequest"
 
 const URL_PATH = "https://mexrentacar.com/api/v1/rateRequest"
 export const MEXRENT_URL = URL_PATH
@@ -12,12 +14,9 @@ export const MEXRENT_URL = URL_PATH
 const formUrlEncoded = (x: any) =>
    Object.keys(x).reduce((p, c) => p + `&${c}=${encodeURIComponent(x[c])}`, '')
 
-const getBody = async (params: any) => {
+const getBody = async (params: any, { pickCode, dropCode }: { pickCode: any, dropCode: any}) => {
     const body: {[k: string]: any} = {};
-    const [pickCode, dropCode ] = await Promise.all([
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 62}),
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 62}),
-    ])
+
     const t1 = getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)
     const t2 = getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)
     body.email_client_service = 'admin@bookingclik.com'
@@ -53,10 +52,15 @@ const getSessionToken = async () => {
     return data.access_token
 }
 
-export default async (params: any) => {
+export default async (params: any, opt: SearchUtilsOptions) => {
+
+    const [pickCode, dropCode ] = await Promise.all([
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 62}),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 62}),
+    ])
 
     const [bodyData, token] = await Promise.all([
-        getBody(params),
+        getBody(params, { pickCode, dropCode }),
         getSessionToken()
     ])
     const { data } = await Axios({
@@ -69,6 +73,13 @@ export default async (params: any) => {
     })
 
     const u = await getClientData({ id: 62, brokerId: params.requestorClientData.clientId })    
+
+    await saveServiceRequest({
+        requestBody: bodyData,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickCode,
+        supplierData: opt.supplierData
+    })
 
     return data.data.map((rate: any) => {
         return {

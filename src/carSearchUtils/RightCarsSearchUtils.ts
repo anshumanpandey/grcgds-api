@@ -1,8 +1,10 @@
 import axios from "axios"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { DB } from "../utils/DB";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 const getRightCarsDataUsers = async () => {
@@ -14,13 +16,9 @@ const getRightCarsDataUsers = async () => {
     return r || []
 }
 
-const generateXmlBody = async (body: any, id: string) => {
+const generateXmlBody = async (body: any, { pickCode, dropCode }: { pickCode: any, dropCode: any }) => {
     const PickUpDateTime = body.VehAvailRQCore.VehRentalCore.PickUpDateTime
     const ReturnDateTime = body.VehAvailRQCore.VehRentalCore.ReturnDateTime
-    const [pickCode, dropCode] = await Promise.all([
-        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 1 }),
-        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 1 }),
-    ])
     const Age = body.VehAvailRQInfo.Customer.Primary.DriverType.Age
     const Code = body.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code
     const currency = body?.POS?.Source?.ISOCurrency
@@ -55,14 +53,26 @@ const generateXmlBody = async (body: any, id: string) => {
 
 export const RC_URL = 'https://ota.right-cars.com'
 
-export default async (body: any) => {
+export default async (body: any, opt: SearchUtilsOptions) => {
 
     const [rc, dataUsers] = await Promise.all([
         getClientData({ id: 1, brokerId: body.requestorClientData.clientId }),
         getRightCarsDataUsers()
     ]);
 
-    const xml = await generateXmlBody(body, "1000022");
+    const [pickCode, dropCode] = await Promise.all([
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 1 }),
+        getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 1 }),
+    ])
+
+    const xml = await generateXmlBody(body, {pickCode, dropCode});
+
+    await saveServiceRequest({
+        requestBody: xml,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickCode,
+        supplierData: opt.supplierData
+    })
 
     const { data } = await axios.post(RC_URL, xml, {
         headers: {

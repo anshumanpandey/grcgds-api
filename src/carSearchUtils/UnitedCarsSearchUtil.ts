@@ -1,8 +1,10 @@
 import Axios from "axios"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 export const UNITEDCAR_URL = 'http://ws.karveinformatica.com:186/Union5/soap/RentaCarPort'
@@ -11,7 +13,7 @@ const getDateTime = (fullDate: string) => {
     return [date, time.slice(0, 5)]
 }
 
-export default async (params: any) => {
+export default async (params: any, opt: SearchUtilsOptions) => {
 
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 58}),
@@ -40,6 +42,13 @@ export default async (params: any) => {
             </req:RetrieveQuotationRequest>
         </soap:Body>
     </soap:Envelope>`
+
+    await saveServiceRequest({
+        requestBody: body,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickupCodeObj,
+        supplierData: opt.supplierData
+    })
 
     const [{ data }, u,] = await Promise.all([
         Axios.post(UNITEDCAR_URL, body, {}),

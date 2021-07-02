@@ -1,7 +1,9 @@
 import Axios from "axios"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 const https = require('https');
 
@@ -13,7 +15,7 @@ const getDateTime = (fullDate: string) => {
 }
 
 
-export default async (params: any) => {
+export default async (params: any, opt: SearchUtilsOptions) => {
 
     const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
@@ -57,6 +59,13 @@ export default async (params: any) => {
        </OTA_VehAvailRateRQ>
     </soapenv:Body>
   </soapenv:Envelope>`
+
+    await saveServiceRequest({
+        requestBody: body,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickupCodeObj,
+        supplierData: opt.supplierData
+    })
 
     const { data } = await Axios({
         method: 'POST',

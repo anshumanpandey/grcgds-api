@@ -1,8 +1,10 @@
 import Axios from "axios"
-import { DB } from "../utils/DB"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions"
+import { getBrokerData } from "../utils/getBrokerData"
 import { getClientData } from "../utils/getClientData"
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode"
 import { getPaypalCredentials } from "../utils/getPaypalCredentials"
+import { saveServiceRequest } from "../utils/saveServiceRequest"
 
 const URL = 'https://api-partner.discovercars.com/api/Aggregator/GetCars?access_token=yHjjy7XZVTsVTb4zP3HLc3uQP3ZJEvBkKBuwWhSwNCkafCXx5ykRmhJdnqW2UJT3'
 const formatDate = (fullDate: string) => {
@@ -10,13 +12,17 @@ const formatDate = (fullDate: string) => {
     return `${date.split('-').reverse().join(".")}T${time.slice(0, -3)}`
 }
 
-export default async (params: any) => {
+export default async (params: any, opt: SearchUtilsOptions) => {
+    const { POS } = params
+    const { Source: { RequestorID } } = POS
+
+    const pickLocationCode = await getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 17})
 
     const body = {
         //04.08.2020T09:00
         "DateFrom": formatDate(params.VehAvailRQCore.VehRentalCore.PickUpDateTime),
         "DateTo": formatDate(params.VehAvailRQCore.VehRentalCore.ReturnDateTime),
-        "PickupLocationID": (await getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 17})).internal_code,
+        "PickupLocationID": pickLocationCode.internal_code,
         "DropOffLocationID": (await getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 17})).internal_code,
         "CurrencyCode": params?.POS?.Source?.ISOCurrency || "GBP",
         "Age": "35",
@@ -28,6 +34,12 @@ export default async (params: any) => {
         "SearchOnlyPartners": "null",
     }
 
+    await saveServiceRequest({
+        requestBody: JSON.stringify(body),
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickLocationCode,
+        supplierData: opt.supplierData
+    })
 
     const { data } = await Axios.post(URL, body, {
         auth: {

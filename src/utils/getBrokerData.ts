@@ -4,13 +4,14 @@ type ClientData = {
     internalCode: string,
 }
 
-export const getBrokerData = async ({ brokerAccountCode }: { brokerAccountCode?: string | number }): Promise<ClientData> => {
+export const getBrokerData = async ({ brokerAccountCode, locationCode }: { locationCode?: string | number, brokerAccountCode?: string | number }): Promise<ClientData> => {
     const query = DB?.select({
         internalCode: 'internal_code'
     })
         .from("client_broker_locations_accountype")
         .groupBy('account_code')
     if (brokerAccountCode) query?.where("client_broker_locations_accountype.account_code", brokerAccountCode)
+    if (locationCode) query?.where("client_broker_locations_accountype.brokerInternalCode", locationCode)
 
     const r = await query;
 

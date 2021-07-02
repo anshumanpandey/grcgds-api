@@ -1,23 +1,30 @@
 import Axios from "axios"
+import { SearchUtilsOptions } from "../types/SearchUtilsOptions"
 import { DB } from "../utils/DB"
 import { getClientData } from "../utils/getClientData"
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode"
 import { getPaypalCredentials } from "../utils/getPaypalCredentials"
+import { saveServiceRequest } from "../utils/saveServiceRequest"
 
 const URL_PATH = "https://webapi.rent.it/api-ri/Quote/CreateAndLoad/"
 export const RENTI_URL = URL_PATH
 
-const getUrl = async (params: any) => {
+const getUrl = async (params: any, { pickCode, dropCode }: { pickCode: any, dropCode: any }) => {
+    return `${URL_PATH}?ClientId=222&APIKey=4a3fa5f2-2df6-2f97-13ef-e8c0bd075917&Language=EN&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode.internal_code}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode.internal_code}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=${pickCode.country || dropCode.country || "IT"}&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
+}
+
+export default async (params: any, opt: SearchUtilsOptions) => {
     const [pickCode, dropCode ] = await Promise.all([
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 11}),
         getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 11}),
     ])
-    return `${URL_PATH}?ClientId=222&APIKey=4a3fa5f2-2df6-2f97-13ef-e8c0bd075917&Language=EN&RemoteIP=127.0.0.1&CountryID=1&PickUpLocationID=${pickCode.internal_code}&PickUpDate=${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}&DropOffLocationID=${dropCode.internal_code}&DropOffDate=${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}&DriverCountryCode=${pickCode.country || dropCode.country || "IT"}&DriverAge=30&Currency=${params?.POS?.Source?.ISOCurrency || "GBP"}&UserID=0`
-}
-
-export default async (params: any) => {
-
-    const url = await getUrl(params)
+    const url = await getUrl(params, { pickCode, dropCode })
+    await saveServiceRequest({
+        requestBody: url,
+        carsSearchId: opt.searchRecord.id,
+        pickupCodeObj: pickCode,
+        supplierData: opt.supplierData
+    })
     const { data } = await Axios.get(url, {})
 
     const u = await getClientData({ id: 11, brokerId: params.requestorClientData.clientId })
