@@ -65,14 +65,14 @@ export default async (body: any, opt: SearchUtilsOptions) => {
         getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 1 }),
     ])
 
-    const xml = await generateXmlBody(body, {pickCode, dropCode});
+    let xml = await generateXmlBody(body, {pickCode, dropCode});
     const record = await saveServiceRequest({
         requestBody: xml,
         carsSearchId: opt.searchRecord.id,
         pickupCodeObj: pickCode,
         supplierData: opt.supplierData
     })
-    xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
+    xml = xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
 
     const { data } = await axios.post(RC_URL, xml, {
         headers: {

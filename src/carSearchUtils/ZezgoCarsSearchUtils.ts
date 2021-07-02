@@ -66,14 +66,14 @@ export default async (body: any,  opt: SearchUtilsOptions) => {
         getCodeForGrcCode({ grcCode: body.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode ,id: 10}),
     ])
 
-    const xml = await generateXmlBody({ ...body, account_code: t?.account_code}, { pickCode, dropCode });
+    let xml = await generateXmlBody({ ...body, account_code: t?.account_code}, { pickCode, dropCode });
     const record = await saveServiceRequest({
         requestBody: xml,
         carsSearchId: opt.searchRecord.id,
         supplierData: opt.supplierData,
         pickupCodeObj: pickCode
     })
-    xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
+    xml = xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
 
     const { data } = await axios.post(ZEZGO_URL, xml, {
         headers: {
