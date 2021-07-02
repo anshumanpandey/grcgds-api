@@ -1,10 +1,10 @@
 import { DB } from "../utils/DB"
 
-type ClientData = {
+type BrokerData = {
     internalCode: string,
 }
 
-export const getBrokerData = async ({ brokerAccountCode, locationCode }: { locationCode?: string | number, brokerAccountCode?: string | number }): Promise<ClientData> => {
+export const getBrokerData = async ({ brokerAccountCode, locationCode }: { locationCode?: string | number, brokerAccountCode?: string | number }): Promise<BrokerData> => {
     const query = DB?.select({
         internalCode: 'internal_code'
     })

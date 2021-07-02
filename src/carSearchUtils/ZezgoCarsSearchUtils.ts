@@ -32,7 +32,7 @@ const generateXmlBody = async (body: any, { pickCode, dropCode }: { pickCode: an
     return `<OTA_VehAvailRateRQ xmlns="https://www.opentravel.org/OTA/2003/05" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRQ.xsd" TimeStamp="2018-12-04T17:00:16" Target="Production" Version="1.002">
     <POS>
       <Source>
-        <RequestorID Type="5" ID="BookingClik270"/>
+        <RequestorID Type="5" ID="{{INTERNAL_CODE}}"/>
       </Source>
     </POS>
     <VehAvailRQCore Status="Available">
@@ -67,12 +67,14 @@ export default async (body: any,  opt: SearchUtilsOptions) => {
     ])
 
     const xml = await generateXmlBody({ ...body, account_code: t?.account_code}, { pickCode, dropCode });
-    await saveServiceRequest({
+    const record = await saveServiceRequest({
         requestBody: xml,
         carsSearchId: opt.searchRecord.id,
         supplierData: opt.supplierData,
         pickupCodeObj: pickCode
     })
+    xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
+
     const { data } = await axios.post(ZEZGO_URL, xml, {
         headers: {
             'Content-Type': 'text/plain; charset=UTF8',

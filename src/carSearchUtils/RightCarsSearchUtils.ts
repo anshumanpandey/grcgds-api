@@ -26,7 +26,7 @@ const generateXmlBody = async (body: any, { pickCode, dropCode }: { pickCode: an
     return `<OTA_VehAvailRateRQ xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05OTA_VehAvailRateRQ.xsd" TimeStamp="2014-09-08-T16:38:24" EchoToken="$ttoken" Target="Production" Version="1.002">
     <POS>
         <Source>
-            <RequestorID Type="5" ID="BookingClik228"/>
+            <RequestorID Type="5" ID="{{INTERNAL_CODE}}"/>
         </Source>
     </POS>
     <VehAvailRQCore Status="Available">
@@ -66,13 +66,13 @@ export default async (body: any, opt: SearchUtilsOptions) => {
     ])
 
     const xml = await generateXmlBody(body, {pickCode, dropCode});
-
-    await saveServiceRequest({
+    const record = await saveServiceRequest({
         requestBody: xml,
         carsSearchId: opt.searchRecord.id,
         pickupCodeObj: pickCode,
         supplierData: opt.supplierData
     })
+    xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
 
     const { data } = await axios.post(RC_URL, xml, {
         headers: {

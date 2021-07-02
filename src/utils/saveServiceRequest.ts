@@ -23,5 +23,5 @@ export const saveServiceRequest = async (params: Params) => {
         "updatedAt ": new Date(),
     }
     const [recordId] = await getDbFor("grcgds_gateway_db")?.insert(toInsert).into('serviceRequest');
-    return { id: recordId }
+    return { id: recordId, brokerData }
 }
