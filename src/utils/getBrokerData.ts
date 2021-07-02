@@ -15,7 +15,7 @@ export const getBrokerData = async (p: Params): Promise<BrokerData> => {
         .groupBy('account_code')
     if (p.brokerAccountCode) query?.where("client_broker_locations_accountype.account_code", p.brokerAccountCode)
     if (p.locationCode) query?.where("client_broker_locations_accountype.brokerInternalCode", p.locationCode)
-    if (p.brokerId) query?.where("client_broker_locations_accountype.brokerInternalCode", p.brokerId)
+    if (p.brokerId) query?.where("client_broker_locations_accountype.brokerId", p.brokerId)
 
     const r = await query;
 

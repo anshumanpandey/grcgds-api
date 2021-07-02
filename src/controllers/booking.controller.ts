@@ -1090,7 +1090,7 @@ export const createBooking = async (body: any) => {
     try {   
         const cliendData = await getClientData({
             brokerId: RequestorID.ID.slice(4,6),
-            clientAccountCode: RequestorID.RATEID.slice(4)
+            clientAccountCode: RequestorID.RATE_ID.slice(4)
         })
 
         const bookingFn = clientBookingsMaps[parseInt(cliendData.clientId.toString() || "0")]
@@ -1125,10 +1125,9 @@ export const searchBookings = async (body: any) => {
         const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
 
         const params: GetBookingsParams = { RequestorIDs, appUserEmail: Email }
-        if (RequestorID.RATEID) {
+        if (RequestorID.RATE_ID) {
             const cliendData = await getBrokerData({
-                brokerId: RequestorID.ID.slice(4,6),
-                brokerAccountCode: RequestorID.RATEID.slice(4)
+                brokerAccountCode: RequestorID.RATE_ID.slice(4)
             })
             if (cliendData) params.clientId = cliendData.clientId
         }
