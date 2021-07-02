@@ -1177,7 +1177,7 @@ export const cancelBooking = async (body: any) => {
 
         let json = null;
 
-        clientCancelBookingsMaps[cliendData.clientId](body)
+        await clientCancelBookingsMaps[cliendData.clientId](body)
             .then(() => cancelBookingByResNumber(resNumber))
             .then(() => {
                 json = {
