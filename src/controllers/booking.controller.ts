@@ -1117,7 +1117,7 @@ export const createBooking = async (body: any) => {
 export const searchBookings = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
-    const { VehRetResRQCore: { Email }, CONTEXT: { Filter = [] } } = body
+    const { VehRetResRQCore: { Email, ResNumber }, CONTEXT: { Filter = [] } } = body
     const { POS: { Source: { RequestorID } } } = body
 
     try {
@@ -1130,6 +1130,9 @@ export const searchBookings = async (body: any) => {
                 brokerAccountCode: RequestorID.RATEID.slice(4)
             })
             if (cliendData) params.clientId = cliendData.clientId
+        }
+        if (ResNumber?.Number) {
+            params.resNumber = ResNumber.Number
         }
 
         const bookings = await getBookings(params)

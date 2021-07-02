@@ -7,8 +7,8 @@ export enum BOOKING_STATUS_ENUM {
     CANCELLED = "Cancelled"
 }
 
-export type GetBookingsParams = { RequestorIDs? : string[], appUserEmail?: string, clientId?: string }
-export const getBookings = async ({ RequestorIDs = [], appUserEmail, clientId }: GetBookingsParams ) => {
+export type GetBookingsParams = { RequestorIDs? : string[], appUserEmail?: string, clientId?: string, resNumber?: string }
+export const getBookings = async ({ RequestorIDs = [], appUserEmail, clientId, resNumber }: GetBookingsParams ) => {
     logger.info("Getting bookings")
     const getBookingQuery = DB?.select().from("Bookings").whereNot('customerId', null)
     if (appUserEmail) {
@@ -26,6 +26,10 @@ export const getBookings = async ({ RequestorIDs = [], appUserEmail, clientId }:
     }
     if (clientId) {
         getBookingQuery?.where("grcgdsClient", clientId)
+    }
+
+    if (resNumber) {
+        getBookingQuery?.where("resNumber", resNumber)
     }
     const [r, extras ] = await Promise.all([
         getBookingQuery,
