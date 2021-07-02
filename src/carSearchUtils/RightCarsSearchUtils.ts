@@ -94,7 +94,7 @@ export default async (body: any, opt: SearchUtilsOptions) => {
                         ...r.VehAvailCore[0],
                         $: {
                             ...vehCoreMeta,
-                            Deeplink: deeplink.replace(/(&amp;)/g, '&'),
+                            Deeplink: deeplink?.replace(/(&amp;)/g, '&') || '',
                             "Supplier_ID": `GRC-${rc.clientAccountCode}`,
                             "Supplier_Name": rc.clientname,
                             ...getPaypalCredentials({ requetorClient: body.requestorClientData, supplier: rc })
