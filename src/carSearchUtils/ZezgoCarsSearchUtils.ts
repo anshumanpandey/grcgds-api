@@ -5,7 +5,7 @@ import { DB } from "../utils/DB";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
-import { saveServiceRequest } from "../utils/saveServiceRequest";
+import { lateSaveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 const getDataUser = async (body: any) => {
@@ -67,13 +67,14 @@ export default async (body: any,  opt: SearchUtilsOptions) => {
     ])
 
     let xml = await generateXmlBody({ ...body, account_code: t?.account_code}, { pickCode, dropCode });
-    const record = await saveServiceRequest({
+    const record = await lateSaveServiceRequest({
         requestBody: xml,
         carsSearchId: opt.searchRecord.id,
         supplierData: opt.supplierData,
         pickupCodeObj: pickCode
     })
     xml = xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
+    await record.saveRequest({ requestBody: xml })
 
     const { data } = await axios.post(ZEZGO_URL, xml, {
         headers: {

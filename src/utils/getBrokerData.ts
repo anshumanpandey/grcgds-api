@@ -1,6 +1,6 @@
 import { DB } from "../utils/DB"
 
-type BrokerData = {
+export type BrokerData = {
     internalCode: string,
 }
 

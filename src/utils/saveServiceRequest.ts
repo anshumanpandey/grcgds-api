@@ -1,6 +1,6 @@
 import { SupplierData } from "../services/requestor.service";
 import DB, { getDbFor } from "./DB";
-import { getBrokerData } from "./getBrokerData";
+import { BrokerData, getBrokerData } from "./getBrokerData";
 import { CompanyLocation } from "./getCodeForGrcCode";
 
 type Params = {
@@ -9,12 +9,8 @@ type Params = {
     pickupCodeObj: CompanyLocation,
     supplierData: SupplierData
 }
-export const saveServiceRequest = async (params: Params) => {
-    const brokerData = await getBrokerData({
-        brokerAccountCode: params.supplierData.account_code,
-        locationCode: params.pickupCodeObj.GRCGDSlocatincode,
-    })
 
+const saveRecord = async (params: Params, brokerData: BrokerData) => {
     const toInsert = {
         internalCode: brokerData.internalCode,
         body: params.requestBody,
@@ -24,4 +20,22 @@ export const saveServiceRequest = async (params: Params) => {
     }
     const [recordId] = await getDbFor("grcgds_gateway_db")?.insert(toInsert).into('serviceRequest');
     return { id: recordId, brokerData }
+}
+export const saveServiceRequest = async (params: Params) => {
+    const brokerData = await getBrokerData({
+        brokerAccountCode: params.supplierData.account_code,
+        locationCode: params.pickupCodeObj.GRCGDSlocatincode,
+    })
+    return saveRecord(params, brokerData)
+}
+
+export const lateSaveServiceRequest = async (params: Params) => {
+    const brokerData = await getBrokerData({
+        brokerAccountCode: params.supplierData.account_code,
+        locationCode: params.pickupCodeObj.GRCGDSlocatincode,
+    })
+    return {
+        brokerData,
+        saveRequest: ({ requestBody }: { requestBody: Params["requestBody"]}) => saveRecord({...params, requestBody }, brokerData)
+    }
 }

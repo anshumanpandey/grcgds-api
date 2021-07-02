@@ -4,7 +4,7 @@ import { DB } from "../utils/DB";
 import { getClientData } from "../utils/getClientData";
 import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../utils/getPaypalCredentials";
-import { saveServiceRequest } from "../utils/saveServiceRequest";
+import { lateSaveServiceRequest, saveServiceRequest } from "../utils/saveServiceRequest";
 import { xmlToJson } from '../utils/XmlConfig';
 
 const getRightCarsDataUsers = async () => {
@@ -66,13 +66,14 @@ export default async (body: any, opt: SearchUtilsOptions) => {
     ])
 
     let xml = await generateXmlBody(body, {pickCode, dropCode});
-    const record = await saveServiceRequest({
+    const record = await lateSaveServiceRequest({
         requestBody: xml,
         carsSearchId: opt.searchRecord.id,
         pickupCodeObj: pickCode,
         supplierData: opt.supplierData
     })
     xml = xml.replace("{{INTERNAL_CODE}}", record.brokerData.internalCode)
+    await record.saveRequest({ requestBody: xml })
 
     const { data } = await axios.post(RC_URL, xml, {
         headers: {
