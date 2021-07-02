@@ -1164,7 +1164,7 @@ export const cancelBooking = async (body: any) => {
 
     const resNumber = VehCancelRQCore.ResNumber.Number
 
-    const bookings = await getBookingsBy({ requestorId: RequestorID.ID, resNumber, grcgdsClientId: RequestorID.RATEID.slice(4).slice(0,-4) })
+    const bookings = await getBookingsBy({ requestorId: RequestorID.ID, resNumber })
 
     if (bookings.length === 0) throw new ApiError("Booking not found")
     if (bookings.every(b => b.reservationStatus === BOOKING_STATUS_ENUM.CANCELLED)) throw new ApiError("Booking not found")

@@ -58,12 +58,14 @@ export const cancelBookingByResNumber = async (resNumber: string) => {
     })
 }
 
-export const getBookingsBy = async ({ requestorId, grcgdsClientId, resNumber }: { requestorId: string, grcgdsClientId: string, resNumber: string }) => {
-    const bookings = await DB?.select().from("Bookings")
+export const getBookingsBy = async ({ requestorId, grcgdsClientId, resNumber }: { requestorId: string, grcgdsClientId?: string, resNumber: string }) => {
+    const query = DB?.select().from("Bookings")
     .where('requestorId', requestorId)
-    .where('grcgdsClient', grcgdsClientId)
     .where('resNumber', resNumber)
 
+    if (grcgdsClientId) query?.where('grcgdsClient', grcgdsClientId)
+
+    const bookings = await query
     if (!bookings) return []
 
     return bookings
