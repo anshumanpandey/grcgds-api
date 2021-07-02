@@ -51,7 +51,7 @@ export const getBookings = async ({ RequestorIDs = [], appUserEmail, clientId }:
 }
 
 export const cancelBookingByResNumber = async (resNumber: string) => {
-    return DB?.select().from("Bookings")
+    return DB?.table("Bookings")
     .where('resNumber', resNumber)
     .update({
         reservationStatus: BOOKING_STATUS_ENUM.CANCELLED,
