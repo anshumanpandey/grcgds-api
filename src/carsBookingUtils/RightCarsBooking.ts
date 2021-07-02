@@ -207,7 +207,7 @@ export const cancelRightCarsBooking = async (body: any) => {
     VehCancelRQ.xsd">
     <POS>
     <Source>
-    <RequestorID Type="5" ID="MOBILE001" />
+    <RequestorID Type="5" ID="${brokerData.internalCode}" />
     </Source>
     </POS>
     <VehCancelRQCore>
