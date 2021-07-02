@@ -1090,7 +1090,7 @@ export const createBooking = async (body: any) => {
     try {   
         const cliendData = await getClientData({
             brokerId: RequestorID.ID.slice(4,6),
-            clientAccountCode: RequestorID.RATE_ID.slice(4)
+            clientAccountCode: RequestorID.RATEID.slice(4)
         })
 
         const bookingFn = clientBookingsMaps[parseInt(cliendData.clientId.toString() || "0")]
