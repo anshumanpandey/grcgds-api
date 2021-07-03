@@ -13,6 +13,7 @@ import { logger } from '../utils/Logger';
 import ZezgoBooking, { cancelZezgoBooking } from '../carsBookingUtils/ZezgoBooking';
 import { getClientData } from '../utils/getClientData';
 import { getBrokerData } from '../utils/getBrokerData';
+import { getHannkUserByEmail, saveHannkUserByEmail, updateHannkUserByEmail } from '../services/requestor.service';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1085,7 +1086,7 @@ const clientBookingsMaps: {[k: number]: (p: any) => void } = {
 export const createBooking = async (body: any) => {
     const validator = validateFor(schema)
     validator(body)
-    const { CONTEXT, POS: { Source: { RequestorID } } } = body
+    const { VehResRQCore, POS: { Source: { RequestorID } } } = body
 
     try {   
         const cliendData = await getClientData({
@@ -1096,6 +1097,24 @@ export const createBooking = async (body: any) => {
         const bookingFn = clientBookingsMaps[parseInt(cliendData.clientId.toString() || "0")]
 
         if (!bookingFn) throw new ApiError('We could not find the requested booking supplier')
+
+        const primary = VehResRQCore?.Customer?.Primary
+        if (primary.Email) {
+            const hannkUser = await getHannkUserByEmail({ email: primary.Email })
+            const params = {
+                firstName: primary.PersonName.GivenName,
+                lastname: primary.PersonName.Surname,
+                phonenumber: primary.Telephone.PhoneNumber
+            }
+            if (hannkUser) {
+                await updateHannkUserByEmail({
+                    ...params,
+                    id: hannkUser.id
+                })
+            } else {
+                await saveHannkUserByEmail(params)
+            }
+        }
 
         let json = await bookingFn(body)
 

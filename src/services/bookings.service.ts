@@ -24,13 +24,8 @@ export const getBookings = async ({ RequestorIDs = [], userData, clientId, resNu
             phonenumber: userData.phonenumber || "",
         }
         const hannkUser = await getHannkUserByEmail({ email: userData.email })
-            console.log('hannkUser found', hannkUser)
         if (hannkUser) {
             getBookingQuery?.where("customerId", hannkUser.id)
-            console.log('updating uswer id', hannkUser.id)
-            await updateHannkUserByEmail({ ...userParams, id: hannkUser.id})
-        } else {
-            await saveHannkUserByEmail(userParams)
         }
     }
     if (RequestorIDs && RequestorIDs.length != 0) {
