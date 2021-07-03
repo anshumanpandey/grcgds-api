@@ -102,6 +102,7 @@ export type UpdateHannkUserParams = { id: string } & Partial<SaveHannkUserParams
 export const updateHannkUserByEmail = async (params: UpdateHannkUserParams) => {
     const r = await getDbFor("grcgds_gateway_db")
         .table("users")
+        .where("id", "=", params.id,)
         .update({
             username: params.email,
             firstname: params.firstName,
