@@ -1117,14 +1117,23 @@ export const createBooking = async (body: any) => {
 export const searchBookings = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
-    const { VehRetResRQCore: { Email, ResNumber }, CONTEXT: { Filter = [] } } = body
+    const { VehRetResRQCore, CONTEXT: { Filter = [] } } = body
     const { POS: { Source: { RequestorID } } } = body
+    const { Email, ResNumber, PersonName, Telephone } = VehRetResRQCore
 
     try {
 
         const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
 
-        const params: GetBookingsParams = { RequestorIDs, appUserEmail: Email }
+        const params: GetBookingsParams = {
+            RequestorIDs,
+            userData: {
+                email: Email,
+                firstName: PersonName.GivenName,
+                lastname: PersonName.GivenName,
+                phonenumber: Telephone.PhoneNumber
+            }
+        }
         if (RequestorID.RATEID) {
             const cliendData = await getBrokerData({
                 brokerAccountCode: RequestorID.RATEID.slice(4)

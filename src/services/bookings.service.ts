@@ -1,20 +1,34 @@
 import { DB, getDbFor } from "../utils/DB";
 import { logger } from "../utils/Logger";
 import { getCompanyLocations } from "./locations.service";
-import { getHannkUserByEmail } from "./requestor.service";
+import { getHannkUserByEmail, saveHannkUserByEmail, SaveHannkUserParams, updateHannkUserByEmail } from "./requestor.service";
 
 export enum BOOKING_STATUS_ENUM {
     CANCELLED = "Cancelled"
 }
 
-export type GetBookingsParams = { RequestorIDs? : string[], appUserEmail?: string, clientId?: string, resNumber?: string }
-export const getBookings = async ({ RequestorIDs = [], appUserEmail, clientId, resNumber }: GetBookingsParams ) => {
+export type GetBookingsParams = {
+    RequestorIDs? : string[],
+    clientId?: string,
+    resNumber?: string,
+    userData: SaveHannkUserParams
+}
+export const getBookings = async ({ RequestorIDs = [], userData, clientId, resNumber }: GetBookingsParams ) => {
     logger.info("Getting bookings")
     const getBookingQuery = DB?.select().from("Bookings").whereNot('customerId', null)
-    if (appUserEmail) {
-        const hannkUser = await getHannkUserByEmail({ email: appUserEmail })
+    if (userData.email) {
+        const userParams = {
+            email: userData.email,
+            firstName: userData.firstName || "",
+            lastname: userData.lastname || "",
+            phonenumber: userData.phonenumber || "",
+        }
+        const hannkUser = await getHannkUserByEmail({ email: userData.email })
         if (hannkUser) {
             getBookingQuery?.where("customerId", hannkUser.id)
+            await updateHannkUserByEmail({ id: hannkUser.id, ...userParams})
+        } else {
+            await saveHannkUserByEmail(userParams)
         }
     }
     if (RequestorIDs && RequestorIDs.length != 0) {

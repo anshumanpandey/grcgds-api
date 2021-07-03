@@ -77,11 +77,39 @@ export const getUsersByName = async (params: { firstname?: string, lastname?: st
 }
 
 export const getHannkUserByEmail = async ({ email }: { email: string }) => {
-    const r = await getDbFor("grcgds_hannk")
+    const r = await getDbFor("grcgds_gateway_db")
         .from("users")
         .where({ username: email })
 
     return r.length != 0 ? r[0] : null
+}
+
+export type SaveHannkUserParams = { email?: string, firstName?: string, lastname?: string, phonenumber?: string }
+export const saveHannkUserByEmail = async (params: SaveHannkUserParams) => {
+    const r = await getDbFor("grcgds_gateway_db")
+        .table("users")
+        .insert({
+            username: params.email,
+            firstname: params.firstName,
+            lastname: params.lastname,
+            mobilenumber: params.phonenumber,
+        })
+
+    return r
+}
+
+export type UpdateHannkUserParams = { id: string } & Partial<SaveHannkUserParams>
+export const updateHannkUserByEmail = async (params: UpdateHannkUserParams) => {
+    const r = await getDbFor("grcgds_gateway_db")
+        .table("users")
+        .update({
+            username: params.email,
+            firstname: params.firstName,
+            lastname: params.lastname,
+            mobilenumber: params.phonenumber,
+        })
+
+    return r
 }
 
 export const SUPORTED_URL = new Map();
