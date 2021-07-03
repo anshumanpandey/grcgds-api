@@ -103,7 +103,7 @@ export const saveHannkUserByEmail = async (params: SaveHannkUserParams) => {
             lastname: params.lastname,
             mobilenumber: params.phonenumber,
             city: params.city,
-            addr1: params.address,
+            add1: params.address,
             postcode: params.postcode,
             country: params.country,
         })
@@ -122,7 +122,7 @@ export const updateHannkUserByEmail = async (params: UpdateHannkUserParams) => {
             lastname: params.lastname,
             mobilenumber: params.phonenumber,
             city: params.city,
-            addr1: params.address,
+            add1: params.address,
             postcode: params.postcode,
             country: params.country,
         })
