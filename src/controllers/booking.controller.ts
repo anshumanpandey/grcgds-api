@@ -13,7 +13,7 @@ import { logger } from '../utils/Logger';
 import ZezgoBooking, { cancelZezgoBooking } from '../carsBookingUtils/ZezgoBooking';
 import { getClientData } from '../utils/getClientData';
 import { getBrokerData } from '../utils/getBrokerData';
-import { getHannkUserByEmail, saveHannkUserByEmail, updateHannkUserByEmail } from '../services/requestor.service';
+import { getHannkUserByEmail, saveHannkUserByEmail, SaveHannkUserParams, updateHannkUserByEmail } from '../services/requestor.service';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1101,10 +1101,15 @@ export const createBooking = async (body: any) => {
         const primary = VehResRQCore?.Customer?.Primary
         if (primary.Email) {
             const hannkUser = await getHannkUserByEmail({ email: primary.Email })
-            const params = {
+            const params: SaveHannkUserParams = {
                 firstName: primary.PersonName.GivenName,
                 lastname: primary.PersonName.Surname,
-                phonenumber: primary.Telephone.PhoneNumber
+                phonenumber: primary.Telephone.PhoneNumber,
+                
+                city: primary.Address.CityName,
+                address: primary.Address.StreetNmbr,
+                country: primary.Address.Country,
+                postcode: primary.Address.PostalCode,
             }
             if (hannkUser) {
                 await updateHannkUserByEmail({

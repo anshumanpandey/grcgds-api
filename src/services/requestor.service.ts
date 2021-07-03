@@ -84,7 +84,16 @@ export const getHannkUserByEmail = async ({ email }: { email: string }) => {
     return r.length != 0 ? r[0] : null
 }
 
-export type SaveHannkUserParams = { email?: string, firstName?: string, lastname?: string, phonenumber?: string }
+export type SaveHannkUserParams = {
+    email?: string,
+    firstName?: string,
+    lastname?: string,
+    phonenumber?: string,
+    city?: string,
+    address?: string,
+    postcode?: string,
+    country?: string,
+}
 export const saveHannkUserByEmail = async (params: SaveHannkUserParams) => {
     const r = await getDbFor("grcgds_gateway_db")
         .table("users")
@@ -93,6 +102,10 @@ export const saveHannkUserByEmail = async (params: SaveHannkUserParams) => {
             firstname: params.firstName,
             lastname: params.lastname,
             mobilenumber: params.phonenumber,
+            city: params.city,
+            addr1: params.address,
+            postcode: params.postcode,
+            country: params.country,
         })
 
     return r
@@ -108,6 +121,10 @@ export const updateHannkUserByEmail = async (params: UpdateHannkUserParams) => {
             firstname: params.firstName,
             lastname: params.lastname,
             mobilenumber: params.phonenumber,
+            city: params.city,
+            addr1: params.address,
+            postcode: params.postcode,
+            country: params.country,
         })
 
     return r
