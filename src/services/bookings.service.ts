@@ -26,7 +26,8 @@ export const getBookings = async ({ RequestorIDs = [], userData, clientId, resNu
         const hannkUser = await getHannkUserByEmail({ email: userData.email })
         if (hannkUser) {
             getBookingQuery?.where("customerId", hannkUser.id)
-            await updateHannkUserByEmail({ id: hannkUser.id, ...userParams})
+            console.log('updating uswer id', hannkUser.id)
+            await updateHannkUserByEmail({ ...userParams, id: hannkUser.id})
         } else {
             await saveHannkUserByEmail(userParams)
         }
