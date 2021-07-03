@@ -1130,7 +1130,7 @@ export const searchBookings = async (body: any) => {
             userData: {
                 email: Email,
                 firstName: PersonName.GivenName,
-                lastname: PersonName.GivenName,
+                lastname: PersonName.Surname,
                 phonenumber: Telephone.PhoneNumber
             }
         }
