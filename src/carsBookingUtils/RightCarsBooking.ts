@@ -12,7 +12,7 @@ export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
     const { Source: { RequestorID } } = POS
     const { VehPref, Customer } = VehResRQCore
-    const { Primary: { Email, Address, PersonName: { GivenName, Surname, NamePrefix } } } = Customer
+    const { Primary: { Email, Telephone, Address, PersonName: { GivenName, Surname, NamePrefix } } } = Customer
 
     const pickLocation = VehResRQCore.VehRentalCore.PickUpLocation.LocationCode
     const dropLocation = VehResRQCore.VehRentalCore.ReturnLocation.LocationCode
@@ -39,7 +39,7 @@ export default async (body: any) => {
     <GivenName>${GivenName}</GivenName>
     <Surname>${Surname}</Surname>
     </PersonName>
-    <Telephone />
+    <Telephone>${Telephone?.PhoneNumber || ""}<Telephone/>
     <Email>${Email}</Email>
     <Address>
         <StreetNmbr>${Address.StreetNmbr || ""}</StreetNmbr>
