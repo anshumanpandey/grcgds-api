@@ -81,7 +81,7 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
     <OTA_VehRetResRS>
     <Success/>
     <VehRetResRSCore>
-        ${bookings.filter(b => b.customer).map((b) => {
+        ${bookings.map((b) => {
             const extras = b.extras.length != 0 ? b.extras.map((e: any) => {
                 return `<${e.vendorEquipId}>${e.quantity}</${e.vendorEquipId}>`;
             }).join("\n"): ""
