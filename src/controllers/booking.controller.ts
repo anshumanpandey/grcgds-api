@@ -1394,17 +1394,13 @@ const SearchBookingSchema = {
 export const searchBookings = async (body: any) => {
     const validator = validateFor(SearchBookingSchema)
     validator(body)
-    const { VehRetResRQCore, CONTEXT: { Filter = [] } } = body
+    const { VehRetResRQCore } = body
     const { POS: { Source: { RequestorID } } } = body
     const { ResNumber } = VehRetResRQCore
 
     try {
 
-        const RequestorIDs = Array.isArray(Filter) ? Filter.map((f: any) => f.content) : Filter.content == "" ? [] : [Filter.content]
-
-        const params: GetBookingsParams = {
-            RequestorIDs,
-        }
+        const params: GetBookingsParams = {}
         if (RequestorID.RATEID) {
             const cliendData = await getBrokerData({
                 brokerAccountCode: RequestorID.RATEID.slice(4)
