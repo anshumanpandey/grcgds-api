@@ -14,7 +14,7 @@ export type GetBookingsParams = {
 }
 export const getBookings = async ({ RequestorIDs = [], clientId, resNumber }: GetBookingsParams ) => {
     logger.info("Getting bookings")
-    const getBookingQuery = DB?.select().from("Bookings").whereNot('customerId', null)
+    const getBookingQuery = DB?.select().from("Bookings")
     if (RequestorIDs && RequestorIDs.length != 0) {
         getBookingQuery?.andWhere(function() {
             RequestorIDs.forEach(id => {
