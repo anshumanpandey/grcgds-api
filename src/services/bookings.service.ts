@@ -90,8 +90,8 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
             <Customer>
                 <Primary>
                 <PersonName>
-                    <GivenName>${b.customer.firstname}</GivenName>
-                    <Surname>${b.customer.lastname}</Surname>
+                    <GivenName>${b.customer?.firstname || ""}</GivenName>
+                    <Surname>${b.customer?.lastname || ""}</Surname>
                 </PersonName>
                 <Email/>
                 <Address>
