@@ -180,7 +180,7 @@ export const getRightCarsBooking = async (body: any) => {
             await LogBookingToDb(toInsert)
         }
 
-        const usersBookings = await getBookings({ userData: { email: VehRetSingleResRQ.Email.Address } })
+        const usersBookings = await getBookings({ resNumber })
 
         return usersBookings.find(b => b.resNumber == VehRetSingleResRQ.ResNumber.Number)
 

@@ -1138,12 +1138,281 @@ export const createBooking = async (body: any) => {
     }
 }
 
+const SearchBookingSchema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "xmlns": "http://www.opentravel.org/OTA/2003/05",
+            "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+            "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05  \nVehRetResRQ.xsd",
+            "POS": {
+                "Source": {
+                    "RequestorID": {
+                        "Type": "5",
+                        "ID": "GRC-660000",
+                        "RATE_ID": "GRC-200002",
+                        "ID_NAME": "Acme Rent A Car"
+                    },
+                    "ApiKey": "c32419e4-d316-4a54-b20d-296eb2dcf7a2"
+                }
+            },
+            "VehRetResRQCore": {
+                "ResNumber": {
+                    "Number": ""
+                },
+                "PersonName": {
+                    "GivenName": "ddddddd",
+                    "Surname": "Test"
+                },
+                "Telephone": {
+                    "PhoneNumber": "123465"
+                }
+            },
+            "CONTEXT": "\n    "
+        }
+    ],
+    "required": [
+        "xmlns",
+        "xmlns:xsi",
+        "xsi:schemaLocation",
+        "POS",
+        "VehRetResRQCore",
+        "CONTEXT"
+    ],
+    "properties": {
+        "xmlns": {
+            "$id": "#/properties/xmlns",
+            "type": "string",
+            "title": "The xmlns schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "http://www.opentravel.org/OTA/2003/05"
+            ]
+        },
+        "xmlns:xsi": {
+            "$id": "#/properties/xmlns%3Axsi",
+            "type": "string",
+            "title": "The xmlns:xsi schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "http://www.w3.org/2001/XMLSchema-instance"
+            ]
+        },
+        "xsi:schemaLocation": {
+            "$id": "#/properties/xsi%3AschemaLocation",
+            "type": "string",
+            "title": "The xsi:schemaLocation schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "http://www.opentravel.org/OTA/2003/05  \nVehRetResRQ.xsd"
+            ]
+        },
+        "POS": {
+            "$id": "#/properties/POS",
+            "type": "object",
+            "title": "The POS schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "Source": {
+                        "RequestorID": {
+                            "Type": "5",
+                            "ID": "GRC-660000",
+                            "RATE_ID": "GRC-200002",
+                            "ID_NAME": "Acme Rent A Car"
+                        },
+                        "ApiKey": "c32419e4-d316-4a54-b20d-296eb2dcf7a2"
+                    }
+                }
+            ],
+            "required": [
+                "Source"
+            ],
+            "properties": {
+                "Source": {
+                    "$id": "#/properties/POS/properties/Source",
+                    "default": {},
+                    "description": "An explanation about the purpose of this instance.",
+                    "examples": [
+                        {
+                            "RequestorID": {
+                                "Type": "5",
+                                "ID": "GRC-660000",
+                                "RATE_ID": "GRC-200002",
+                                "ID_NAME": "Acme Rent A Car"
+                            },
+                            "ApiKey": "c32419e4-d316-4a54-b20d-296eb2dcf7a2"
+                        }
+                    ],
+                    "required": [
+                        "RequestorID"
+                    ],
+                    "title": "The Source schema",
+                    "type": "object",
+                    "properties": {
+                        "RequestorID": {
+                            "$id": "#/properties/POS/properties/Source/properties/RequestorID",
+                            "default": {},
+                            "description": "An explanation about the purpose of this instance.",
+                            "examples": [
+                                {
+                                    "Type": "5",
+                                    "ID": "GRC-660000",
+                                    "RATE_ID": "GRC-200002",
+                                    "ID_NAME": "Acme Rent A Car"
+                                }
+                            ],
+                            "required": [
+                                "ID",
+                                "RATE_ID"
+                            ],
+                            "title": "The RequestorID schema",
+                            "type": "object",
+                            "properties": {
+                                "Type": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/Type",
+                                    "type": "string",
+                                    "title": "The Type schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "5"
+                                    ]
+                                },
+                                "ID": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/ID",
+                                    "type": "string",
+                                    "title": "The ID schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "GRC-660000"
+                                    ]
+                                },
+                                "RATE_ID": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/RATE_ID",
+                                    "type": "string",
+                                    "title": "The RATE_ID schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "GRC-200002"
+                                    ]
+                                },
+                                "ID_NAME": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/ID_NAME",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "examples": [
+                                        "Acme Rent A Car"
+                                    ],
+                                    "title": "The ID_NAME schema",
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": true
+                        },
+                        "ApiKey": {
+                            "$id": "#/properties/POS/properties/Source/properties/ApiKey",
+                            "type": "string",
+                            "title": "The ApiKey schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "c32419e4-d316-4a54-b20d-296eb2dcf7a2"
+                            ]
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "VehRetResRQCore": {
+            "$id": "#/properties/VehRetResRQCore",
+            "type": "object",
+            "title": "The VehRetResRQCore schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "ResNumber": {
+                        "Number": ""
+                    },
+                    "PersonName": {
+                        "GivenName": "ddddddd",
+                        "Surname": "Test"
+                    },
+                    "Telephone": {
+                        "PhoneNumber": "123465"
+                    }
+                }
+            ],
+            "required": [
+                "ResNumber",
+                "PersonName",
+                "Telephone"
+            ],
+            "properties": {
+                "ResNumber": {
+                    "$id": "#/properties/VehRetResRQCore/properties/ResNumber",
+                    "type": "object",
+                    "title": "The ResNumber schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "Number": ""
+                        }
+                    ],
+                    "required": [
+                        "Number"
+                    ],
+                    "properties": {
+                        "Number": {
+                            "$id": "#/properties/VehRetResRQCore/properties/ResNumber/properties/Number",
+                            "description": "An explanation about the purpose of this instance.",
+                            "examples": [
+                                ""
+                            ],
+                            "title": "The Number schema",
+                            "minLength": 1,
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "CONTEXT": {
+            "$id": "#/properties/CONTEXT",
+            "type": "string",
+            "title": "The CONTEXT schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "\n    "
+            ]
+        }
+    },
+    "additionalProperties": true
+}
+
 export const searchBookings = async (body: any) => {
-    //const validator = validateFor(schema)
-    //validator(body)
+    const validator = validateFor(SearchBookingSchema)
+    validator(body)
     const { VehRetResRQCore, CONTEXT: { Filter = [] } } = body
     const { POS: { Source: { RequestorID } } } = body
-    const { Email, ResNumber, PersonName, Telephone } = VehRetResRQCore
+    const { ResNumber } = VehRetResRQCore
 
     try {
 
@@ -1151,16 +1420,10 @@ export const searchBookings = async (body: any) => {
 
         const params: GetBookingsParams = {
             RequestorIDs,
-            userData: {
-                email: Email,
-                firstName: PersonName.GivenName,
-                lastname: PersonName.Surname,
-                phonenumber: Telephone.PhoneNumber
-            }
         }
-        if (RequestorID.RATEID) {
+        if (RequestorID.RATE_ID) {
             const cliendData = await getBrokerData({
-                brokerAccountCode: RequestorID.RATEID.slice(4)
+                brokerAccountCode: RequestorID.RATE_ID.slice(4)
             })
             if (cliendData) params.clientId = cliendData.clientId
         }

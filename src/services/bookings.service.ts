@@ -11,23 +11,10 @@ export type GetBookingsParams = {
     RequestorIDs? : string[],
     clientId?: string,
     resNumber?: string,
-    userData: SaveHannkUserParams
 }
-export const getBookings = async ({ RequestorIDs = [], userData, clientId, resNumber }: GetBookingsParams ) => {
+export const getBookings = async ({ RequestorIDs = [], clientId, resNumber }: GetBookingsParams ) => {
     logger.info("Getting bookings")
     const getBookingQuery = DB?.select().from("Bookings").whereNot('customerId', null)
-    if (userData.email) {
-        const userParams = {
-            email: userData.email,
-            firstName: userData.firstName || "",
-            lastname: userData.lastname || "",
-            phonenumber: userData.phonenumber || "",
-        }
-        const hannkUser = await getHannkUserByEmail({ email: userData.email })
-        if (hannkUser) {
-            getBookingQuery?.where("customerId", hannkUser.id)
-        }
-    }
     if (RequestorIDs && RequestorIDs.length != 0) {
         getBookingQuery?.andWhere(function() {
             RequestorIDs.forEach(id => {

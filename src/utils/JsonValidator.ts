@@ -7,7 +7,7 @@ export const validateFor = (schema: any) => {
     return (data: any) => {
         if (validate(data) == false) {
             console.log(validate.errors)
-            throw new ApiError(`Invalid Body! ${validate.errors?.map(i => i.message).join(', ')}`)
+            throw new ApiError(`Invalid Body! ${validate.errors?.map(i => `${i.schemaPath}: ${i.message}`).join(', ')}`)
         }
     }
 }
