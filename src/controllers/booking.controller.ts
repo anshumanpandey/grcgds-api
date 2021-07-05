@@ -1155,7 +1155,7 @@ const SearchBookingSchema = {
                     "RequestorID": {
                         "Type": "5",
                         "ID": "GRC-660000",
-                        "RATE_ID": "GRC-200002",
+                        "RATEID": "GRC-200002",
                         "ID_NAME": "Acme Rent A Car"
                     },
                     "ApiKey": "c32419e4-d316-4a54-b20d-296eb2dcf7a2"
@@ -1227,7 +1227,7 @@ const SearchBookingSchema = {
                         "RequestorID": {
                             "Type": "5",
                             "ID": "GRC-660000",
-                            "RATE_ID": "GRC-200002",
+                            "RATEID": "GRC-200002",
                             "ID_NAME": "Acme Rent A Car"
                         },
                         "ApiKey": "c32419e4-d316-4a54-b20d-296eb2dcf7a2"
@@ -1247,7 +1247,7 @@ const SearchBookingSchema = {
                             "RequestorID": {
                                 "Type": "5",
                                 "ID": "GRC-660000",
-                                "RATE_ID": "GRC-200002",
+                                "RATEID": "GRC-200002",
                                 "ID_NAME": "Acme Rent A Car"
                             },
                             "ApiKey": "c32419e4-d316-4a54-b20d-296eb2dcf7a2"
@@ -1267,13 +1267,13 @@ const SearchBookingSchema = {
                                 {
                                     "Type": "5",
                                     "ID": "GRC-660000",
-                                    "RATE_ID": "GRC-200002",
+                                    "RATEID": "GRC-200002",
                                     "ID_NAME": "Acme Rent A Car"
                                 }
                             ],
                             "required": [
                                 "ID",
-                                "RATE_ID"
+                                "RATEID"
                             ],
                             "title": "The RequestorID schema",
                             "type": "object",
@@ -1298,10 +1298,10 @@ const SearchBookingSchema = {
                                         "GRC-660000"
                                     ]
                                 },
-                                "RATE_ID": {
-                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/RATE_ID",
+                                "RATEID": {
+                                    "$id": "#/properties/POS/properties/Source/properties/RequestorID/properties/RATEID",
                                     "type": "string",
-                                    "title": "The RATE_ID schema",
+                                    "title": "The RATEID schema",
                                     "description": "An explanation about the purpose of this instance.",
                                     "default": "",
                                     "examples": [
@@ -1421,9 +1421,9 @@ export const searchBookings = async (body: any) => {
         const params: GetBookingsParams = {
             RequestorIDs,
         }
-        if (RequestorID.RATE_ID) {
+        if (RequestorID.RATEID) {
             const cliendData = await getBrokerData({
-                brokerAccountCode: RequestorID.RATE_ID.slice(4)
+                brokerAccountCode: RequestorID.RATEID.slice(4)
             })
             if (cliendData) params.clientId = cliendData.clientId
         }
