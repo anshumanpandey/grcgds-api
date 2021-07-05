@@ -1412,9 +1412,9 @@ export const searchBookings = async (body: any) => {
         }
 
         const bookings = await getBookings(params)
-        console.log({ bookings })
         const xml = await createBookingsXmlResponse(bookings)
         const response = await xmlToJson(xml)
+        console.log({ response })
 
         logger.info("Sending OTA_VehRetResRQ response")
         return [
