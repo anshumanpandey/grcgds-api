@@ -1176,7 +1176,6 @@ const SearchBookingSchema = {
     "required": [
         "POS",
         "VehRetResRQCore",
-        "CONTEXT"
     ],
     "properties": {
         "xmlns": {
