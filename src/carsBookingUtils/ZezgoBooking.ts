@@ -10,7 +10,7 @@ export default async (body: any) => {
     const { VehResRQCore, RentalPaymentPref, POS } = body
     const { Source: { RequestorID } } = POS
     const { VehPref, Customer } = VehResRQCore
-    const { Primary: { Email, PersonName: { GivenName, Surname, NamePrefix } } } = Customer
+    const { Primary: { Email, Address, PersonName: { GivenName, Surname, NamePrefix } } } = Customer
 
     const pickLocation = VehResRQCore.VehRentalCore.PickUpLocation.LocationCode
     const dropLocation = VehResRQCore.VehRentalCore.ReturnLocation.LocationCode
@@ -40,9 +40,10 @@ export default async (body: any) => {
     <Telephone />
     <Email>${Email}</Email>
     <Address>
-    <StreetNmbr />
-    <CityName />
-    <PostalCode />
+        <StreetNmbr>${Address.StreetNmbr || ""}</StreetNmbr>
+        <CityName>${Address.CityName || ""}</CityName>
+        <PostalCode>${Address.PostalCode || ""}</PostalCode>
+        <Country>${Address.Country || ""}</Country>
     </Address>
     <CustLoyalty ProgramID="" MembershipID="" />
     </Primary>
