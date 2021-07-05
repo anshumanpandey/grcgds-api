@@ -1174,9 +1174,6 @@ const SearchBookingSchema = {
         }
     ],
     "required": [
-        "xmlns",
-        "xmlns:xsi",
-        "xsi:schemaLocation",
         "POS",
         "VehRetResRQCore",
         "CONTEXT"
