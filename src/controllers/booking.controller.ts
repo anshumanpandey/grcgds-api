@@ -1341,19 +1341,10 @@ const SearchBookingSchema = {
                     "ResNumber": {
                         "Number": ""
                     },
-                    "PersonName": {
-                        "GivenName": "ddddddd",
-                        "Surname": "Test"
-                    },
-                    "Telephone": {
-                        "PhoneNumber": "123465"
-                    }
                 }
             ],
             "required": [
                 "ResNumber",
-                "PersonName",
-                "Telephone"
             ],
             "properties": {
                 "ResNumber": {
