@@ -66,7 +66,7 @@ export default async (body: any) => {
     </PaymentCard>
     </Voucher>
     </RentalPaymentPref>
-    <VehResRQInfo>
+    </VehResRQInfo>
     </OTA_VehResRQ>`;
 
 
