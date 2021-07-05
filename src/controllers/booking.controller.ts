@@ -110,9 +110,6 @@ const schema = {
         }
     ],
     "required": [
-        "xmlns",
-        "xmlns:xsi",
-        "xsi:schemaLocation",
         "POS",
         "VehResRQCore",
         "VehResRQInfo",
