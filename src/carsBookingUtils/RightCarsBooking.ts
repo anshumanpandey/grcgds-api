@@ -49,11 +49,12 @@ export default async (body: any) => {
     </Address>
     </Primary>
     </Customer>
-    <VendorPref></VendorPref>
+    <VendorPref/>
     <VehPref Code="${VehPref.Code}" />
-    <SpecialEquipPrefs>
-    </SpecialEquipPrefs><PromoDesc></PromoDesc></VehResRQCore><VehResRQInfo/>
-    <VehResRQInfo>
+    <SpecialEquipPrefs></SpecialEquipPrefs>
+        <PromoDesc></PromoDesc>
+    </VehResRQCore>
+    <VehResRQInfo/>
     <ArrivalDetails FlightNo="IB3154"/>
     <RentalPaymentPref>
     <Voucher Identifier="${RentalPaymentPref.Voucher.Identifier}">
@@ -67,7 +68,6 @@ export default async (body: any) => {
     </PaymentCard>
     </Voucher>
     </RentalPaymentPref>
-    </VehResRQInfo>
     </OTA_VehResRQ>`;
 
 
