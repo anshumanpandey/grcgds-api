@@ -31,6 +31,7 @@ export const getDataSuppliers = async ({ RequestorID, rateId, brokerInternalCode
         .innerJoin('client_broker_locations_accountype', 'client_broker_locations_accountype.account_code', 'data_suppliers_user.account_code')
         .where({ "data_suppliers_user.brokerId": RequestorID })
         .where("client_broker_locations_accountype.active", 1)
+        .where("client_broker_locations_accountype.clientId", DB.ref("data_suppliers_user.clientId"))
         .groupBy('clients.clientname')
     if (brokerInternalCode) query?.where("client_broker_locations_accountype.brokerInternalCode", brokerInternalCode)
     if (rateId) query?.where("client_broker_locations_accountype.account_code", rateId)
