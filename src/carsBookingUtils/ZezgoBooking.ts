@@ -37,7 +37,7 @@ export default async (body: any) => {
     <GivenName>${GivenName}</GivenName>
     <Surname>${Surname}</Surname>
     </PersonName>
-    <Telephone><PhoneNumber>${Telephone?.PhoneNumber || ""}</PhoneNumber></Telephone>
+    <Telephone PhoneNumber="${Telephone?.PhoneNumber || ""}" MobileNumber="${Telephone?.MobileNumber || ""}"/>
     <Email>${Email}</Email>
     <Address>
         <StreetNmbr>${Address.StreetNmbr || ""}</StreetNmbr>
@@ -45,7 +45,6 @@ export default async (body: any) => {
         <PostalCode>${Address.PostalCode || ""}</PostalCode>
         <Country>${Address.Country || ""}</Country>
     </Address>
-    <CustLoyalty ProgramID="" MembershipID="" />
     </Primary>
     </Customer>
     <VendorPref></VendorPref>

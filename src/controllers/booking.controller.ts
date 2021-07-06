@@ -545,13 +545,24 @@ const schema = {
                                         }
                                     ],
                                     "required": [
-                                        "PhoneNumber"
+                                        "PhoneNumber",
+                                        "MobileNumber"
                                     ],
                                     "properties": {
                                         "PhoneNumber": {
                                             "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Telephone/properties/PhoneNumber",
                                             "type": "string",
                                             "title": "The PhoneNumber schema",
+                                            "description": "An explanation about the purpose of this instance.",
+                                            "default": "",
+                                            "examples": [
+                                                "+1 8006471058"
+                                            ]
+                                        },
+                                        "MobileNumber": {
+                                            "$id": "#/properties/VehResRQCore/properties/Customer/properties/Primary/properties/Telephone/properties/PhoneNumber",
+                                            "type": "string",
+                                            "title": "The MobileNumber schema",
                                             "description": "An explanation about the purpose of this instance.",
                                             "default": "",
                                             "examples": [
