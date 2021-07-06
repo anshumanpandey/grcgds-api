@@ -37,7 +37,7 @@ export default async (body: any) => {
     <GivenName>${GivenName}</GivenName>
     <Surname>${Surname}</Surname>
     </PersonName>
-    <Telephone>${Telephone?.PhoneNumber || ""}</Telephone>
+    <Telephone><PhoneNumber>${Telephone?.PhoneNumber || ""}</PhoneNumber></Telephone>
     <Email>${Email}</Email>
     <Address>
         <StreetNmbr>${Address.StreetNmbr || ""}</StreetNmbr>
