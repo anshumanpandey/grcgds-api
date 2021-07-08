@@ -14,6 +14,7 @@ import ZezgoBooking, { cancelZezgoBooking } from '../carsBookingUtils/ZezgoBooki
 import { getClientData } from '../utils/getClientData';
 import { getBrokerData } from '../utils/getBrokerData';
 import { getHannkUserByEmail, saveHannkUserByEmail, SaveHannkUserParams, updateHannkUserByEmail } from '../services/requestor.service';
+import { XmlError } from '../utils/XmlError';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -1442,9 +1443,6 @@ export const cancelBooking = async (body: any) => {
 
     const bookings = await getBookingsBy({ requestorId: RequestorID.ID, resNumber })
 
-    if (bookings.length === 0) throw new ApiError("Booking not found")
-    if (bookings.every(b => b.reservationStatus === BOOKING_STATUS_ENUM.CANCELLED)) throw new ApiError("Booking not found")
-
     const cliendData = await getBrokerData({
         brokerAccountCode: RequestorID.RATEID.slice(4)
     })
@@ -1464,6 +1462,9 @@ export const cancelBooking = async (body: any) => {
                         }
                     }
                 }
+            })
+            .catch(err => {
+                throw new XmlError(err.message)
             })
 
         return [
