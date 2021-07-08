@@ -1,55 +1,41 @@
+import RightCarsFetchBooking from "../carsFetchBookingUtils/RightCars.fetchBooking";
+import ZezgoFetchBooking from "../carsFetchBookingUtils/Zezgo.fetchBooking";
 import { DB, getDbFor } from "../utils/DB";
+import { getBrokerData } from "../utils/getBrokerData";
 import { logger } from "../utils/Logger";
+import { xmlToJson } from "../utils/XmlConfig";
 import { getCompanyLocations } from "./locations.service";
-import { getHannkUserByEmail, saveHannkUserByEmail, SaveHannkUserParams, updateHannkUserByEmail } from "./requestor.service";
 
 export enum BOOKING_STATUS_ENUM {
     CANCELLED = "Cancelled"
 }
+export type FetchBookingsParams = {
+    ResNumber: string,
+    RequestorId: string
+}
+export type FetchBookingFn = (p: FetchBookingsParams) => Promise<GRCBooking>;
 
 export type GetBookingsParams = {
-    RequestorIDs? : string[],
-    clientId?: string,
-    resNumber?: string,
+    accountCode : string,
+    brokerId: string,
+    resNumber: string,
 }
-export const getBookings = async ({ RequestorIDs = [], clientId, resNumber }: GetBookingsParams ) => {
-    logger.info("Getting bookings")
-    const getBookingQuery = DB?.select().from("Bookings")
-    if (RequestorIDs && RequestorIDs.length != 0) {
-        getBookingQuery?.andWhere(function() {
-            RequestorIDs.forEach(id => {
-                this.orWhere("requestorId", id)
-            })
-        })
-    }
-    if (clientId) {
-        getBookingQuery?.where("grcgdsClient", clientId)
-    }
-
-    if (resNumber) {
-        getBookingQuery?.where("resNumber", resNumber)
-    }
-    const [r, extras ] = await Promise.all([
-        getBookingQuery,
-        DB?.select().from("BookingsExtras")
-    ]);
-
-    if (!r) return [];
-    if (r.length == 0) return [];
-
-    const [customers, grcClients] = await Promise.all([
-        getDbFor("grcgds_hannk").select().from("users"),
-        getDbFor("grcgds_gateway_db").select().from("clients"),
-    ])
-
-    return r.map((r) => {
-        return {
-            ...r,
-            supplier: grcClients.find((s) => s.id == r.grcgdsClient),
-            customer: customers.find(c => c.id == r.customerId ),
-            extras: (extras || []).filter(e => e.bookingId == r.id)
-        }
+const getBookingMap = new Map<string, FetchBookingFn>()
+getBookingMap.set("1", RightCarsFetchBooking)
+getBookingMap.set("10", ZezgoFetchBooking)
+export const getBookings = async ({ accountCode, brokerId, resNumber }: GetBookingsParams ) => {
+    const brokerData = await getBrokerData({
+        brokerAccountCode: accountCode,
+        brokerId
     })
+
+    let booking = null
+    const fn = await getBookingMap.get(brokerData.clientId)
+    if (fn) {
+        booking = await fn({ ResNumber: resNumber, RequestorId: brokerData.internalCode })
+    }
+
+    return booking
 }
 
 export const cancelBookingByResNumber = async (resNumber: string) => {
@@ -72,8 +58,35 @@ export const getBookingsBy = async ({ requestorId, grcgdsClientId, resNumber }: 
 
     return bookings
 }
+export type BookingLocationDate = {
+    day: string,
+    month: string,
+    year: string,
+    hour: string,
+    minutes: string,
+}
+type BookingLocation = {
+    code: string,
+    country: string,
+    pickupInstructions: string,
+    locationName: string,
+    date: BookingLocationDate
+}
+export type GRCBooking = {
+    customer: {
+        firstname: string,
+        lastname: string,
+    },
+    resNumber: string,
+    carPrice: string,
+    supplier: {
+        phonenumber: string
+    },
+    pickupLocation: BookingLocation,
+    dropoffLocation: BookingLocation
+}
 
-export const createBookingsXmlResponse = async (bookings: any[]) => {
+export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
     logger.info('Creating booking response')
     const codes = await getCompanyLocations()
     return `
@@ -82,9 +95,6 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
     <Success/>
     <VehRetResRSCore>
         ${bookings.map((b) => {
-            const extras = b.extras.length != 0 ? b.extras.map((e: any) => {
-                return `<${e.vendorEquipId}>${e.quantity}</${e.vendorEquipId}>`;
-            }).join("\n"): ""
         return `
             <VehReservation>
             <Customer>
@@ -108,19 +118,19 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                 <VehRentalCore>
                 <PickUpLocation>
                     <Name/>
-                    <LocationCode>${b.pickLocation}</LocationCode>
-                    <Pickupdate>${b.pickupDate}T${b.pickupTime.slice(0, 5)}</Pickupdate>
+                    <LocationCode>${b.pickupLocation.code}</LocationCode>
+                    <Pickupdate>${b.pickupLocation.date.year}-${b.pickupLocation.date.month}-${b.pickupLocation.date.day}T${b.pickupLocation.date.hour}:${b.pickupLocation.date.minutes}</Pickupdate>
                 </PickUpLocation>
                 <ReturnLocation>
                     <Name/>
-                    <LocationCode>${b.dropoffLocation}</LocationCode>
-                    <Pickupdate>${b.dropoffDate}T${b.dropoffTime.slice(0, 5)}</Pickupdate>
-                </ReturnLocation>
+                    <LocationCode>${b.dropoffLocation.code}</LocationCode>
+                    <Pickupdate>${b.dropoffLocation.date.year}-${b.dropoffLocation.date.month}-${b.dropoffLocation.date.day}T${b.dropoffLocation.date.hour}:${b.dropoffLocation.date.minutes}</Pickupdate>
+                    </ReturnLocation>
                 </VehRentalCore>
                 <Vehicle>
                     <Code>FVMR</Code>
                 </Vehicle>
-                <Extras>${extras}</Extras>
+                <Extras></Extras>
                 <RentalRate>
                 <RateDistance>
                     <Unlimited>true</Unlimited>
@@ -165,16 +175,16 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <CountryName>
                     <Name/>
                     <Code/>
-                    <CountryCode>${codes.find(c => c.internal_code == b.pickLocation)?.country}</CountryCode>
+                    <CountryCode>${b.pickupLocation.country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
-                <Code>${b.pickLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.pickLocation)?.location || b.pickupFullAddress}</Name>
+                <Code>${b.pickupLocation.code}</Code>
+                <Name>${b.pickupLocation.locationName}</Name>
                 <CodeContext>Pickup Location</CodeContext>
-                <Pickupinst>${b.pickupInstructions}</Pickupinst>
+                <Pickupinst>${b.pickupLocation.pickupInstructions}</Pickupinst>
                 </LocationDetails>
                 <LocationDetails>
                 <Address>
@@ -184,16 +194,16 @@ export const createBookingsXmlResponse = async (bookings: any[]) => {
                     <CountryName>
                         <Name/>
                         <Code/>
-                        <CountryCode>${codes.find(c => c.internal_code == b.dropoffLocation)?.country}</CountryCode>
+                        <CountryCode>${b.dropoffLocation.country}</CountryCode>
                     </CountryName>
                 </Address>
                 <Telephone>
                     <PhoneNumber>${b?.supplier?.phonenumber}</PhoneNumber>
                 </Telephone>
-                <Code>${b.dropoffLocation}</Code>
-                <Name>${codes.find(c => c.internal_code == b.dropoffLocation)?.location || b.dropoffFullAddress}</Name>
+                <Code>${b.dropoffLocation.code}</Code>
+                <Name>${b.dropoffLocation.locationName}</Name>
                 <CodeContext>Return Location</CodeContext>
-				<Returninst>${b.returninstructions || ""}</Returninst>
+				<Returninst>${b.dropoffLocation.pickupInstructions}</Returninst>
                 </LocationDetails>
             </VehSegmentInfo>
             </VehReservation>`;

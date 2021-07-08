@@ -1411,19 +1411,14 @@ export const searchBookings = async (body: any) => {
 
     try {
 
-        const params: GetBookingsParams = {}
-        if (RequestorID.RATEID) {
-            const cliendData = await getBrokerData({
-                brokerAccountCode: RequestorID.RATEID.slice(4)
-            })
-            if (cliendData) params.clientId = cliendData.clientId
-        }
-        if (ResNumber?.Number) {
-            params.resNumber = ResNumber.Number
+        const params: GetBookingsParams = {
+            accountCode: RequestorID.RATEID.replace('GRC-', ''),
+            brokerId: RequestorID.ID.replace('GRC-', '').slice(0,2),
+            resNumber: ResNumber.Number
         }
 
         const bookings = await getBookings(params)
-        const xml = await createBookingsXmlResponse(bookings)
+        const xml = await createBookingsXmlResponse(bookings ? [bookings] : [])
         const response = await xmlToJson(xml)
 
         logger.info("Sending OTA_VehRetResRQ response")
@@ -1500,7 +1495,7 @@ export const getSingleBooking = async (body: any) => {
     //const validator = validateFor(schema)
     //validator(body)
 
-    try {
+    /*try {
         const booking = await getRightCarsBooking(body)
         if (!booking) throw new ApiError('Booking now found')
         const xml = await createBookingsXmlResponse([booking])
@@ -1519,5 +1514,5 @@ export const getSingleBooking = async (body: any) => {
         } else {
             throw error
         }
-    }
+    }*/
 }

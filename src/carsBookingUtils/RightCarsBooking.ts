@@ -180,9 +180,9 @@ export const getRightCarsBooking = async (body: any) => {
             await LogBookingToDb(toInsert)
         }
 
-        const usersBookings = await getBookings({ resNumber })
+        //const usersBookings = await getBookings({ resNumber })
 
-        return usersBookings.find(b => b.resNumber == VehRetSingleResRQ.ResNumber.Number)
+        return //usersBookings.find(b => b.resNumber == VehRetSingleResRQ.ResNumber.Number)
 
     } catch (error) {
         if (error.response) {
