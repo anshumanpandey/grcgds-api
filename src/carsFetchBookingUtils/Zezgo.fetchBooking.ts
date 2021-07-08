@@ -229,6 +229,7 @@ export default async ({ ResNumber, RequestorId }: Params): Promise<GRCBooking> =
             lastname: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].PersonName[0].Surname[0],
         },
         resNumber: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].ResNumber[0],
+        carCode: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].Vehicle[0].Code[0],
         carPrice: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].TotalCharge[0].EstimatedTotalAmount[0],
         supplier: {
             phonenumber: ""

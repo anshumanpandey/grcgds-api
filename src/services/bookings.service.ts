@@ -81,6 +81,7 @@ export type GRCBooking = {
         lastname: string,
     },
     resNumber: string,
+    carCode: string,
     carPrice: string,
     supplier: {
         phonenumber: string
