@@ -2,6 +2,7 @@ import axios from "axios"
 import { RC_URL } from "../carSearchUtils/RightCarsSearchUtils"
 import { BookingLocationDate, FetchBookingsParams, GRCBooking } from "../services/bookings.service"
 import { xmlToJson } from "../utils/XmlConfig"
+import { XmlError } from "../utils/XmlError"
 
 export interface RCBookingData {
     OTA_VehRetResRS: OTAVehRetResRS;
@@ -206,6 +207,10 @@ export default async ({ ResNumber, RequestorId }: FetchBookingsParams): Promise<
             'Content-Type': 'application/soap+xml;charset=utf-8',
         }
     })
+
+    if (data.includes("Error")) {
+        throw new XmlError(data)
+    }
 
     const rcBooking = await xmlToJson(data) as unknown as RCBookingData
 

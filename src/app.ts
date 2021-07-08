@@ -31,7 +31,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     if (err instanceof XmlError) {
         xmlToJson(err.message)
             .then((r) => {
-                const singleError = (r.OTA_VehResRS || r.OTA_VehCancelRS).Errors[0]
+                const singleError = (r.OTA_VehResRS || r.OTA_VehCancelRS || r.OTA_VehRetResRS).Errors[0]
                 BuildXmlResponse(res, singleError, err.code, "Errors")
             })
         return

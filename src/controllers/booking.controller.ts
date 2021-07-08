@@ -1409,32 +1409,23 @@ export const searchBookings = async (body: any) => {
     const { POS: { Source: { RequestorID } } } = body
     const { ResNumber } = VehRetResRQCore
 
-    try {
-
-        const params: GetBookingsParams = {
-            accountCode: RequestorID.RATEID.replace('GRC-', ''),
-            brokerId: RequestorID.ID.replace('GRC-', '').slice(0,2),
-            resNumber: ResNumber.Number
-        }
-
-        const bookings = await getBookings(params)
-        const xml = await createBookingsXmlResponse(bookings ? [bookings] : [])
-        const response = await xmlToJson(xml)
-
-        logger.info("Sending OTA_VehRetResRQ response")
-        return [
-            response.OTA_VehRetResRS,
-            200,
-            "OTA_VehRetResRS",
-            { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehRetResRS.xsd" }
-        ]
-    } catch (error) {
-        if (error.response) {
-            throw new ApiError(error.response.data.error)
-        } else {
-            throw error
-        }
+    const params: GetBookingsParams = {
+        accountCode: RequestorID.RATEID.replace('GRC-', ''),
+        brokerId: RequestorID.ID.replace('GRC-', '').slice(0,2),
+        resNumber: ResNumber.Number
     }
+
+    const bookings = await getBookings(params)
+    const xml = await createBookingsXmlResponse(bookings ? [bookings] : [])
+    const response = await xmlToJson(xml)
+
+    logger.info("Sending OTA_VehRetResRQ response")
+    return [
+        response.OTA_VehRetResRS,
+        200,
+        "OTA_VehRetResRS",
+        { "xsi:schemaLocation": "http://www.opentravel.org/OTA/2003/05 OTA_VehRetResRS.xsd" }
+    ]
 }
 
 const clientCancelBookingsMaps: Record<string, (body: any) => Promise<any>> = {
