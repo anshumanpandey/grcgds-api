@@ -1,5 +1,6 @@
 import RightCarsFetchBooking from "../carsFetchBookingUtils/RightCars.fetchBooking";
 import ZezgoFetchBooking from "../carsFetchBookingUtils/Zezgo.fetchBooking";
+import { ApiError } from "../utils/ApiError";
 import { DB, getDbFor } from "../utils/DB";
 import { getBrokerData } from "../utils/getBrokerData";
 import { logger } from "../utils/Logger";
@@ -28,6 +29,8 @@ export const getBookings = async ({ accountCode, brokerId, resNumber }: GetBooki
         brokerAccountCode: accountCode,
         brokerId
     })
+
+    if (!brokerData) throw new ApiError("Supplier not found")
 
     let booking = null
     const fn = await getBookingMap.get(brokerData.clientId)
