@@ -132,7 +132,7 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                     </ReturnLocation>
                 </VehRentalCore>
                 <Vehicle>
-                    <Code>FVMR</Code>
+                    <Code>${b.carCode}</Code>
                 </Vehicle>
                 <Extras></Extras>
                 <RentalRate>
