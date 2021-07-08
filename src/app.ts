@@ -49,8 +49,15 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     } else if (err.name === 'RequestorIDError') {
         console.log(err)
         res.send("Invalid Account Code")
-    }
-    else {
+    } else if (err.stack && err.stack.includes('sax.js')) {
+        BuildXmlResponse(res, {
+            Error: {
+                StatusCode: 400,
+                Message: "Malformed xml body"
+            }
+        }, 400, "Errors",)
+        return
+    }else {
         console.log(err)
         BuildXmlResponse(res, {
             Error: {
