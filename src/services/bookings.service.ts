@@ -180,12 +180,14 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 </RateDistance>
                 <VehicleCharges>
                     <VehicleCharge>
-                        <TaxAmount>
-                            <Total>${b.taxData.total}</Total>
-                            <CurrencyCode>${b.taxData.currencyCode}</CurrencyCode>
-                            <Percentage>${b.taxData.percentage}</Percentage>
-                            <Description>${b.taxData.description}</Description>
-                        </TaxAmount>
+                        <TaxAmounts>
+                            <TaxAmount>
+                                <Total>${b.taxData.total}</Total>
+                                <CurrencyCode>${b.taxData.currencyCode}</CurrencyCode>
+                                <Percentage>${b.taxData.percentage}</Percentage>
+                                <Description>${b.taxData.description}</Description>
+                            </TaxAmount>
+                        </TaxAmounts>
                         <Calculation>
                             <UnitCharge>${b.calculation.unitCharge}</UnitCharge>
                             <UnitName>${b.calculation.unitName}</UnitName>
