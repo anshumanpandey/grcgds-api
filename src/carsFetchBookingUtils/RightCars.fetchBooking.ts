@@ -76,10 +76,7 @@ export interface ConfID {
 }
 
 export interface Extra {
-    ADDR:  string[];
-    BSEAT: string[];
-    CSEAT: string[];
-    GPS:   string[];
+    [k: string]:  string[];
 }
 
 export interface RentalRate {
@@ -172,7 +169,7 @@ const dateStringToDateJson = (dateString: string): BookingLocationDate => {
     //dateString be like "2021-08-08T10:00:00"
     const [date, time] = dateString.split('T')
     const [year, month, day] = date.split('-')
-    const [hour, minutes] = time.split(":")
+    const [hour, minutes, seconds] = time.split(":")
 
     return {
         day,
@@ -180,6 +177,7 @@ const dateStringToDateJson = (dateString: string): BookingLocationDate => {
         year,
         hour: hour,
         minutes: minutes,
+        seconds
     }
 }
 export default async ({ ResNumber, RequestorId }: FetchBookingsParams): Promise<GRCBooking> => {
@@ -218,31 +216,78 @@ export default async ({ ResNumber, RequestorId }: FetchBookingsParams): Promise<
     const dropLocation = rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails.find(e => e.CodeContext[0] == "Return Location")
     const pickupDateString = rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].VehRentalCore[0].PickUpLocation[0].Pickupdate[0]
     const dropDateString = rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].VehRentalCore[0].ReturnLocation[0].Returndate[0]
+    const extraKeys = Object.keys(rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].Extras[0])
     return {
         customer: {
             firstname: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].PersonName[0].GivenName[0],
             lastname: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].PersonName[0].Surname[0],
+            email: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].Email[0],
+            address: {
+                addressLine: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].Address[0].AddressLine[0],
+                postalCode: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].Address[0].PostalCode[0],
+                cityName: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].Address[0].CityName[0],
+            },
+        },
+        extras: extraKeys.map((key) => {
+            return {
+                key,
+                val: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].Extras[0][key][0]
+            }
+        }) || [],
+        taxData: {
+            total: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0].TaxAmounts[0].TaxAmount[0].Total[0],
+            currencyCode: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0].TaxAmounts[0].TaxAmount[0].CurrencyCode[0],
+            percentage: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0].TaxAmounts[0].TaxAmount[0].Percentage[0],
+            description: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0].TaxAmounts[0].TaxAmount[0].Description[0],
+        },
+        calculation: {
+            unitCharge: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0].Calculation[0].UnitCharge[0],
+            quantity: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0].Calculation[0].Quantity[0],
+            unitName: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0].Calculation[0].UnitName[0],
+        },
+        rateQualifier: {
+            rateCategory: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].RateQualifier[0].RateCategory[0],
+            rateQualifier: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].RateQualifier[0].RateQualifier[0],
+            ratePeriod: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].RateQualifier[0].RatePeriod[0],
+            vendorRateID: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].RentalRate[0].RateQualifier[0].VendorRateID[0],
         },
         resNumber: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].ConfID[0].ResNumber[0],
         carCode: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].Vehicle[0].Code[0],
         carPrice: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].TotalCharge[0].EstimatedTotalAmount[0],
         supplier: {
-            phonenumber: ""
+            phonenumber: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Telephone[0].PhoneNumber[0]
         },
         pickupLocation: {
             code: pickupLocation?.Code[0] || "",
             country: pickupLocation?.Address[0]?.CountryName?.[0]?.Code[0] || "",
             pickupInstructions: pickupLocation?.Pickupinst?.[0] || "",
-            locationName: pickupLocation?.Address[0].AddressLine[0] || "",
-            date: dateStringToDateJson(pickupDateString)
+            locationName: pickupLocation?.Name[0] || "",
+            date: dateStringToDateJson(pickupDateString),
+            address: {
+                addressLine: pickupLocation?.Address[0].AddressLine[0] || "",
+                cityName: pickupLocation?.Address[0].CityName[0] || "",
+                postalCode: pickupLocation?.Address[0].PostalCode[0] || "",
+                countryName: {
+                    name: pickupLocation?.Address[0].CountryName?.[0].Name[0] || "",
+                    code: pickupLocation?.Address[0].CountryName?.[0].Code[0] || "",
+                }
+            }
         },
         dropoffLocation: {
             code: dropLocation?.Code[0] || "",
             country: dropLocation?.Address[0]?.CountryName?.[0]?.Code[0] || "",
-            pickupInstructions: dropLocation?.Pickupinst?.[0] || "",
-            locationName: dropLocation?.Address[0].AddressLine[0] || "",
-            date: dateStringToDateJson(dropDateString)
-
+            pickupInstructions: dropLocation?.ReturnInst?.[0] || "",
+            locationName: dropLocation?.Name[0] || "",
+            date: dateStringToDateJson(dropDateString),
+            address: {
+                addressLine: dropLocation?.Address[0].AddressLine[0] || "",
+                cityName: dropLocation?.Address[0].CityName[0] || "",
+                postalCode: dropLocation?.Address[0].PostalCode[0] || "",
+                countryName: {
+                    name: dropLocation?.Address[0].CountryName?.[0].Name[0] || "",
+                    code: dropLocation?.Address[0].CountryName?.[0].Code[0] || "",
+                }
+            }
         }
     }
 }

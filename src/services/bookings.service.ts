@@ -4,7 +4,6 @@ import { ApiError } from "../utils/ApiError";
 import { DB, getDbFor } from "../utils/DB";
 import { getBrokerData } from "../utils/getBrokerData";
 import { logger } from "../utils/Logger";
-import { xmlToJson } from "../utils/XmlConfig";
 import { getCompanyLocations } from "./locations.service";
 
 export enum BOOKING_STATUS_ENUM {
@@ -67,18 +66,55 @@ export type BookingLocationDate = {
     year: string,
     hour: string,
     minutes: string,
+    seconds: string,
 }
 type BookingLocation = {
     code: string,
     country: string,
     pickupInstructions: string,
     locationName: string,
-    date: BookingLocationDate
+    date: BookingLocationDate,
+    address: {
+        addressLine: string,
+        cityName: string,
+        postalCode: string,
+        countryName: {
+            name: string
+            code: string
+        }
+    }
 }
 export type GRCBooking = {
     customer: {
         firstname: string,
         lastname: string,
+        email: string,
+        address: {
+            addressLine: string,
+            postalCode: string,
+            cityName: string,
+        }
+    },
+    extras: {
+        key: string,
+        val: string,
+    }[],
+    taxData: {
+        total: string,
+        currencyCode: string,
+        percentage: string,
+        description: string,
+    },
+    calculation: {
+        unitCharge: string,
+        unitName: string,
+        quantity: string,
+    },
+    rateQualifier: {
+        rateCategory: string,
+        rateQualifier: string,
+        ratePeriod: string,
+        vendorRateID: string,
     },
     resNumber: string,
     carCode: string,
@@ -107,11 +143,11 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                     <GivenName>${b.customer?.firstname || ""}</GivenName>
                     <Surname>${b.customer?.lastname || ""}</Surname>
                 </PersonName>
-                <Email/>
+                <Email>${b.customer.email}</Email>
                 <Address>
-                    <AddressLine/>
-                    <CityName/>
-                    <PostalCode/>
+                    <AddressLine>${b.customer.address.addressLine}</AddressLine>
+                    <CityName>${b.customer.address.cityName}</CityName>
+                    <PostalCode>${b.customer.address.postalCode}</PostalCode>
                 </Address>
                 </Primary>
             </Customer>
@@ -123,18 +159,19 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 <PickUpLocation>
                     <Name/>
                     <LocationCode>${b.pickupLocation.code}</LocationCode>
-                    <Pickupdate>${b.pickupLocation.date.year}-${b.pickupLocation.date.month}-${b.pickupLocation.date.day}T${b.pickupLocation.date.hour}:${b.pickupLocation.date.minutes}</Pickupdate>
+                    <Pickupdate>${b.pickupLocation.date.year}-${b.pickupLocation.date.month}-${b.pickupLocation.date.day}T${b.pickupLocation.date.hour}:${b.pickupLocation.date.minutes}:${b.dropoffLocation.date.seconds}</Pickupdate>
                 </PickUpLocation>
                 <ReturnLocation>
                     <Name/>
                     <LocationCode>${b.dropoffLocation.code}</LocationCode>
-                    <Pickupdate>${b.dropoffLocation.date.year}-${b.dropoffLocation.date.month}-${b.dropoffLocation.date.day}T${b.dropoffLocation.date.hour}:${b.dropoffLocation.date.minutes}</Pickupdate>
+                    <Returndate>${b.dropoffLocation.date.year}-${b.dropoffLocation.date.month}-${b.dropoffLocation.date.day}T${b.dropoffLocation.date.hour}:${b.dropoffLocation.date.minutes}:${b.dropoffLocation.date.seconds}</Returndate>
                     </ReturnLocation>
                 </VehRentalCore>
                 <Vehicle>
                     <Code>${b.carCode}</Code>
+                    <regnumber/>
                 </Vehicle>
-                <Extras></Extras>
+                <Extras>${b.extras.map(e => `<${e.key}>${e.val}</${e.key}>`).join(`\n`)}</Extras>
                 <RentalRate>
                 <RateDistance>
                     <Unlimited>true</Unlimited>
@@ -143,27 +180,25 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 </RateDistance>
                 <VehicleCharges>
                     <VehicleCharge>
-                    <TaxAmounts>
                         <TaxAmount>
-                        <Total/>
-                        <CurrencyCode/>
-                        <Percentage/>
-                        <Description>Tax</Description>
+                            <Total>${b.taxData.total}</Total>
+                            <CurrencyCode>${b.taxData.currencyCode}</CurrencyCode>
+                            <Percentage>${b.taxData.percentage}</Percentage>
+                            <Description>${b.taxData.description}</Description>
                         </TaxAmount>
-                    </TaxAmounts>
-                    <Calculation>
-                        <UnitCharge/>
-                        <UnitName>Day</UnitName>
-                        <Quantity>1</Quantity>
-                    </Calculation>
+                        <Calculation>
+                            <UnitCharge>${b.calculation.unitCharge}</UnitCharge>
+                            <UnitName>${b.calculation.unitName}</UnitName>
+                            <Quantity>${b.calculation.quantity}</Quantity>
+                        </Calculation>
                     </VehicleCharge>
                 </VehicleCharges>
-                <RateQualifier>
-                    <RateCategory/>
-                    <RateQualifier/>
-                    <RatePeriod/>
-                    <VendorRateID/>
-                </RateQualifier>
+                    <RateQualifier>
+						<RateCategory>${b.rateQualifier.rateCategory}</RateCategory>
+						<RateQualifier>${b.rateQualifier.rateQualifier}</RateQualifier>
+						<RatePeriod>${b.rateQualifier.ratePeriod}</RatePeriod>
+						<VendorRateID>${b.rateQualifier.vendorRateID}</VendorRateID>
+					</RateQualifier>
                 </RentalRate>
                 <TotalCharge>
                 <RateTotalAmount>${b.carPrice}</RateTotalAmount>
@@ -173,13 +208,12 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
             <VehSegmentInfo>
                 <LocationDetails>
                 <Address>
-                    <AddressLine/>
-                    <CityName/>
-                    <PostalCode/>
+                    <AddressLine>${b.pickupLocation.address.addressLine}</AddressLine>
+                    <CityName>${b.pickupLocation.address.cityName}</CityName>
+                    <PostalCode>${b.pickupLocation.address.postalCode}</PostalCode>
                     <CountryName>
-                    <Name/>
-                    <Code/>
-                    <CountryCode>${b.pickupLocation.country}</CountryCode>
+                        <Name>${b.pickupLocation.address.countryName.name}</Name>
+                        <Code>${b.pickupLocation.address.countryName.code}</Code>
                     </CountryName>
                 </Address>
                 <Telephone>
@@ -192,13 +226,12 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 </LocationDetails>
                 <LocationDetails>
                 <Address>
-                    <AddressLine/>
-                    <CityName/>
-                    <PostalCode/>
+                    <AddressLine>${b.dropoffLocation.address.addressLine}</AddressLine>
+                    <CityName>${b.dropoffLocation.address.cityName}</CityName>
+                    <PostalCode>${b.dropoffLocation.address.postalCode}</PostalCode>
                     <CountryName>
-                        <Name/>
-                        <Code/>
-                        <CountryCode>${b.dropoffLocation.country}</CountryCode>
+                        <Name>${b.dropoffLocation.address.countryName.name}</Name>
+                        <Code>${b.dropoffLocation.address.countryName.code}</Code>
                     </CountryName>
                 </Address>
                 <Telephone>
@@ -207,7 +240,7 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 <Code>${b.dropoffLocation.code}</Code>
                 <Name>${b.dropoffLocation.locationName}</Name>
                 <CodeContext>Return Location</CodeContext>
-				<Returninst>${b.dropoffLocation.pickupInstructions}</Returninst>
+				<ReturnInst>${b.dropoffLocation.pickupInstructions}</ReturnInst>
                 </LocationDetails>
             </VehSegmentInfo>
             </VehReservation>`;
