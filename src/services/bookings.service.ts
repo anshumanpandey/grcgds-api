@@ -70,7 +70,8 @@ export type BookingLocationDate = {
 }
 type BookingLocation = {
     code: string,
-    country: string,
+    countryCode: string,
+    countryName: string,
     pickupInstructions: string,
     locationName: string,
     date: BookingLocationDate,
@@ -214,7 +215,7 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                     <CityName>${b.pickupLocation.address.cityName}</CityName>
                     <PostalCode>${b.pickupLocation.address.postalCode}</PostalCode>
                     <CountryName>
-                        <Name>${b.pickupLocation.address.countryName.name}</Name>
+                        <Name>${b.pickupLocation.countryName}</Name>
                         <Code>${b.pickupLocation.address.countryName.code}</Code>
                     </CountryName>
                 </Address>
@@ -232,7 +233,7 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                     <CityName>${b.dropoffLocation.address.cityName}</CityName>
                     <PostalCode>${b.dropoffLocation.address.postalCode}</PostalCode>
                     <CountryName>
-                        <Name>${b.dropoffLocation.address.countryName.name}</Name>
+                        <Name>${b.dropoffLocation.countryName}</Name>
                         <Code>${b.dropoffLocation.address.countryName.code}</Code>
                     </CountryName>
                 </Address>

@@ -1,6 +1,7 @@
 import axios from "axios"
 import { ZEZGO_URL } from "../carSearchUtils/ZezgoCarsSearchUtils"
 import { BookingLocationDate, GRCBooking } from "../services/bookings.service"
+import { getCountryBy } from "../utils/getCountryBy"
 import { xmlToJson } from "../utils/XmlConfig"
 import { XmlError } from "../utils/XmlError"
 
@@ -222,6 +223,14 @@ export default async ({ ResNumber, RequestorId }: Params): Promise<GRCBooking> =
     const pickupDateString = rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].VehRentalCore[0].PickUpLocation[0].Pickupdate[0]
     const dropDateString = rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].VehRentalCore[0].ReturnLocation[0].Returndate[0]
     const extraKeys = Object.keys(rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].Extras[0])
+
+    const pickCountryCode = pickupLocation?.Address[0]?.CountryName?.[0]?.Code[0] || ""
+    const dropCountryCode = dropLocation?.Address[0]?.CountryName?.[0]?.Code[0] || ""
+    const [pickCountry, dropCountry] = await Promise.all([
+        getCountryBy({ code: pickCountryCode }),
+        getCountryBy({ code: dropCountryCode }),
+    ])
+    
     return {
         customer: {
             firstname: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].Customer[0].Primary[0].PersonName[0].GivenName[0],
@@ -264,7 +273,8 @@ export default async ({ ResNumber, RequestorId }: Params): Promise<GRCBooking> =
         },
         pickupLocation: {
             code: pickupLocation?.Code[0] || "",
-            country: pickupLocation?.Address[0]?.CountryName?.[0]?.Code[0] || "",
+            countryCode: pickCountryCode,
+            countryName: pickCountry.countryName,
             pickupInstructions: pickupLocation?.Pickupinst?.[0] || "",
             locationName: pickupLocation?.Name[0] || "",
             date: dateStringToDateJson(pickupDateString),
@@ -280,7 +290,8 @@ export default async ({ ResNumber, RequestorId }: Params): Promise<GRCBooking> =
         },
         dropoffLocation: {
             code: dropLocation?.Code[0] || "",
-            country: dropLocation?.Address[0]?.CountryName?.[0]?.Code[0] || "",
+            countryCode: dropCountryCode,
+            countryName: dropCountry.countryName,
             pickupInstructions: dropLocation?.ReturnInst?.[0] || "",
             locationName: dropLocation?.Name[0] || "",
             date: dateStringToDateJson(dropDateString),
