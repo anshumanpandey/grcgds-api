@@ -19,33 +19,34 @@ export default async (params: any, opt: SearchUtilsOptions) => {
 
     const currency = params.VehAvailRQCore.Currency.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 64}),
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 64}),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 64 }),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 64 }),
     ])
 
     if (!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
 
-    const body = `<?xml version="1.0" encoding="utf-8"?>
-        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-        <soap:Body>
-        <MultiplePrices_GroupDetails xmlns="http://www.jimpisoft.pt/Rentway_Reservations_WS/getMultiplePrices_GroupDetails">
-            <objRequest>
-                <currency>${currency}</currency>
-                <pickUp>
-                <Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)}</Date>
-                <rentalStation>${pickupCodeObj.internal_code}</rentalStation>
-                </pickUp>
-                <dropOff>
-                <Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)}</Date>
-                <rentalStation>${returnCodeObj.internal_code}</rentalStation>
-                </dropOff>
-                <Date_of_Birth>1990-01-30</Date_of_Birth>
-                <companyCode>9948</companyCode>
-                <customerCode>23247</customerCode>
-            </objRequest>
-            </MultiplePrices_GroupDetails>
-        </soap:Body>
-        </soap:Envelope>`
+    const body = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:get="http://www.jimpisoft.pt/Rentway_Reservations_WS/getMultiplePrices_GroupDetails">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <get:MultiplePrices_GroupDetails>
+         <get:objRequest>
+            <get:companyCode>9906</get:companyCode>
+            <get:customerCode>2809</get:customerCode>
+            <get:pickUp>
+               <get:Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.PickUpDateTime)}</get:Date>
+               <get:rentalStation>${pickupCodeObj.internal_code}</get:rentalStation>
+            </get:pickUp>
+            <get:dropOff>
+               <get:Date>${getDateTime(params.VehAvailRQCore.VehRentalCore.ReturnDateTime)}</get:Date>
+               <get:rentalStation>${returnCodeObj.internal_code}</get:rentalStation>
+            </get:dropOff>
+            <get:username>usrBookingClik</get:username>
+            <get:password>Ix;aesooS0que4bo</get:password>
+         </get:objRequest>
+      </get:MultiplePrices_GroupDetails>
+   </soapenv:Body>
+</soapenv:Envelope>
+        `
 
     await saveServiceRequest({
         requestBody: body,
@@ -59,7 +60,7 @@ export default async (params: any, opt: SearchUtilsOptions) => {
         httpsAgent: new https.Agent({
             rejectUnauthorized: false
         }),
-        url: `https://62.28.221.122/Rentway_WS/getMultiplePrices_GroupDetails.asmx`,
+        url: `https://webservice.nizacars.es/Rentway_WS/getMultiplePrices_GroupDetails.asmx`,
         headers: {
             "Content-Type": "text/xml;charset=UTF-8",
             "SOAPAction": "http://www.jimpisoft.pt/Rentway_Reservations_WS/getMultiplePrices_GroupDetails/MultiplePrices_GroupDetails"

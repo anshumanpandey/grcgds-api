@@ -26,6 +26,7 @@ import YesawaySearchUtils from '../carSearchUtils/YesawaySearchUtils';
 import RoutesRezWorldSearchUtil from '../carSearchUtils/RoutesRezWorldSearchUtil';
 import NucarSearchUtil from '../carSearchUtils/NucarSearchUtil';
 import { SearchUtilsOptions } from '../types/SearchUtilsOptions';
+import NizaSearchUtil from '../carSearchUtils/NizaSearchUtil';
 const allSettled = require('promise.allsettled');
 
 const schema = {
@@ -361,6 +362,7 @@ SUPORTED_CLIENT_SERVICES.set(74, (body: any, extras: SearchUtilsOptions) => Yesa
 SUPORTED_CLIENT_SERVICES.set(75, (body: any, extras: SearchUtilsOptions) => AceRentSearchUtils(body, extras))
 SUPORTED_CLIENT_SERVICES.set(72, (body: any, extras: SearchUtilsOptions) => RoutesRezWorldSearchUtil(body, extras))
 SUPORTED_CLIENT_SERVICES.set(76, (body: any, extras: SearchUtilsOptions) => NucarSearchUtil(body, extras))
+SUPORTED_CLIENT_SERVICES.set(64, (body: any, extras: SearchUtilsOptions) => NizaSearchUtil(body, extras))
 
 
 
