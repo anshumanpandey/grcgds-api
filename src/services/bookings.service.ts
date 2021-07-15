@@ -43,7 +43,7 @@ export const getBookings = async ({ accountCode, brokerId, resNumber }: GetBooki
         .then((promises: any) => {
             const successPromises = promises.filter((p: any) => p.status == "fulfilled")
             if (successPromises.length === 0) return Promise.reject(new ApiError("Booking not found"))
-            return successPromises[0]
+            return successPromises[0].value
         })
     }
 
