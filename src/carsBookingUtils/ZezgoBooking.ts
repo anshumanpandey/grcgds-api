@@ -50,7 +50,7 @@ export default async (body: any) => {
     <VendorPref/>
     <VehPref Code="${VehPref.Code}" />
     <SpecialEquipPrefs>${VehResRQCore.SpecialEquipPrefs.SpecialEquipPref
-        .join((i: any) => `<SpecialEquipPref vendorEquipID="${i.vendorEquipID}" Quantity="${i.Quantity}"/>`)}</SpecialEquipPrefs>
+        .map((i: any) => `<SpecialEquipPref vendorEquipID="${i.vendorEquipID}" Quantity="${i.Quantity}"/>`).join('\n')}</SpecialEquipPrefs>
         <PromoDesc></PromoDesc>
     </VehResRQCore>
     <VehResRQInfo/>
