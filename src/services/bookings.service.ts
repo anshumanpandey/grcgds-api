@@ -1,10 +1,11 @@
 import RightCarsFetchBooking from "../carsFetchBookingUtils/RightCars.fetchBooking";
 import ZezgoFetchBooking from "../carsFetchBookingUtils/Zezgo.fetchBooking";
 import { ApiError } from "../utils/ApiError";
-import { DB, getDbFor } from "../utils/DB";
+import { DB } from "../utils/DB";
 import { getBrokerData } from "../utils/getBrokerData";
 import { logger } from "../utils/Logger";
 import { getCompanyLocations } from "./locations.service";
+const allSettled = require('promise.allsettled');
 
 export enum BOOKING_STATUS_ENUM {
     CANCELLED = "Cancelled"
@@ -24,17 +25,26 @@ const getBookingMap = new Map<string, FetchBookingFn>()
 getBookingMap.set("1", RightCarsFetchBooking)
 getBookingMap.set("10", ZezgoFetchBooking)
 export const getBookings = async ({ accountCode, brokerId, resNumber }: GetBookingsParams ) => {
+    let fn = Array.from(getBookingMap.values())
+
     const brokerData = await getBrokerData({
         brokerAccountCode: accountCode,
         brokerId
     })
-
-    if (!brokerData) throw new ApiError("Supplier not found")
-
+    if (accountCode !== null) {    
+        const f = getBookingMap.get(brokerData.clientId)
+        if (f) {
+            fn = [f]
+        }
+    }
     let booking = null
-    const fn = await getBookingMap.get(brokerData.clientId)
-    if (fn) {
-        booking = await fn({ ResNumber: resNumber, RequestorId: brokerData.internalCode })
+    if (fn.length !== 0) {
+        booking = await allSettled(fn.map(f => f({ ResNumber: resNumber, RequestorId: brokerData.internalCode })))
+        .then((promises: any) => {
+            const successPromises = promises.filter((p: any) => p.status == "fulfilled")
+            if (successPromises.length === 0) return Promise.reject(new ApiError("Booking not found"))
+            return successPromises[0]
+        })
     }
 
     return booking

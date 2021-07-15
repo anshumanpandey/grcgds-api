@@ -1277,7 +1277,6 @@ const SearchBookingSchema = {
                             ],
                             "required": [
                                 "ID",
-                                "RATEID"
                             ],
                             "title": "The RequestorID schema",
                             "type": "object",
@@ -1410,7 +1409,7 @@ export const searchBookings = async (body: any) => {
     const { ResNumber } = VehRetResRQCore
 
     const params: GetBookingsParams = {
-        accountCode: RequestorID.RATEID.replace('GRC-', ''),
+        accountCode: RequestorID?.RATEID?.replace('GRC-', '') || null,
         brokerId: RequestorID.ID.replace('GRC-', '').slice(0,2),
         resNumber: ResNumber.Number
     }
