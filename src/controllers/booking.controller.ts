@@ -764,7 +764,6 @@ const schema = {
                         }
                     ],
                     "required": [
-                        ""
                     ],
                     "title": "The SpecialEquipPrefs schema",
                     "type": [
