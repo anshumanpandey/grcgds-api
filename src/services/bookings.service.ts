@@ -12,6 +12,8 @@ export enum BOOKING_STATUS_ENUM {
 }
 export type FetchBookingsParams = {
     ResNumber: string,
+    SupplierName: string,
+    AccountCode: string,
     RequestorId: string
 }
 export type FetchBookingFn = (p: FetchBookingsParams) => Promise<GRCBooking>;
@@ -39,7 +41,7 @@ export const getBookings = async ({ accountCode, brokerId, resNumber }: GetBooki
     }
     let booking = null
     if (fn.length !== 0) {
-        booking = await allSettled(fn.map(f => f({ ResNumber: resNumber, RequestorId: brokerData.internalCode })))
+        booking = await allSettled(fn.map(f => f({ ResNumber: resNumber, RequestorId: brokerData.internalCode, SupplierName: brokerData.clientname, AccountCode: brokerData.accountCode })))
         .then((promises: any) => {
             const successPromises = promises.filter((p: any) => p.status == "fulfilled")
             if (successPromises.length === 0) return Promise.reject(new ApiError("Booking not found"))
@@ -131,7 +133,9 @@ export type GRCBooking = {
     carCode: string,
     carPrice: string,
     supplier: {
-        phonenumber: string
+        phonenumber: string,
+        id: string,
+        name: string,
     },
     pickupLocation: BookingLocation,
     dropoffLocation: BookingLocation
@@ -163,6 +167,10 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 </Primary>
             </Customer>
             <VehSegmentCore>
+                <Supplier>
+                    <ID>${b.supplier.id}</ID>
+                    <Name>${b.supplier.name}</Name>
+                </Supplier>
                 <ConfID>
                 <ResNumber>${b.resNumber}</ResNumber>
                 </ConfID>

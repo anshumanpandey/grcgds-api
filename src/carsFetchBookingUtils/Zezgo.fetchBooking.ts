@@ -1,6 +1,6 @@
 import axios from "axios"
 import { ZEZGO_URL } from "../carSearchUtils/ZezgoCarsSearchUtils"
-import { BookingLocationDate, GRCBooking } from "../services/bookings.service"
+import { BookingLocationDate, FetchBookingsParams, GRCBooking } from "../services/bookings.service"
 import { getCountryBy } from "../utils/getCountryBy"
 import { xmlToJson } from "../utils/XmlConfig"
 import { XmlError } from "../utils/XmlError"
@@ -166,11 +166,6 @@ export interface LocationDetail {
     ReturnInst?: string[];
 }
 
-type Params = {
-    ResNumber: string,
-    RequestorId: string
-}
-
 const dateStringToDateJson = (dateString: string): BookingLocationDate => {
     //dateString be like "2021-08-08T10:00:00"
     const [date, time] = dateString.split('T')
@@ -186,7 +181,7 @@ const dateStringToDateJson = (dateString: string): BookingLocationDate => {
         seconds
     }
 }
-export default async ({ ResNumber, RequestorId }: Params): Promise<GRCBooking> => {
+export default async ({ ResNumber, RequestorId, AccountCode }: FetchBookingsParams): Promise<GRCBooking> => {
 
     const xml = `<OTA_VehRetResRQ xmlns="http://www.opentravel.org/OTA/2003/05"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -269,7 +264,9 @@ export default async ({ ResNumber, RequestorId }: Params): Promise<GRCBooking> =
         carCode: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].Vehicle[0].Code[0],
         carPrice: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].TotalCharge[0].EstimatedTotalAmount[0],
         supplier: {
-            phonenumber: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Telephone[0].PhoneNumber[0]
+            phonenumber: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Telephone[0].PhoneNumber[0],
+            id: `GRC-${RequestorId}`,
+            name: AccountCode
         },
         pickupLocation: {
             code: pickupLocation?.Code[0] || "",
