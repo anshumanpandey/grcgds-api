@@ -181,7 +181,7 @@ const dateStringToDateJson = (dateString: string): BookingLocationDate => {
         seconds
     }
 }
-export default async ({ ResNumber, RequestorId, AccountCode }: FetchBookingsParams): Promise<GRCBooking> => {
+export default async ({ ResNumber, RequestorId, AccountCode, SupplierName }: FetchBookingsParams): Promise<GRCBooking> => {
 
     const xml = `<OTA_VehRetResRQ xmlns="http://www.opentravel.org/OTA/2003/05"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -265,8 +265,8 @@ export default async ({ ResNumber, RequestorId, AccountCode }: FetchBookingsPara
         carPrice: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentCore[0].TotalCharge[0].EstimatedTotalAmount[0],
         supplier: {
             phonenumber: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Telephone[0].PhoneNumber[0],
-            id: `GRC-${RequestorId}`,
-            name: AccountCode
+            id: `GRC-${AccountCode}`,
+            name: SupplierName
         },
         pickupLocation: {
             code: pickupLocation?.Code[0] || "",
