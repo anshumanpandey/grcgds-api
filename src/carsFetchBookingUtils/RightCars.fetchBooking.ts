@@ -266,7 +266,8 @@ export default async ({ ResNumber, RequestorId, AccountCode, SupplierName }: Fet
         supplier: {
             phonenumber: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0].VehSegmentInfo[0].LocationDetails[0].Telephone[0].PhoneNumber[0],
             id: `GRC-${AccountCode}`,
-            name: SupplierName
+            name: SupplierName,
+            rateId: RequestorId,
         },
         pickupLocation: {
             code: pickupLocation?.Code[0] || "",

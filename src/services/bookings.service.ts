@@ -136,6 +136,7 @@ export type GRCBooking = {
         phonenumber: string,
         id: string,
         name: string,
+        rateId: string,
     },
     pickupLocation: BookingLocation,
     dropoffLocation: BookingLocation
@@ -170,6 +171,7 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 <Supplier>
                     <ID>${b.supplier.id}</ID>
                     <Name>${b.supplier.name}</Name>
+                    <RateID>${b.supplier.rateId}</RateID>
                 </Supplier>
                 <ConfID>
                 <ResNumber>${b.resNumber}</ResNumber>
