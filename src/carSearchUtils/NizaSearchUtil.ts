@@ -89,7 +89,7 @@ export default async (params: any, opt: SearchUtilsOptions) => {
                         "AirConditionInd": $VehAvail.AC[0] == 'false' ? "No" : "Yes",
                         //missing property on response
                         "TransmissionType": $VehAvail.automaticTransmission[0] == 'true' ? "Automatic" : 'Manual',
-                        "BrandPicURL": $VehAvail.imageURL[0],
+                        "BrandPicURL": "https://www.grcgds.com/nizacars-logo.jpeg",
                         "Brand": u.clientname,
                     },
                     "VehMakeModel": [{
