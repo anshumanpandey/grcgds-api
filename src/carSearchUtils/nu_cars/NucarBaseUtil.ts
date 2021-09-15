@@ -1,26 +1,23 @@
 import Axios from "axios"
-import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
-import { getClientData } from "../utils/getClientData";
-import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
-import { getPaypalCredentials } from "../utils/getPaypalCredentials";
-import { saveServiceRequest } from "../utils/saveServiceRequest";
-import { xmlToJson } from '../utils/XmlConfig';
-const https = require('https');
+import { SearchUtilsOptions } from "../../types/SearchUtilsOptions";
+import { getClientData } from "../../utils/getClientData";
+import { getCodeForGrcCode } from "../../utils/getCodeForGrcCode";
+import { getPaypalCredentials } from "../../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../../utils/saveServiceRequest";
+import { xmlToJson } from '../../utils/XmlConfig';
 
 export const NUCARS_URL = `https://wservices.nucarrentals.com:8443/axis2/services/VehWebService2006`
-const getDateTime = (fullDate: string) => {
-    //2021-02-02 10:00
-    const [date, time] = fullDate.split('T')
-    return `${date} ${time.slice(0, 5)}`
+
+type NucarBaseParams = {
+    id: string,
+    accountId: string
 }
-
-
-export default async (params: any, opt: SearchUtilsOptions) => {
+export default (p: NucarBaseParams) => async (params: any, opt: SearchUtilsOptions) => {
 
     const currency = params?.VehAvailRQCore?.Currency?.Code || 'GBP'
     const [pickupCodeObj, returnCodeObj] = await Promise.all([
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 76 }),
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 76 }),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: p.id }),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: p.id }),
     ])
 
     if (!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
@@ -32,8 +29,7 @@ export default async (params: any, opt: SearchUtilsOptions) => {
           <POS>
              <!--Agent Duty Code = CL87654-->
              <Source ISOCountry="US" AgentDutyCode="CL87654">
-                <!--NOTE: PrePeay Code 4700ARC is used in RequestorID below-->
-                <RequestorID Type="5" ID="4700ARC">
+                <RequestorID Type="5" ID="${p.accountId}">
                    <CompanyName Code="CL" CodeContext="NUORG">CL</CompanyName>
                 </RequestorID>
                 <BookingChannel Type="6" Primary="true">
@@ -44,8 +40,8 @@ export default async (params: any, opt: SearchUtilsOptions) => {
           <VehAvailRQCore Status="All">
              <!--Enter location rental and return date/time-->
              <VehRentalCore 
-                    PickUpDateTime="${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}" 
-                    ReturnDateTime="${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}">
+                    PickUpDateTime="${params.VehAvailRQCore.VehRentalCore.PickUpDateTime}:00" 
+                    ReturnDateTime="${params.VehAvailRQCore.VehRentalCore.ReturnDateTime}:00">
                 <PickUpLocation LocationCode="${pickupCodeObj.internal_code}"/>
                 <ReturnLocation LocationCode="${returnCodeObj.internal_code}"/>
              </VehRentalCore>
@@ -53,8 +49,7 @@ export default async (params: any, opt: SearchUtilsOptions) => {
              <VendorPrefs>
                 <VendorPref Code="NU" CompanyShortName="NU Car Rentals">NU Car Rentals</VendorPref>
              </VendorPrefs>
-             <!--NOTE: PrePayCode 4700ARC is used in PromotionCode below-->
-             <RateQualifier PromotionCode="4700ARC"/>
+             <RateQualifier PromotionCode="${p.accountId}"/>
           </VehAvailRQCore>
        </OTA_VehAvailRateRQ>
     </soapenv:Body>
@@ -78,7 +73,7 @@ export default async (params: any, opt: SearchUtilsOptions) => {
         data: body
     })
 
-    const u = await getClientData({ id: 76, brokerId: params.requestorClientData.clientId })
+    const u = await getClientData({ id: p.id, brokerId: params.requestorClientData.clientId })
 
     const json = await xmlToJson(data, { charkey: "" });
 
