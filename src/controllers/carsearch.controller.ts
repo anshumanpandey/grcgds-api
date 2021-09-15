@@ -19,7 +19,7 @@ import JimpsoftSearchUtil from '../carSearchUtils/JimpsoftSearchUtil';
 import { LogCarSearchToDb } from '../utils/LogCarSearch';
 import MexrentacarSearchUtil from '../carSearchUtils/MexrentacarSearchUtil';
 import EasyRentSearchUtils from '../carSearchUtils/EasyRentSearchUtils';
-import EasitentSearchUtil from '../carSearchUtils/EasitentSearchUtil';
+import EasitentSearchUtil from '../carSearchUtils/easirent/EasitentSearchUtil';
 import WheelsForCarsSearchUtil from '../carSearchUtils/WheelsForCarsSearchUtil';
 import { getClientData } from '../utils/getClientData';
 import YesawaySearchUtils from '../carSearchUtils/YesawaySearchUtils';

@@ -1,11 +1,10 @@
 import Axios from "axios"
-import { SearchUtilsOptions } from "../types/SearchUtilsOptions";
-import { getBrokerData } from "../utils/getBrokerData";
-import { getClientData } from "../utils/getClientData";
-import { getCodeForGrcCode } from "../utils/getCodeForGrcCode";
-import { getPaypalCredentials } from "../utils/getPaypalCredentials";
-import { saveServiceRequest } from "../utils/saveServiceRequest";
-import { xmlToJson } from '../utils/XmlConfig';
+import { SearchUtilsOptions } from "../../types/SearchUtilsOptions";
+import { getClientData } from "../../utils/getClientData";
+import { getCodeForGrcCode } from "../../utils/getCodeForGrcCode";
+import { getPaypalCredentials } from "../../utils/getPaypalCredentials";
+import { saveServiceRequest } from "../../utils/saveServiceRequest";
+import { xmlToJson } from '../../utils/XmlConfig';
 
 export const EASIRENT_URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
 const getDateTime = (fullDate: string) => {
@@ -13,22 +12,21 @@ const getDateTime = (fullDate: string) => {
     return [date, time.slice(0, 5)]
 }
 
-export default async (params: any, opt: SearchUtilsOptions) => {
+type EasirentBaseParams = {
+    clientId: string;
+    bcode: string;
+}
+export default (p: EasirentBaseParams) => async (params: any, opt: SearchUtilsOptions) => {
     const [ pickupCodeObj, returnCodeObj ] = await Promise.all([
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: 57}),
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: 57}),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: p.clientId }),
+        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: p.clientId }),
     ])
 
     if(!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
 
-    let bcode = "$BRO166"
-    if (params.VehAvailRQInfo.Customer.Primary.CitizenCountryName.Code.toLowerCase() == "us" && pickupCodeObj.country.toLowerCase() == "us") {
-        bcode = "$USA166A"
-    }
-
     const body = `<?xml version="1.0" encoding="utf-8"?>
     <GetVehicles>
-        <bcode>${bcode}</bcode>
+        <bcode>${p.bcode}</bcode>
         <vtype>1</vtype>
         <estmiles>10000</estmiles>
         <currency>${params?.POS?.Source?.ISOCurrency}</currency>
@@ -53,7 +51,7 @@ export default async (params: any, opt: SearchUtilsOptions) => {
 
     const [{ data }, u, ] = await Promise.all([
         Axios.post(EASIRENT_URL, body, {}),
-        getClientData({ id: 57, brokerId: params.requestorClientData.clientId })
+        getClientData({ id: p.clientId , brokerId: params.requestorClientData.clientId })
     ])
 
     const json = await xmlToJson(data, { charkey: "" });

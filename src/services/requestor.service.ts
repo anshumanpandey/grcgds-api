@@ -1,4 +1,4 @@
-import EasitentSearchUtil, { EASIRENT_URL } from "../carSearchUtils/EasitentSearchUtil"
+import EasitentSearchUtil, { EASIRENT_URL } from "../carSearchUtils/easirent/EasitentSearchUtil"
 import EasyRentSearchUtils from "../carSearchUtils/EasyRentSearchUtils"
 import GrcgdsSearchUtils, { GRCGDS_URL } from "../carSearchUtils/GrcgdsSearchUtils"
 import JimpsoftSearchUtil, { JIMPSOFT_URL } from "../carSearchUtils/JimpsoftSearchUtil"
