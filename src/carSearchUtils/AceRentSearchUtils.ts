@@ -53,6 +53,8 @@ export default async (params: any, opt: SearchUtilsOptions) => {
     const { data } = await Axios({
         method: 'POST',
         url: ACERENTCAR_URL,
+        //2 seconds
+        timeout: 2000,
         headers: {
             'SOAPAction': 'VehAvailRate', 
             'Content-Type': 'text/xml; charset=utf-8'

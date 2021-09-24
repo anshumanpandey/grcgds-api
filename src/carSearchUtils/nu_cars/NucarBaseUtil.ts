@@ -5,6 +5,7 @@ import { getCodeForGrcCode } from "../../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../../utils/getPaypalCredentials";
 import { saveServiceRequest } from "../../utils/saveServiceRequest";
 import { xmlToJson } from '../../utils/XmlConfig';
+import { XmlError } from "../../utils/XmlError";
 
 export const NUCARS_URL = `https://wservices.nucarrentals.com:8443/axis2/services/VehWebService2006`
 
@@ -75,6 +76,10 @@ export default (p: NucarBaseParams) => async (params: any, opt: SearchUtilsOptio
 
     const u = await getClientData({ id: p.id, brokerId: params.requestorClientData.clientId })
 
+    if (data.includes("Error")) {
+        throw new XmlError(data)
+    }
+    
     const json = await xmlToJson(data, { charkey: "" });
 
     return json["soapenv:Envelope"]["soapenv:Body"][0].OTA_VehAvailRateRS[0].VehAvailRSCore[0].VehVendorAvails[0].VehVendorAvail[0].VehAvails[0].VehAvail.map(($VehAvail: any) => {
@@ -98,7 +103,7 @@ export default (p: NucarBaseParams) => async (params: any, opt: SearchUtilsOptio
                     "VehMakeModel": [{
                         $: {
                             "Name": $VehAvail.VehAvailCore[0].Vehicle[0].VehMakeModel[0].$.Name,
-                            "PictureURL": $VehAvail.VehAvailCore[0].Vehicle[0].PictureURL[0],
+                            "PictureURL": `https://www.grcgds.com/nucars-logo.jpeg`,
                         }
                     }],
                     "VehType": [{
@@ -121,6 +126,7 @@ export default (p: NucarBaseParams) => async (params: any, opt: SearchUtilsOptio
                     $: {
                         "RateTotalAmount": Number($VehAvail.VehAvailCore[0].TotalCharge[0].$.RateTotalAmount).toFixed(2),
                         "CurrencyCode": currency,
+                        "Commission": $VehAvail.VehAvailCore[0].Fees[0].Fee.find((i:any) => i.$.Description.toLowerCase().trim() === "commission")?.Amount || "",
                     }
                 }],
                 "PricedEquips": []
