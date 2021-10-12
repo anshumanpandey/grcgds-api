@@ -1,7 +1,7 @@
 import Axios from "axios"
 import { SearchUtilsOptions } from "../../types/SearchUtilsOptions";
 import { getClientData } from "../../utils/getClientData";
-import { getCodeForGrcCode } from "../../utils/getCodeForGrcCode";
+import { CompanyLocation, getCodeForGrcCode } from "../../utils/getCodeForGrcCode";
 import { getPaypalCredentials } from "../../utils/getPaypalCredentials";
 import { saveServiceRequest } from "../../utils/saveServiceRequest";
 import { xmlToJson } from '../../utils/XmlConfig';
@@ -15,12 +15,11 @@ const getDateTime = (fullDate: string) => {
 type EasirentBaseParams = {
     clientId: string;
     bcode: string;
+    pickupCodeObj: CompanyLocation;
+    returnCodeObj: CompanyLocation;
 }
 export default (p: EasirentBaseParams) => async (params: any, opt: SearchUtilsOptions) => {
-    const [ pickupCodeObj, returnCodeObj ] = await Promise.all([
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.PickUpLocation.LocationCode, id: p.clientId }),
-        getCodeForGrcCode({ grcCode: params.VehAvailRQCore.VehRentalCore.ReturnLocation.LocationCode, id: p.clientId }),
-    ])
+    const { pickupCodeObj, returnCodeObj } = p;
 
     if(!pickupCodeObj || !returnCodeObj) return Promise.reject(`No code mapping found for grc code ${pickupCodeObj} or ${returnCodeObj}`)
 
