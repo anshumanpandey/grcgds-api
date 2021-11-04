@@ -1,6 +1,5 @@
 import axios from "axios"
 import { xmlToJson } from "../utils/XmlConfig"
-import { XmlError } from "../utils/XmlError"
 import { DB } from '../utils/DB';
 import { ApiError } from "../utils/ApiError";
 import LogBookingToDb from "../utils/LogBookingToDb";
@@ -48,7 +47,6 @@ export default async (body: any) => {
                 <DropOffTime>${dropoffTime.slice(0,5)}</DropOffTime>
                 <CarTypeId>${VehPref.Acriss}</CarTypeId>
                 <RateId>${VehPref.RateId}</RateId>
-                <PaymentMethod>${Math.floor(100000 + Math.random() * 900000)}</PaymentMethod>
                 <ChargedAmount>${RentalPaymentPref.Voucher.PaymentCard.AmountPaid}</ChargedAmount>
             </req:CreateReserveRequest>
         </soap:Body>

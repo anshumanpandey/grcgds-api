@@ -374,7 +374,7 @@ export const searchCars = async (body: any, req: any) => {
     const clientId = body.POS.Source.RequestorID.ID.replace('GRC-', "").slice(0, -4)
     const rateId = body.POS.Source.RequestorID?.RATE_ID?.replace('GRC-', "")
     body.requestorClientData = await getClientData({ id: clientId })
-    const { CONTEXT, POS } = body
+    const { CONTEXT } = body
 
     try {
         const [pickDate, pickTime] = body.VehAvailRQCore.VehRentalCore.PickUpDateTime.split('T')
