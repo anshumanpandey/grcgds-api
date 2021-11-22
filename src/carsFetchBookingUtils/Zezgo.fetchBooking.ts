@@ -181,7 +181,7 @@ const dateStringToDateJson = (dateString: string): BookingLocationDate => {
         seconds
     }
 }
-export default async ({ ResNumber, RequestorId, AccountCode, SupplierName }: FetchBookingsParams): Promise<GRCBooking> => {
+export default async ({ ResNumber, RequestorId, AccountCode, SupplierName, clientSurname, clientName }: FetchBookingsParams): Promise<GRCBooking> => {
 
     const xml = `<OTA_VehRetResRQ xmlns="http://www.opentravel.org/OTA/2003/05"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -195,11 +195,11 @@ export default async ({ ResNumber, RequestorId, AccountCode, SupplierName }: Fet
     <VehRetResRQCore>
     <ResNumber Number="${ResNumber}"/>
     <PersonName>
-    <GivenName>Rick</GivenName>
-    <Surname>Little</Surname>
+    <GivenName>${clientName || ""}</GivenName>
+    <Surname>${clientSurname || ""}</Surname>
     </PersonName>
     </VehRetResRQCore>
-    </OTA_VehRetResRQ>`
+    </OTA_VehRetResRQ>`;
 
     const { data } = await axios.post(ZEZGO_URL, xml, {
         headers: {

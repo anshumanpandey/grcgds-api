@@ -1406,13 +1406,15 @@ export const searchBookings = async (body: any) => {
     validator(body)
     const { VehRetResRQCore } = body
     const { POS: { Source: { RequestorID } } } = body
-    const { ResNumber } = VehRetResRQCore
+    const { ResNumber, PersonName } = VehRetResRQCore;
 
     const params: GetBookingsParams = {
-        accountCode: RequestorID?.RATEID?.replace('GRC-', '') || null,
-        brokerId: RequestorID.ID.replace('GRC-', '').slice(0,2),
-        resNumber: ResNumber.Number
-    }
+      accountCode: RequestorID?.RATEID?.replace("GRC-", "") || null,
+      brokerId: RequestorID.ID.replace("GRC-", "").slice(0, 2),
+      resNumber: ResNumber.Number,
+      clientName: PersonName.GivenName,
+      clientSurname: PersonName.Surname,
+    };
 
     const bookings = await getBookings(params)
     const xml = await createBookingsXmlResponse(bookings ? [bookings] : [])

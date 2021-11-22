@@ -1,5 +1,6 @@
 import RightCarsFetchBooking from "../carsFetchBookingUtils/RightCars.fetchBooking";
 import ZezgoFetchBooking from "../carsFetchBookingUtils/Zezgo.fetchBooking";
+import UnitedFetchBooking from "../carsFetchBookingUtils/UnitedCars.fetchBooking";
 import { ApiError } from "../utils/ApiError";
 import { DB } from "../utils/DB";
 import { getBrokerData } from "../utils/getBrokerData";
@@ -11,22 +12,27 @@ export enum BOOKING_STATUS_ENUM {
     CANCELLED = "Cancelled"
 }
 export type FetchBookingsParams = {
-    ResNumber: string,
-    SupplierName: string,
-    AccountCode: string,
-    RequestorId: string
-}
+  ResNumber: string;
+  SupplierName: string;
+  AccountCode: string;
+  RequestorId: string;
+  clientName: string;
+  clientSurname: string;
+};
 export type FetchBookingFn = (p: FetchBookingsParams) => Promise<GRCBooking>;
 
 export type GetBookingsParams = {
-    accountCode : string,
-    brokerId: string,
-    resNumber: string,
-}
+  accountCode: string;
+  brokerId: string;
+  resNumber: string;
+  clientName: string;
+  clientSurname: string;
+};
 const getBookingMap = new Map<string, FetchBookingFn>()
 getBookingMap.set("1", RightCarsFetchBooking)
-getBookingMap.set("10", ZezgoFetchBooking)
-export const getBookings = async ({ accountCode, brokerId, resNumber }: GetBookingsParams ) => {
+getBookingMap.set("10", ZezgoFetchBooking);
+getBookingMap.set("58", UnitedFetchBooking);
+export const getBookings = async ({ accountCode, brokerId, resNumber, clientName, clientSurname }: GetBookingsParams ) => {
     let fn = Array.from(getBookingMap.values())
 
     const brokerData = await getBrokerData({
@@ -41,12 +47,25 @@ export const getBookings = async ({ accountCode, brokerId, resNumber }: GetBooki
     }
     let booking = null
     if (fn.length !== 0) {
-        booking = await allSettled(fn.map(f => f({ ResNumber: resNumber, RequestorId: brokerData.internalCode, SupplierName: brokerData.clientname, AccountCode: brokerData.accountCode })))
-        .then((promises: any) => {
-            const successPromises = promises.filter((p: any) => p.status == "fulfilled")
-            if (successPromises.length === 0) return Promise.reject(new ApiError("Booking not found"))
-            return successPromises[0].value
-        })
+        booking = await allSettled(
+          fn.map((f) =>
+            f({
+              ResNumber: resNumber,
+              RequestorId: brokerData.internalCode,
+              SupplierName: brokerData.clientname,
+              AccountCode: brokerData.accountCode,
+              clientName,
+              clientSurname,
+            })
+          )
+        ).then((promises: any) => {
+          const successPromises = promises.filter(
+            (p: any) => p.status == "fulfilled"
+          );
+          if (successPromises.length === 0)
+            return Promise.reject(new ApiError("Booking not found"));
+          return successPromises[0].value;
+        });
     }
 
     return booking
