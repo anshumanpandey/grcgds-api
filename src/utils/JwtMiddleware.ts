@@ -11,19 +11,23 @@ export default () => {
         console.log(md5(ip))
         let pos: any = null;
         if (req.body.OTA_VehLocSearchRQ) {
-            pos = req.body.OTA_VehLocSearchRQ.POS
+          pos = req.body.OTA_VehLocSearchRQ.POS;
         } else if (req.body.OTA_CountryListRQ) {
-            pos = req.body.OTA_CountryListRQ.POS
+          pos = req.body.OTA_CountryListRQ.POS;
         } else if (req.body.OTA_VehAvailRateRQ) {
-            pos = req.body.OTA_VehAvailRateRQ.POS
+          pos = req.body.OTA_VehAvailRateRQ.POS;
         } else if (req.body.OTA_VehResRQ) {
-            pos = req.body.OTA_VehResRQ.POS
+          pos = req.body.OTA_VehResRQ.POS;
         } else if (req.body.OTA_VehRetResRQ) {
-            pos = req.body.OTA_VehRetResRQ.POS
+          pos = req.body.OTA_VehRetResRQ.POS;
         } else if (req.body.OTA_VehCancelRQ) {
-            pos = req.body.OTA_VehCancelRQ.POS
+          pos = req.body.OTA_VehCancelRQ.POS;
         } else if (req.body.OTA_VehRetSingleResRQ) {
-            pos = req.body.OTA_VehRetSingleResRQ.POS
+          pos = req.body.OTA_VehRetSingleResRQ.POS;
+        } else if (req.body.OTA_CreateAnswerReview) {
+          pos = req.body.OTA_CreateAnswerReview.POS;
+        } else if (req.body.OTA_GetAnswerReview) {
+          pos = req.body.OTA_GetAnswerReview.POS;
         }
         DB?.select().where('pall', md5(ip)).table("white")
             .then((r) => {

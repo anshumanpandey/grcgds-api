@@ -7,6 +7,7 @@ import JwtMiddleware from '../utils/JwtMiddleware';
 import { searchCars } from '../controllers/carsearch.controller';
 import { cancelBooking, createBooking, getSingleBooking, searchBookings } from '../controllers/booking.controller';
 import { logger } from '../utils/Logger';
+import { getReviews, replyReview } from '../controllers/review.controller';
 
 export const routes = express();
 
@@ -40,6 +41,20 @@ routes.post('/', XmlMiddleware(), JwtMiddleware(),expressAsyncHandler(async (req
       const r = await getSingleBooking(req.body.OTA_VehRetSingleResRQ)
       //@ts-expect-error
       BuildXmlResponse(res,...r)
+    } else if (req.body.OTA_GetAnswerReview) {
+      const r = await getReviews(req.body.OTA_GetAnswerReview);
+      //@ts-expect-error
+      BuildXmlResponse(res, ...r);
+    } else if (req.body.OTA_CreateAnswerReview) {
+      const r = await replyReview(req.body.OTA_CreateAnswerReview);
+      //@ts-expect-error
+      BuildXmlResponse(res, ...r);
     } else {
-      BuildXmlResponse(res,{ Response: "Request not supported" }, 200, "OTA_UnsuportedRequest")}
+      BuildXmlResponse(
+        res,
+        { Response: "Request not supported" },
+        200,
+        "OTA_UnsuportedRequest"
+      );
+    }
   }));
