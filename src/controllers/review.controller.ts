@@ -1,23 +1,43 @@
 import Axios, { AxiosRequestConfig } from "axios";
+import { ApiError } from "../utils/ApiError";
 import { getDbFor } from "../utils/DB";
-import { findBussinessByReviewId, generateAccessToken, saveRefreshToken, refreshAccessToken,supplierTokenHasExpired } from "../utils/ReviewTracker";
+import { getClientData } from "../utils/getClientData";
+import {
+  findBussinessByReviewId,
+  generateAccessToken,
+  saveRefreshToken,
+  refreshAccessToken,
+  supplierTokenHasExpired,
+} from "../utils/ReviewTracker";
 
 export const replyReview = async (body: any) => {
   const reviewId = body.ReviewID;
   const answerText = body.Answer;
 
-  const supplierBesiness = await findBussinessByReviewId({ reviewId })
+  const supplierBesiness = await findBussinessByReviewId({ reviewId });
   let accessToken = supplierBesiness.accessToken;
 
-  let tokenData: any | undefined = undefined
+  const clientId = body.POS.Source.RequestorID.ID.replace("GRC-", "").slice(
+    0,
+    -4
+  );
+  const client = await getClientData({ id: clientId });
+
+  if (!client.trustpilotEmail || !client.trustpilotPassword) {
+    throw new ApiError("Client has not defined Trustpilot credentials");
+  }
+  let tokenData: any | undefined = undefined;
 
   if (
     !supplierBesiness.accessToken ||
     !supplierBesiness.refreshToken ||
-    !supplierBesiness.expiresIn || 
+    !supplierBesiness.expiresIn ||
     !supplierBesiness.updatedAt
   ) {
-    const credentials = await generateAccessToken();
+    const credentials = await generateAccessToken({
+      email: client.trustpilotEmail,
+      password: client.trustpilotPassword,
+    });
     accessToken = credentials.access_token;
 
     tokenData = {
@@ -25,8 +45,7 @@ export const replyReview = async (body: any) => {
       accessToken: credentials.access_token,
       expiresIn: credentials.expires_in,
       id: supplierBesiness.id,
-    }
-
+    };
   } else if (supplierTokenHasExpired({ business: supplierBesiness })) {
     const refresh = await refreshAccessToken("");
     accessToken = refresh.access_token;
@@ -39,10 +58,8 @@ export const replyReview = async (body: any) => {
     };
   }
 
-  console.log({ tokenData });
-  console.log({ accessToken });
   if (tokenData) {
-    await saveRefreshToken(tokenData); 
+    await saveRefreshToken(tokenData);
   }
 
   const data = {
@@ -67,23 +84,21 @@ export const replyReview = async (body: any) => {
         createdAt: new Date().toISOString(),
         reviewId: reviewId,
       });
-
     })
     .catch((err) => {
       console.log(err.response.data);
     });
 
-    return [
-      { Success: "Yes" },
-      200,
-      "OTA_ReviewRes",
-      {
-        "xsi:schemaLocation":
-          "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd",
-      },
-    ];
+  return [
+    { Success: "Yes" },
+    200,
+    "OTA_ReviewRes",
+    {
+      "xsi:schemaLocation":
+        "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd",
+    },
+  ];
 };
-
 
 export const getReviews = async (body: any) => {
   const query = getDbFor()

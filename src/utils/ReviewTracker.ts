@@ -3,7 +3,10 @@ import Axios, { AxiosRequestConfig } from "axios";
 import { addSeconds, isAfter } from "date-fns";
 import { getDbFor } from "./DB";
 
-export const generateAccessToken = async () => {
+export const generateAccessToken = async (p: {
+  email: string;
+  password: string;
+}) => {
   const axiosConfig: AxiosRequestConfig = {
     method: "post",
     url: `https://api.trustpilot.com/v1/oauth/oauth-business-users-for-applications/accesstoken`,
@@ -13,7 +16,7 @@ export const generateAccessToken = async () => {
       ).toString("base64")}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    data: `grant_type=password&username=${process.env.TRUSTPILOT_EMAIL}&password=${process.env.TRUSTPILOT_PASSWORD}`,
+    data: `grant_type=password&username=${p.email}&password=${p.password}`,
   };
   const { data } = await Axios(axiosConfig);
 
@@ -57,7 +60,10 @@ export const fetchReviews = async (
     !business.expiresIn ||
     !business.updatedAt
   ) {
-    const credentials = await generateAccessToken();
+    const credentials = await generateAccessToken({
+      email: process.env.TRUSTPILOT_EMAIL as string,
+      password: process.env.TRUSTPILOT_PASSWORD as string
+    });
     accessToken = credentials.access_token;
 
     tokenData = {
