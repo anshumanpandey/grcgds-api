@@ -1,18 +1,53 @@
 import Axios, { AxiosRequestConfig } from "axios";
 import { getDbFor } from "../utils/DB";
+import { findBussinessByReviewId, generateAccessToken, saveRefreshToken, refreshAccessToken,supplierTokenHasExpired } from "../utils/ReviewTracker";
 
 export const replyReview = async (body: any) => {
   const reviewId = body.ReviewID;
   const answerText = body.Answer;
 
-  const [business, credentials] = await Promise.all([
-    getBusinessId(),
-    getCredentials(),
-  ]);
+  const supplierBesiness = await findBussinessByReviewId({ reviewId })
+  let accessToken = supplierBesiness.accessToken;
+
+  let tokenData: any | undefined = undefined
+
+  if (
+    !supplierBesiness.accessToken ||
+    !supplierBesiness.refreshToken ||
+    !supplierBesiness.expiresIn || 
+    !supplierBesiness.updatedAt
+  ) {
+    const credentials = await generateAccessToken();
+    accessToken = credentials.access_token;
+
+    tokenData = {
+      refreshToken: credentials.refresh_token,
+      accessToken: credentials.access_token,
+      expiresIn: credentials.expires_in,
+      id: supplierBesiness.id,
+    }
+
+  } else if (supplierTokenHasExpired({ business: supplierBesiness })) {
+    const refresh = await refreshAccessToken("");
+    accessToken = refresh.access_token;
+
+    tokenData = {
+      refreshToken: refresh.refresh_token,
+      accessToken: refresh.access_token,
+      expiresIn: refresh.expires_in,
+      id: supplierBesiness.id,
+    };
+  }
+
+  console.log({ tokenData });
+  console.log({ accessToken });
+  if (tokenData) {
+    await saveRefreshToken(tokenData); 
+  }
 
   const data = {
     message: answerText,
-    authorBusinessUserId: business.id,
+    authorBusinessUserId: supplierBesiness.trustpilotId,
   };
 
   const axiosConfig: AxiosRequestConfig = {
@@ -20,48 +55,35 @@ export const replyReview = async (body: any) => {
     url: `https://api.trustpilot.com/v1/private/reviews/${reviewId}/reply`,
     data,
     headers: {
-      Authorization: `Bearer ${credentials.access_token}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   };
 
   await Axios(axiosConfig)
-    .then(({ data: responseBody }) => {
-      console.log(responseBody);
+    .then(() => {
+      getDbFor()?.("TrustpilotReviewReplies").insert({
+        authorBusinessUserId: data.authorBusinessUserId,
+        text: data.message,
+        createdAt: new Date().toISOString(),
+        reviewId: reviewId,
+      });
+
     })
     .catch((err) => {
       console.log(err.response.data);
     });
+
+    return [
+      { Success: "Yes" },
+      200,
+      "OTA_ReviewRes",
+      {
+        "xsi:schemaLocation":
+          "http://www.opentravel.org/OTA/2003/05 OTA_VehAvailRateRS.xsd",
+      },
+    ];
 };
 
-const getCredentials = async () => {
-  const { data } = await Axios({
-    method: "post",
-    url: `https://api.trustpilot.com/v1/oauth/oauth-business-users-for-applications/accesstoken`,
-    headers: {
-      Authorization: `Basic ${Buffer.from(
-        "aYJy0oD9JI4Rm9PjBjdiIZtGIin6gLF5:nlKRljtRbzZdlYWq"
-      ).toString("base64")}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    data: "grant_type=password&username=alison.lee@tlinternationalgroup.com&password=Vaccine21!",
-  });
-
-  return data;
-};
-
-const getBusinessId = async () => {
-  const params = {
-    apikey: "aYJy0oD9JI4Rm9PjBjdiIZtGIin6gLF5",
-    name: "right-cars.com",
-  };
-  const { data } = await Axios({
-    method: "get",
-    url: "https://api.trustpilot.com/v1/business-units/find",
-    params,
-  });
-
-  return data;
-};
 
 export const getReviews = async (body: any) => {
   const query = getDbFor()
@@ -72,6 +94,7 @@ export const getReviews = async (body: any) => {
       "TrustpilotReviewBody.text as Text",
       "TrustpilotConsumer.id as ConsumerId",
       "TrustpilotConsumer.displayName as ConsumerDisplayName",
+      "TrustpilotIdSupplierMap.supplierName as SupplierName",
       getDbFor()?.raw(
         "(CASE WHEN isVerified <> 0 THEN 'True' ELSE 'False' END) as IsVerified"
       ),
@@ -91,6 +114,12 @@ export const getReviews = async (body: any) => {
       "TrustpilotReview.consumerId",
       "=",
       "TrustpilotConsumer.id"
+    )
+    .innerJoin(
+      "TrustpilotIdSupplierMap",
+      "TrustpilotReview.businessId",
+      "=",
+      "TrustpilotIdSupplierMap.trustpilotId"
     );
 
   const Review = await query;
