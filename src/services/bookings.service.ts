@@ -15,6 +15,7 @@ export type FetchBookingsParams = {
   ResNumber: string;
   SupplierName: string;
   AccountCode: string;
+  brokerId: string;
   RequestorId: string;
   clientName: string;
   clientSurname: string;
@@ -56,6 +57,7 @@ export const getBookings = async ({ accountCode, brokerId, resNumber, clientName
               AccountCode: brokerData.accountCode,
               clientName,
               clientSurname,
+              brokerId,
             })
           )
         ).then((promises: any) => {
