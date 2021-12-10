@@ -1,7 +1,9 @@
 require("dotenv").config();
 import Axios, { AxiosRequestConfig } from "axios";
 import { addSeconds, isAfter } from "date-fns";
+import { ApiError } from "./ApiError";
 import { getDbFor } from "./DB";
+import { ClientData } from "./getClientData";
 
 export const generateAccessToken = async (p: {
   email: string;
@@ -62,7 +64,7 @@ export const fetchReviews = async (
   ) {
     const credentials = await generateAccessToken({
       email: process.env.TRUSTPILOT_EMAIL as string,
-      password: process.env.TRUSTPILOT_PASSWORD as string
+      password: process.env.TRUSTPILOT_PASSWORD as string,
     });
     accessToken = credentials.access_token;
 
@@ -84,7 +86,7 @@ export const fetchReviews = async (
     };
   }
 
-    console.log({ isExpired: supplierTokenHasExpired({ business }) });
+  console.log({ isExpired: supplierTokenHasExpired({ business }) });
   if (tokenData) {
     await saveRefreshToken(tokenData);
   }
@@ -188,6 +190,7 @@ const saveReviews = async (d: Review[]) => {
           data.replies.push({
             authorBusinessUserId: review.companyReply.authorBusinessUserId,
             text: review.companyReply.text,
+            posted: true,
             createdAt:
               review.companyReply.updatedAt || review.companyReply.createdAt,
             reviewId: review.id,
@@ -268,7 +271,7 @@ export const saveRefreshToken = (data: {
   return query;
 };
 
-type SupplierBusiness = {
+export type SupplierBusiness = {
   id: string;
   trustpilotId: string;
   supplierName: string;
@@ -292,6 +295,12 @@ export const findBussinessByReviewId = (data: {
     .first();
 };
 
+export const getBusiness = (): Promise<SupplierBusiness[]> => {
+  const query = getDbFor()?.("TrustpilotIdSupplierMap").select();
+
+  return query;
+};
+
 export const supplierTokenHasExpired = (data: {
   business: SupplierBusiness;
 }) => {
@@ -313,6 +322,98 @@ export const startReviewTracker = () => {
   setInterval(() => {
     job().catch((err) => console.log("error: ", err));
   }, 1000 * 60 * 60 * FETCH_INTERVAL_HOURS);
+};
+
+type SendInvtiationLinkParams = {
+  locationId: string;
+  supplierName: string;
+  referenceId: string;
+  emailFrom: string;
+  emailTo: string;
+  name: string;
+  business: SupplierBusiness;
+  accessToken: string;
+};
+export const sendInvtiationLink = async (p: SendInvtiationLinkParams) => {
+  const body = {
+    replyTo: p.emailFrom,
+    locale: "en-US",
+    //senderName: p.supplierName,
+    //senderEmail: p.emailFrom,
+    locationId: "",
+    referenceNumber: p.referenceId,
+    consumerName: p.name,
+    consumerEmail: p.emailTo,
+    serviceReviewInvitation: {
+      templateId: "59b5216816d43907c47445e2",
+      preferredSendTime: addSeconds(new Date(), 5).toISOString().split(".")[0],
+      redirectUri: "http://trustpilot.com",
+      tags: [],
+    },
+  };
+
+  const axiosConfig: AxiosRequestConfig = {
+    method: "POST",
+    url: `https://invitations-api.trustpilot.com/v1/private/business-units/${p.business.trustpilotId}/email-invitations`,
+    data: body,
+    headers: {
+      Authorization: `Bearer ${p.accessToken}`,
+    },
+  };
+  const { data } = await Axios(axiosConfig);
+
+  return data
+};
+
+export const getCachedTokenForBusiness = async (p: {
+  supplierBesiness: SupplierBusiness;
+  client: ClientData;
+}) => {
+  let accessToken = p.supplierBesiness.accessToken;
+  let tokenData: any | undefined = undefined;
+
+  if (!p.client.trustpilotEmail || !p.client.trustpilotPassword) {
+    throw new ApiError("Client has not defined Trustpilot credentials");
+  }
+
+  if (
+    !p.supplierBesiness.accessToken ||
+    !p.supplierBesiness.refreshToken ||
+    !p.supplierBesiness.expiresIn ||
+    !p.supplierBesiness.updatedAt
+  ) {
+    const credentials = await generateAccessToken({
+      email: p.client.trustpilotEmail,
+      password: p.client.trustpilotPassword,
+    });
+    accessToken = credentials.access_token;
+
+    tokenData = {
+      refreshToken: credentials.refresh_token,
+      accessToken: credentials.access_token,
+      expiresIn: credentials.expires_in,
+      id: p.supplierBesiness.id,
+    };
+  } else if (supplierTokenHasExpired({ business: p.supplierBesiness })) {
+    const refresh = await refreshAccessToken(p.supplierBesiness.refreshToken);
+    accessToken = refresh.access_token;
+
+    tokenData = {
+      refreshToken: refresh.refresh_token,
+      accessToken: refresh.access_token,
+      expiresIn: refresh.expires_in,
+      id: p.supplierBesiness.id,
+    };
+  }
+
+  if (tokenData) {
+    await saveRefreshToken(tokenData);
+  }
+
+  if (!accessToken) {
+    throw new ApiError("Could not generate Trustpilot API token");
+  }
+  return accessToken;
 };
 
 export interface Review {

@@ -28,6 +28,8 @@ export default () => {
           pos = req.body.OTA_CreateAnswerReview.POS;
         } else if (req.body.OTA_GetAnswerReview) {
           pos = req.body.OTA_GetAnswerReview.POS;
+        } else if (req.body.OTA_DispatchReviewInvitation) {
+          pos = req.body.OTA_DispatchReviewInvitation.POS;
         }
         DB?.select().where('pall', md5(ip)).table("white")
             .then((r) => {

@@ -1,6 +1,6 @@
 import { DB } from "../utils/DB"
 
-type ClientData = {
+export type ClientData = {
   clientId: string;
   clientname: string;
   clientAccountCode: string;
