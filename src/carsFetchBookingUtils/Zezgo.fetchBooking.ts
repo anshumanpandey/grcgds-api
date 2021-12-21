@@ -155,6 +155,7 @@ export interface ReturnLocation {
 export interface Vehicle {
   Code: string[];
   regnumber: string[];
+  MakeModel: string[];
 }
 
 export interface VehSegmentInfo {
@@ -309,6 +310,13 @@ export default async ({
         rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
           .VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0]
           .TaxAmounts[0].TaxAmount[0].Description[0],
+    },
+    vehicle: {
+      code: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+        .VehSegmentCore[0].Vehicle[0].Code[0],
+      makeModel:
+        rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+          .VehSegmentCore[0].Vehicle[0].MakeModel[0],
     },
     calculation: {
       unitCharge:

@@ -155,6 +155,7 @@ export interface ReturnLocation {
 export interface Vehicle {
   Code: string[];
   regnumber: string[];
+  MakeModel: string[]
 }
 
 export interface VehSegmentInfo {
@@ -283,6 +284,13 @@ export default async ({
           rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
             .Customer[0].Primary[0].Address[0].CityName[0],
       },
+    },
+    vehicle: {
+      code: rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+        .VehSegmentCore[0].Vehicle[0].Code[0],
+      makeModel:
+        rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+          .VehSegmentCore[0].Vehicle[0].MakeModel[0],
     },
     extras:
       extraKeys.map((key) => {

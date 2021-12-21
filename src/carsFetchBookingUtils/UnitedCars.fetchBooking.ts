@@ -76,6 +76,13 @@ export default async ({
             .VehSegmentCore[0].RentalRate[0].VehicleCharges[0].VehicleCharge[0]
             .TaxAmounts[0].TaxAmount[0].Description[0],
       },
+      vehicle: {
+        code: json.OTA_VehRetResRS.OTA_VehRetResRS.VehRetResRSCore[0]
+          .VehReservation[0].VehSegmentCore[0].Vehicle[0].Code[0],
+        makeModel:
+          json.OTA_VehRetResRS.OTA_VehRetResRS.VehRetResRSCore[0]
+            .VehReservation[0].VehSegmentCore[0].Vehicle[0].MakeModel[0],
+      },
       calculation: {
         unitCharge:
           json.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
