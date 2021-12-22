@@ -156,6 +156,10 @@ export interface Vehicle {
   Code: string[];
   regnumber: string[];
   MakeModel: string[]
+  PictureURL: string[]
+  Doors: string[]
+  Transmission: string[]
+  AirConditionInd: string[]
 }
 
 export interface VehSegmentInfo {
@@ -291,6 +295,18 @@ export default async ({
       makeModel:
         rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
           .VehSegmentCore[0].Vehicle[0].MakeModel[0],
+      pictureURL:
+        rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+          .VehSegmentCore[0].Vehicle[0].PictureURL[0],
+      doors:
+        rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+          .VehSegmentCore[0].Vehicle[0].Doors[0],
+      transmission:
+        rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+          .VehSegmentCore[0].Vehicle[0].Transmission[0],
+      airConditionInd:
+        rcBooking.OTA_VehRetResRS.VehRetResRSCore[0].VehReservation[0]
+          .VehSegmentCore[0].Vehicle[0].AirConditionInd[0],
     },
     extras:
       extraKeys.map((key) => {

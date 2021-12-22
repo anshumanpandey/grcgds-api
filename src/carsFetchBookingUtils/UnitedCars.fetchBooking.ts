@@ -82,6 +82,10 @@ export default async ({
         makeModel:
           json.OTA_VehRetResRS.OTA_VehRetResRS.VehRetResRSCore[0]
             .VehReservation[0].VehSegmentCore[0].Vehicle[0].MakeModel[0],
+        pictureURL: "",
+        doors: "",
+        transmission: "",
+        airConditionInd: "",
       },
       calculation: {
         unitCharge:

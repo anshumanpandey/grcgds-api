@@ -142,6 +142,10 @@ export type GRCBooking = {
   vehicle: {
     code: string;
     makeModel: string;
+    pictureURL: string;
+    transmission: string;
+    doors: string;
+    airConditionInd: string;
   };
   calculation: {
     unitCharge: string;
@@ -224,6 +228,10 @@ export const createBookingsXmlResponse = async (bookings: GRCBooking[]) => {
                 <Vehicle>
                     <Code>${b.carCode}</Code>
                     <MakeModel>${b.vehicle.makeModel}</MakeModel>
+                    <PictureURL>${b.vehicle.pictureURL}</PictureURL>
+                    <Doors>${b.vehicle.doors}</Doors>
+                    <Transmission>${b.vehicle.transmission}</Transmission>
+                    <AirConditionInd>${b.vehicle.airConditionInd}</AirConditionInd>
                 </Vehicle>
                 <Extras>${b.extras
                   .map((e) => `<${e.key}>${e.val}</${e.key}>`)
