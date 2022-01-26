@@ -24,6 +24,6 @@ export const LogCarSearchToDb = async (parmas: Params) => {
         "createdAt": new Date(),
         "updatedAt ": new Date(),
     }
-    const [recordId] = await getDbFor("grcgds_gateway_db")?.insert(toInsert).into('CarSearches');
+    const [recordId] = await getDbFor("hannk_grcgds_gateway_db")?.insert(toInsert).into('CarSearches');
     return { id: recordId }
 }

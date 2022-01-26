@@ -35,7 +35,7 @@ export default () => {
             .then((r) => {
                 if (r.length == 0) {
                     logger.info("Whitelisted IP NOT found!")
-                    return getDbFor("grcgds_gateway_db")?.select()
+                    return getDbFor("hannk_grcgds_gateway_db")?.select()
                         .from("api_key")
                         .where({
                             'key': pos.Source.ApiKey,

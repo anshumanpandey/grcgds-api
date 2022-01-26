@@ -18,7 +18,7 @@ const saveRecord = async (params: Params, brokerData: BrokerData) => {
         "createdAt": new Date(),
         "updatedAt ": new Date(),
     }
-    const [recordId] = await getDbFor("grcgds_gateway_db")?.insert(toInsert).into('serviceRequest');
+    const [recordId] = await getDbFor("hannk_grcgds_gateway_db")?.insert(toInsert).into('serviceRequest');
     return { id: recordId, brokerData }
 }
 export const saveServiceRequest = async (params: Params) => {

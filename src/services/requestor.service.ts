@@ -78,7 +78,7 @@ export const getUsersByName = async (params: { firstname?: string, lastname?: st
 }
 
 export const getHannkUserByEmail = async ({ email }: { email: string }) => {
-    const r = await getDbFor("grcgds_gateway_db")
+    const r = await getDbFor("hannk_grcgds_gateway_db")
         .from("users")
         .where({ username: email })
 
@@ -96,7 +96,7 @@ export type SaveHannkUserParams = {
     country?: string,
 }
 export const saveHannkUserByEmail = async (params: SaveHannkUserParams) => {
-    const r = await getDbFor("grcgds_gateway_db")
+    const r = await getDbFor("hannk_grcgds_gateway_db")
         .table("users")
         .insert({
             username: params.email,
@@ -114,7 +114,7 @@ export const saveHannkUserByEmail = async (params: SaveHannkUserParams) => {
 
 export type UpdateHannkUserParams = { id: string } & Partial<SaveHannkUserParams>
 export const updateHannkUserByEmail = async (params: UpdateHannkUserParams) => {
-    const r = await getDbFor("grcgds_gateway_db")
+    const r = await getDbFor("hannk_grcgds_gateway_db")
         .table("users")
         .where("id", params.id)
         .update({
