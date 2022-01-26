@@ -147,7 +147,9 @@ export const getReviews = async (body: any) => {
 
 export const sendInvitations = async (body: any) => {
   type ReviewData = { Email: string; RefNumber: string };
-  const reviewData = body.CustomersData.CustomerData as ReviewData[];
+  const reviewData = Array.isArray(body.CustomersData.CustomerData)
+    ? body.CustomersData.CustomerData
+    : ([body.CustomersData.CustomerData] as ReviewData[]);
 
   const clientId = body.POS.Source.RequestorID.ID.replace("GRC-", "").slice(
     0,
@@ -168,7 +170,7 @@ export const sendInvitations = async (body: any) => {
     });
 
     const filterFn = (d: ReviewData) =>
-      d.RefNumber.includes(b.supplierName === "Zezgo" ? "EZ" : "RC");
+      d.RefNumber.includes(b.supplierName === "Zezgo" ? "EZ" : "ER");
 
     const reviewers = reviewData.filter(filterFn);
 
