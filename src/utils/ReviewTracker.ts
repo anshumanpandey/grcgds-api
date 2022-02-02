@@ -90,18 +90,30 @@ export const fetchReviews = async (
   if (tokenData) {
     await saveRefreshToken(tokenData);
   }
-  const params = {
-    count: 100,
-    language: "en",
-    token: accessToken,
-  };
-  const { data } = await Axios({
-    method: "get",
-    url: `https://api.trustpilot.com/v1/private/business-units/${business.trustpilotId}/reviews`,
-    params,
-  });
+  let lastFetchAmount = null
+  let totalOfReview: any[] = []
+  let currentPage = 1
 
-  return data.reviews;
+  while (lastFetchAmount === null || lastFetchAmount >= 100) {
+    const params = {
+      perPage: 100,
+      language: "en",
+      token: accessToken,
+      page: currentPage,
+    };
+    const { data } = await Axios({
+      method: "get",
+      url: `https://api.trustpilot.com/v1/private/business-units/${business.trustpilotId}/reviews`,
+      params,
+    });
+
+    console.log(data.reviews.length);
+    lastFetchAmount = data.reviews.length;
+    totalOfReview = totalOfReview.concat(data.reviews);
+    currentPage = currentPage + 1
+  }
+
+  return totalOfReview;
 };
 
 const saveReviews = async (d: Review[]) => {
