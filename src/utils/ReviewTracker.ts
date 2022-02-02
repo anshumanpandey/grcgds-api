@@ -107,7 +107,6 @@ export const fetchReviews = async (
       params,
     });
 
-    console.log(data.reviews.length);
     lastFetchAmount = data.reviews.length;
     totalOfReview = totalOfReview.concat(data.reviews);
     currentPage = currentPage + 1
@@ -328,7 +327,7 @@ export const supplierTokenHasExpired = (data: {
   return isAfter(new Date(), expireDate);
 };
 
-const FETCH_INTERVAL_HOURS = 24;
+const FETCH_INTERVAL_HOURS = 0.25;
 
 export const startReviewTracker = () => {
   job().catch((err) => console.log("error: ", err));
