@@ -218,7 +218,8 @@ const saveReviews = async (d: Review[]) => {
           if (locationName) {
             data.locationId = trx("TrustpilotLocation")
               .select(["id"])
-              .where("name", locationName);
+              .where("name", locationName)
+              .first()
           }
           data.consumerId = trx("TrustpilotConsumer")
             .select(["id"])
