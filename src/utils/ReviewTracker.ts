@@ -173,6 +173,7 @@ const saveReviews = async (d: Review[]) => {
         reviewVerificationLevel: review.reviewVerificationLevel,
         createdAt: review.createdAt,
         updatedAt: review.updatedAt,
+        referenceId: review.referenceId,
         locationName: review.location?.name,
         consumerName: review.consumer.displayName,
       });
@@ -436,6 +437,7 @@ export interface Review {
   stars: number;
   title: string;
   text: string;
+  referenceId: string;
   location: null | {
     id: string;
     name: string;
