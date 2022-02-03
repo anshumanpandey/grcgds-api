@@ -161,7 +161,9 @@ export const sendInvitations = async (body: any) => {
   if (!trustpilotEmail || !client.trustpilotPassword) {
     throw new ApiError("Client has not defined Trustpilot credentials");
   }
-  const businesses = await getBusiness();
+  //TODO: DISABLED temporarily
+  const businesses: any[] = [];
+  //const businesses = await getBusiness();
 
   const dispatchEmails = async (b: SupplierBusiness) => {
     const accessToken = await getCachedTokenForBusiness({
@@ -198,7 +200,7 @@ export const sendInvitations = async (body: any) => {
     })
     .reduce((sum: number, next: any) => {
       return sum + next.length;
-    },0);
+    }, 0);
 
   return [
     {
