@@ -170,13 +170,23 @@ export const sendInvitations = async (body: any) => {
     });
 
     const filterFn = (d: ReviewData) =>
-      d.RefNumber.includes(b.supplierName === "Zezgo" ? "EZ" : "ER");
+      d.RefNumber.includes(b.supplierName === "Zezgo" ? "EZ" : "RC");
 
     const reviewers = reviewData.filter(filterFn);
 
+    const query = await getDbFor()
+      .select("*")
+      .from("Bookings")
+      .whereIn(
+        "resNumber",
+        reviewData.map((i: any) => i.RefNumber)
+      );
+
     const doSend = (d: ReviewData) => {
-      return sendInvtiationLink({
-        locationId: "",
+      const locationId = query.find((i) => i.resNumber === d.RefNumber)?.pickLocation || ""
+
+      const linkData = {
+        locationId,
         supplierName: b.supplierName,
         referenceId: d.RefNumber,
         emailFrom: trustpilotEmail,
@@ -184,7 +194,8 @@ export const sendInvitations = async (body: any) => {
         name: client.clientname,
         business: b,
         accessToken,
-      });
+      };
+      return sendInvtiationLink(linkData);
     };
     return allSettled(reviewers.map(doSend)).then((promises: any) => {
       return promises.filter((p: any) => p.status == "fulfilled");
