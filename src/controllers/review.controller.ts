@@ -103,6 +103,8 @@ export const getReviews = async (body: any) => {
       "TrustpilotConsumer.id as ConsumerId",
       "TrustpilotConsumer.displayName as ConsumerDisplayName",
       "TrustpilotIdSupplierMap.supplierName as SupplierName",
+      "TrustpilotEmailedReview.branchLocation as BranchLocation",
+      "TrustpilotLocation.name as TrustpilotLocationName",
       getDbFor()?.raw(
         "(CASE WHEN isVerified <> 0 THEN 'True' ELSE 'False' END) as IsVerified"
       ),
@@ -128,11 +130,30 @@ export const getReviews = async (body: any) => {
       "TrustpilotReview.businessId",
       "=",
       "TrustpilotIdSupplierMap.trustpilotId"
-    );
+    )
+    .leftJoin(
+      "TrustpilotLocation",
+      "TrustpilotReview.locationId",
+      "=",
+      "TrustpilotLocation.id"
+    )
+    .leftJoin(
+      "TrustpilotEmailedReview",
+      "TrustpilotReview.referenceId",
+      "=",
+      "TrustpilotEmailedReview.resNumber"
+    )
+    .orderBy("TrustpilotReview.createdAt", "desc");
 
   const Review = await query;
 
-  const parse = (el: any) => ({ Review: el });
+
+  const parse = (el: any) => ({
+    Review: {
+      ...el,
+      BranchLocation: el.TrustpilotLocationName || el.BranchLocation,
+    },
+  });
 
   return [
     { Reviews: [Review.map(parse)] },

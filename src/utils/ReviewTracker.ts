@@ -169,9 +169,12 @@ const saveReviews = async (d: Review[]) => {
         numberOfReviews: review.consumer.numberOfReviews,
       });
       let locationName = review.location ? review.location?.name : ""
-      const emailFound = emailsSended.find(i => i.resNumber === review.referenceId)
-      if (locationName && emailFound) {
-        locationName = emailFound.branchLocation || ""
+      let grcLocation = null;
+      const emailFound = emailsSended.find(
+        (i) => i.resNumber === review.referenceId
+      );
+      if (emailFound) {
+        grcLocation = emailFound.branchLocation || "";
       }
       data.reviews.push({
         id: review.id,
@@ -185,6 +188,7 @@ const saveReviews = async (d: Review[]) => {
         updatedAt: review.updatedAt,
         referenceId: review.referenceId,
         locationName,
+        grcLocation,
         consumerName: review.consumer.displayName,
       });
 
