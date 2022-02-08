@@ -126,6 +126,11 @@ const saveReviews = async (d: Review[]) => {
     d.map((r) => r.id)
   );
 
+  const emailsSended = await getDbFor()?.("TrustpilotEmailedReview").whereIn(
+    "resNumber",
+    d.map((r) => r.referenceId)
+  );
+
   const findRecordPerReviewId = (review: Review) => (b: any) =>
     b.reviewId === review.id;
 
@@ -163,6 +168,11 @@ const saveReviews = async (d: Review[]) => {
         displayLocation: review.consumer.displayLocation,
         numberOfReviews: review.consumer.numberOfReviews,
       });
+      let locationName = review.location ? review.location?.name : ""
+      const emailFound = emailsSended.find(i => i.resNumber === review.referenceId)
+      if (locationName && emailFound) {
+        locationName = emailFound.branchLocation || ""
+      }
       data.reviews.push({
         id: review.id,
         stars: review.stars,
@@ -174,7 +184,7 @@ const saveReviews = async (d: Review[]) => {
         createdAt: review.createdAt,
         updatedAt: review.updatedAt,
         referenceId: review.referenceId,
-        locationName: review.location?.name,
+        locationName,
         consumerName: review.consumer.displayName,
       });
 
@@ -338,7 +348,6 @@ export const startReviewTracker = () => {
 };
 
 type SendInvtiationLinkParams = {
-  locationId: string;
   supplierName: string;
   referenceId: string;
   emailFrom: string;
@@ -346,6 +355,7 @@ type SendInvtiationLinkParams = {
   name: string;
   business: SupplierBusiness;
   accessToken: string;
+  branchLocation: string;
 };
 export const sendInvtiationLink = async (p: SendInvtiationLinkParams) => {
   const body = {
@@ -353,7 +363,7 @@ export const sendInvtiationLink = async (p: SendInvtiationLinkParams) => {
     locale: "en-US",
     //senderName: p.supplierName,
     //senderEmail: p.emailFrom,
-    locationId: "",
+    locationId: p.branchLocation,
     referenceNumber: p.referenceId,
     consumerName: p.name,
     consumerEmail: p.emailTo,
@@ -374,6 +384,12 @@ export const sendInvtiationLink = async (p: SendInvtiationLinkParams) => {
     },
   };
   const { data } = await Axios(axiosConfig);
+
+  await getDbFor().into("TrustpilotEmailedReview").insert({
+    branchLocation: p.branchLocation,
+    email: p.emailTo,
+    resNumber: p.referenceId,
+  });
 
   return data
 };

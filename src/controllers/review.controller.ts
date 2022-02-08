@@ -146,7 +146,7 @@ export const getReviews = async (body: any) => {
 };
 
 export const sendInvitations = async (body: any) => {
-  type ReviewData = { Email: string; RefNumber: string };
+  type ReviewData = { Email: string; RefNumber: string; BranchLocation: string };
   const reviewData = Array.isArray(body.CustomersData.CustomerData)
     ? body.CustomersData.CustomerData
     : ([body.CustomersData.CustomerData] as ReviewData[]);
@@ -174,30 +174,20 @@ export const sendInvitations = async (body: any) => {
 
     const reviewers = reviewData.filter(filterFn);
 
-    const query = await getDbFor()
-      .select("*")
-      .from("Bookings")
-      .whereIn(
-        "resNumber",
-        reviewData.map((i: any) => i.RefNumber)
-      );
-
     const doSend = (d: ReviewData) => {
-      const locationId = query.find((i) => i.resNumber === d.RefNumber)?.pickLocation || ""
-
-      const linkData = {
-        locationId,
+      return sendInvtiationLink({
         supplierName: b.supplierName,
         referenceId: d.RefNumber,
         emailFrom: trustpilotEmail,
         emailTo: d.Email,
+        branchLocation: d.BranchLocation || "",
         name: client.clientname,
         business: b,
         accessToken,
-      };
-      return sendInvtiationLink(linkData);
+      });
     };
     return allSettled(reviewers.map(doSend)).then((promises: any) => {
+      console.log(promises);
       return promises.filter((p: any) => p.status == "fulfilled");
     });
   };
