@@ -149,10 +149,7 @@ export const getReviews = async (body: any) => {
 
 
   const parse = (el: any) => ({
-    Review: {
-      ...el,
-      BranchLocation: el.TrustpilotLocationName || el.BranchLocation,
-    },
+    Review: el,
   });
 
   return [
