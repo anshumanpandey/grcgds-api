@@ -103,7 +103,7 @@ export const getReviews = async (body: any) => {
       "TrustpilotConsumer.id as ConsumerId",
       "TrustpilotConsumer.displayName as ConsumerDisplayName",
       "TrustpilotIdSupplierMap.supplierName as SupplierName",
-      "TrustpilotEmailedReview.branchLocation as BranchLocation",
+      "grcgds_locations.locationname as BranchLocation",
       "TrustpilotLocation.name as TrustpilotLocationName",
       getDbFor()?.raw(
         "(CASE WHEN isVerified <> 0 THEN 'True' ELSE 'False' END) as IsVerified"
@@ -138,10 +138,16 @@ export const getReviews = async (body: any) => {
       "TrustpilotLocation.id"
     )
     .leftJoin(
-      "TrustpilotEmailedReview",
+      { B: "Bookings" },
       "TrustpilotReview.referenceId",
       "=",
-      "TrustpilotEmailedReview.resNumber"
+      "B.resNumber"
+    )
+    .leftJoin(
+      "grcgds_locations",
+      "B.pickLocation",
+      "=",
+      "grcgds_locations.internalcode"
     )
     .orderBy("TrustpilotReview.createdAt", "desc");
 
