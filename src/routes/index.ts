@@ -8,6 +8,9 @@ import { searchCars } from '../controllers/carsearch.controller';
 import { cancelBooking, createBooking, getSingleBooking, searchBookings } from '../controllers/booking.controller';
 import { logger } from '../utils/Logger';
 import { getReviews, replyReview, sendInvitations } from '../controllers/review.controller';
+import CardooBooking from "../carsBookingUtils/cardoo/CardooFreeDeposit";
+import CardooDeposit from "../carsBookingUtils/cardoo/CardooDeposit";
+import CardooDepositFind from "../carsBookingUtils/cardoo/CardooDepositFind";
 
 export const routes = express();
 
@@ -51,6 +54,18 @@ routes.post('/', XmlMiddleware(), JwtMiddleware(),expressAsyncHandler(async (req
       BuildXmlResponse(res, ...r);
     } else if (req.body.OTA_CreateAnswerReview) {
       const r = await replyReview(req.body.OTA_CreateAnswerReview);
+      //@ts-expect-error
+      BuildXmlResponse(res, ...r);
+    } else if (req.body.OTA_DepositFree) {
+      const r = await CardooBooking(req.body.OTA_DepositFree);
+      //@ts-expect-error
+      BuildXmlResponse(res, ...r);
+    } else if (req.body.OTA_Deposit) {
+      const r = await CardooDeposit(req.body.OTA_Deposit);
+      //@ts-expect-error
+      BuildXmlResponse(res, ...r);
+    } else if (req.body.OTA_DepositFind) {
+      const r = await CardooDepositFind(req.body.OTA_DepositFind);
       //@ts-expect-error
       BuildXmlResponse(res, ...r);
     } else {

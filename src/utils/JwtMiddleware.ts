@@ -10,26 +10,26 @@ export default () => {
         console.log(ip)
         console.log(md5(ip))
         let pos: any = null;
-        if (req.body.OTA_VehLocSearchRQ) {
-          pos = req.body.OTA_VehLocSearchRQ.POS;
-        } else if (req.body.OTA_CountryListRQ) {
-          pos = req.body.OTA_CountryListRQ.POS;
-        } else if (req.body.OTA_VehAvailRateRQ) {
-          pos = req.body.OTA_VehAvailRateRQ.POS;
-        } else if (req.body.OTA_VehResRQ) {
-          pos = req.body.OTA_VehResRQ.POS;
-        } else if (req.body.OTA_VehRetResRQ) {
-          pos = req.body.OTA_VehRetResRQ.POS;
-        } else if (req.body.OTA_VehCancelRQ) {
-          pos = req.body.OTA_VehCancelRQ.POS;
-        } else if (req.body.OTA_VehRetSingleResRQ) {
-          pos = req.body.OTA_VehRetSingleResRQ.POS;
-        } else if (req.body.OTA_CreateAnswerReview) {
-          pos = req.body.OTA_CreateAnswerReview.POS;
-        } else if (req.body.OTA_GetAnswerReview) {
-          pos = req.body.OTA_GetAnswerReview.POS;
-        } else if (req.body.OTA_DispatchReviewInvitation) {
-          pos = req.body.OTA_DispatchReviewInvitation.POS;
+
+        const reqList = [
+          "OTA_VehLocSearchRQ",
+          "OTA_CountryListRQ",
+          "OTA_VehAvailRateRQ",
+          "OTA_VehResRQ",
+          "OTA_VehRetResRQ",
+          "OTA_VehCancelRQ",
+          "OTA_VehRetSingleResRQ",
+          "OTA_CreateAnswerReview",
+          "OTA_GetAnswerReview",
+          "OTA_DispatchReviewInvitation",
+          "OTA_DepositFree",
+          "OTA_Deposit",
+          "OTA_DepositFind",
+        ];
+
+        const found = reqList.find(i => i in req.body)
+        if (found) {
+          pos = req.body[found].POS;
         }
         DB?.select().where('pall', md5(ip)).table("white")
             .then((r) => {

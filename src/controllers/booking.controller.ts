@@ -1,12 +1,11 @@
-import { DB } from '../utils/DB';
 import { validateFor } from '../utils/JsonValidator';
-import axios from "axios"
 import { ApiError } from '../utils/ApiError';
 import { xmlToJson } from '../utils/XmlConfig';
-import RightCarsBooking, { cancelRightCarsBooking, getRightCarsBooking } from '../carsBookingUtils/RightCarsBooking';
-import GrcgdsXmlBooking, { cancelGrcBooking } from '../carsBookingUtils/GrcgdsXmlBooking';
-import { BOOKING_STATUS_ENUM, cancelBookingByResNumber, createBookingsXmlResponse, getBookings, getBookingsBy, GetBookingsParams } from '../services/bookings.service';
-import { isGrcgdsLocations } from '../services/locations.service';
+import RightCarsBooking, {
+  cancelRightCarsBooking,
+} from "../carsBookingUtils/RightCarsBooking";
+import EasirentBooking from "../carsBookingUtils/EasirentBooking";
+import { cancelBookingByResNumber, createBookingsXmlResponse, getBookings, getBookingsBy, GetBookingsParams } from '../services/bookings.service';
 import DiscoverCarsBooking from '../carsBookingUtils/DiscoverCarsBooking';
 import UnitedCarsBooking, { cancelUnitedCarBooking } from '../carsBookingUtils/UnitedCarsBooking';
 import { logger } from '../utils/Logger';
@@ -1084,12 +1083,13 @@ const schema = {
     "additionalProperties": true
 }
 
-const clientBookingsMaps: {[k: number]: (p: any) => void } = {
-    17: DiscoverCarsBooking,
-    58: UnitedCarsBooking,
-    1: RightCarsBooking,
-    10: ZezgoBooking,
-}
+const clientBookingsMaps: { [k: number]: (p: any) => void } = {
+  17: DiscoverCarsBooking,
+  58: UnitedCarsBooking,
+  57: EasirentBooking,
+  1: RightCarsBooking,
+  10: ZezgoBooking,
+};
 
 export const createBooking = async (body: any) => {
     const validator = validateFor(schema)
