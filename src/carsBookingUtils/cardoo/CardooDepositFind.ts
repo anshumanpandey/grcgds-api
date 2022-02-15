@@ -4,7 +4,7 @@ import { validateFor } from "../../utils/JsonValidator";
 
 const schema = {
   $schema: "http://json-schema.org/draft-07/schema",
-  $id: "http://example.com/example.json",
+  $id: "http://example.com/sdsdsdwsd.json",
   type: "object",
   title: "The root schema",
   description: "The root schema comprises the entire JSON document.",
