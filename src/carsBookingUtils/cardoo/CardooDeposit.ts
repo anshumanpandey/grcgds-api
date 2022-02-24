@@ -390,7 +390,7 @@ export default async (body: any) => {
       customer: {
         first_name: body.Customer.FirstName,
         last_name: body.Customer.LastName,
-        email: body.Customer.LastName,
+        email: body.Customer.Email,
         phone_number: body.Customer.PhoneNumber,
       },
       pickup_time: body.PickupTime,
@@ -410,9 +410,9 @@ export default async (body: any) => {
           body.DepositFree.DepositFreePriceRequestId,
       },
       acquiring: {
-        prepay: body.Acquiring.prepay,
+        prepay: body.Acquiring.Prepay,
         price: {
-          cents: body.Acquiring.Price.Cents,
+          cents: parseInt(body.Acquiring.Price.Cents, 10),
           currency_iso: body.Acquiring.Price.CurrencyIso,
         },
       },
