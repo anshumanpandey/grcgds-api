@@ -4,31 +4,132 @@ import { validateFor } from "../../utils/JsonValidator";
 
 const schema = {
   $schema: "http://json-schema.org/draft-07/schema",
-  $id: "http://example.com/asasaswwww.json",
   type: "object",
-  title: "The root schema",
-  description: "The root schema comprises the entire JSON document.",
-  default: {},
-  examples: [
-    {
-      xmlns: "http://www.opentravel.org/OTA/2003/05",
-      "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-      "xsi:schemaLocation":
-        "http://www.opentravel.org/OTA/2003/05\nVehRetResRQ.xsd",
-      POS: {
+  properties: {
+    xmlns: {
+      type: "string",
+    },
+    "xmlns:xsi": {
+      type: "string",
+    },
+    "xsi:schemaLocation": {
+      type: "string",
+    },
+    POS: {
+      type: "object",
+      properties: {
         Source: {
-          ApiKey: "xxx-xxx-xxx",
+          type: "object",
+          properties: {
+            ApiKey: {
+              type: "string",
+            },
+          },
+          required: ["ApiKey"],
         },
       },
-      Vehicle: "619e8f2abd63dda48263ed67",
-      DepositAmount: {
-        Cents: "500000",
-        CurrencyIso: "EUR",
-      },
-      PickupTime: "2021-12-24T10:00:00Z",
-      DropoffTime: "2021-12-27T10:00:00Z",
+      required: ["Source"],
     },
-  ],
+    Vehicle: {
+      type: "string",
+    },
+    DepositAmount: {
+      type: "object",
+      properties: {
+        Cents: {
+          type: "string",
+        },
+        CurrencyIso: {
+          type: "string",
+        },
+      },
+      required: ["Cents", "CurrencyIso"],
+    },
+    PickupTime: {
+      type: "string",
+    },
+    DropoffTime: {
+      type: "string",
+    },
+    PartnerOrderId: {
+      type: "string",
+    },
+    Customer: {
+      type: "object",
+      properties: {
+        FirstName: {
+          type: "string",
+        },
+        LastName: {
+          type: "string",
+        },
+        Email: {
+          type: "string",
+        },
+        PhoneNumber: {
+          type: "string",
+        },
+      },
+      required: ["FirstName", "LastName", "Email", "PhoneNumber"],
+    },
+    City: {
+      type: "string",
+    },
+    Country: {
+      type: "string",
+    },
+    Callbacks: {
+      type: "object",
+      properties: {
+        GuaranteeStatusChanged: {
+          type: "string",
+        },
+      },
+      required: ["GuaranteeStatusChanged"],
+    },
+    Redirects: {
+      type: "object",
+      properties: {
+        SuccessUrl: {
+          type: "string",
+        },
+        FailureUrl: {
+          type: "string",
+        },
+      },
+      required: ["SuccessUrl", "FailureUrl"],
+    },
+    DepositFree: {
+      type: "object",
+      properties: {
+        DepositFreePriceRequestId: {
+          type: "string",
+        },
+      },
+      required: ["DepositFreePriceRequestId"],
+    },
+    Acquiring: {
+      type: "object",
+      properties: {
+        Prepay: {
+          type: "string",
+        },
+        Price: {
+          type: "object",
+          properties: {
+            Cents: {
+              type: "string",
+            },
+            CurrencyIso: {
+              type: "string",
+            },
+          },
+          required: ["Cents", "CurrencyIso"],
+        },
+      },
+      required: ["Prepay", "Price"],
+    },
+  },
   required: [
     "xmlns",
     "xmlns:xsi",
@@ -38,134 +139,21 @@ const schema = {
     "DepositAmount",
     "PickupTime",
     "DropoffTime",
+    "PartnerOrderId",
+    "Customer",
+    "City",
+    "Country",
+    "Callbacks",
+    "Redirects",
+    "DepositFree",
+    "Acquiring",
   ],
-  properties: {
-    xmlns: {
-      $id: "#/properties/xmlns",
-      type: "string",
-      title: "The xmlns schema",
-      description: "An explanation about the purpose of this instance.",
-      default: "",
-      examples: ["http://www.opentravel.org/OTA/2003/05"],
-    },
-    "xmlns:xsi": {
-      $id: "#/properties/xmlns%3Axsi",
-      type: "string",
-      title: "The xmlns:xsi schema",
-      description: "An explanation about the purpose of this instance.",
-      default: "",
-      examples: ["http://www.w3.org/2001/XMLSchema-instance"],
-    },
-    "xsi:schemaLocation": {
-      $id: "#/properties/xsi%3AschemaLocation",
-      type: "string",
-      title: "The xsi:schemaLocation schema",
-      description: "An explanation about the purpose of this instance.",
-      default: "",
-      examples: ["http://www.opentravel.org/OTA/2003/05\nVehRetResRQ.xsd"],
-    },
-    POS: {
-      $id: "#/properties/POS",
-      type: "object",
-      title: "The POS schema",
-      description: "An explanation about the purpose of this instance.",
-      default: {},
-      examples: [
-        {
-          Source: {
-            ApiKey: "xxx-xxx-xxx",
-          },
-        },
-      ],
-      required: ["Source"],
-      properties: {
-        Source: {
-          $id: "#/properties/POS/properties/Source",
-          type: "object",
-          title: "The Source schema",
-          description: "An explanation about the purpose of this instance.",
-          default: {},
-          examples: [
-            {
-              ApiKey: "xxx-xxx-xxx",
-            },
-          ],
-          required: ["ApiKey"],
-          properties: {
-            ApiKey: {
-              $id: "#/properties/POS/properties/Source/properties/ApiKey",
-              type: "string",
-              title: "The ApiKey schema",
-              description: "An explanation about the purpose of this instance.",
-              default: "",
-              examples: ["xxx-xxx-xxx"],
-            },
-          },
-          additionalProperties: false,
-        },
-      },
-      additionalProperties: false,
-    },
-    Vehicle: {
-      $id: "#/properties/Vehicle",
-      type: "string",
-      title: "The Vehicle schema",
-      description: "An explanation about the purpose of this instance.",
-      default: "",
-      examples: ["619e8f2abd63dda48263ed67"],
-    },
-    DepositAmount: {
-      $id: "#/properties/DepositAmount",
-      type: "object",
-      title: "The DepositAmount schema",
-      description: "An explanation about the purpose of this instance.",
-      default: {},
-      examples: [
-        {
-          Cents: "500000",
-          CurrencyIso: "EUR",
-        },
-      ],
-      required: ["Cents", "CurrencyIso"],
-      properties: {
-        Cents: {
-          $id: "#/properties/DepositAmount/properties/Cents",
-          type: "string",
-          title: "The Cents schema",
-          description: "An explanation about the purpose of this instance.",
-          default: "",
-          examples: ["500000"],
-        },
-        CurrencyIso: {
-          $id: "#/properties/DepositAmount/properties/CurrencyIso",
-          type: "string",
-          title: "The CurrencyIso schema",
-          description: "An explanation about the purpose of this instance.",
-          default: "",
-          examples: ["EUR"],
-        },
-      },
-      additionalProperties: false,
-    },
-    PickupTime: {
-      $id: "#/properties/PickupTime",
-      type: "string",
-      title: "The PickupTime schema",
-      description: "An explanation about the purpose of this instance.",
-      default: "",
-      examples: ["2021-12-24T10:00:00Z"],
-    },
-    DropoffTime: {
-      $id: "#/properties/DropoffTime",
-      type: "string",
-      title: "The DropoffTime schema",
-      description: "An explanation about the purpose of this instance.",
-      default: "",
-      examples: ["2021-12-27T10:00:00Z"],
-    },
-  },
-  additionalProperties: false,
 };
+
+
+
+const BASE_URL =
+  "https://sandbox-api.cardoo.finance/partner_api/orders/onetime";
 
 export default async (body: any) => {
   const validator = validateFor(schema);
@@ -173,7 +161,7 @@ export default async (body: any) => {
   const { DepositAmount, DropoffTime, PickupTime, Vehicle } = body;
   const { Cents, CurrencyIso } = DepositAmount;
   try {
-    const bodyData = {
+    const bodyData1 = {
       vehicle: Vehicle,
       session_cookie_id: 1,
       deposit_amount: {
@@ -186,8 +174,58 @@ export default async (body: any) => {
 
     const { data: cardooResponse } = await axios({
       method: "POST",
-      url: "https://sandbox-api.cardoo.finance/partner_api/orders/onetime/deposit_free_price_request",
-      data: bodyData,
+      url: BASE_URL + "/deposit_free_price_request",
+      data: bodyData1,
+      headers: {
+        "Access-Token": "4d55cd2c-68af-4d5a-9d6b-2e2946fa37b7",
+      },
+    });
+
+    const bodyData2 = {
+      partner_order_id: body.PartnerOrderId,
+      customer: {
+        first_name: body.Customer.FirstName,
+        last_name: body.Customer.LastName,
+        email: body.Customer.Email,
+        phone_number: body.Customer.PhoneNumber,
+      },
+      pickup_time: body.PickupTime,
+      dropoff_time: body.DropoffTime,
+      city: body.City,
+      country: body.Country,
+      vehicle: body.Vehicle,
+      callbacks: {
+        guarantee_status_changed: body.Callbacks.GuaranteeStatusChanged,
+      },
+      redirects: {
+        success_url: body.Redirects.SuccessUrl,
+        failure_url: body.Redirects.FailureUrl,
+      },
+      deposit_free: {
+        deposit_free_price_request_id:
+          cardooResponse.deposit_free_price_request_id,
+      },
+      acquiring: {
+        prepay: body.Acquiring.Prepay,
+        price: {
+          cents: parseInt(body.Acquiring.Price.Cents, 10),
+          currency_iso: body.Acquiring.Price.CurrencyIso,
+        },
+      },
+    };
+
+    const { data: cardooOrderResponse } = await axios({
+      method: "POST",
+      url: BASE_URL,
+      data: bodyData2,
+      headers: {
+        "Access-Token": "4d55cd2c-68af-4d5a-9d6b-2e2946fa37b7",
+      },
+    });
+
+    const { data: cardooFindResponse } = await axios({
+      method: "get",
+      url: BASE_URL + "/" + cardooOrderResponse.order_id,
       headers: {
         "Access-Token": "4d55cd2c-68af-4d5a-9d6b-2e2946fa37b7",
       },
@@ -195,9 +233,9 @@ export default async (body: any) => {
 
     return [
       {
-        DepositFreePriceRequestId: cardooResponse.deposit_free_price_request_id,
-        Timestamp: cardooResponse.timestamp,
-        Price: { Cents: cardooResponse.price.cents, CurrencyIso: cardooResponse.price.currency_iso },
+        OrderId: cardooFindResponse.order_id,
+        GuaranteeIssuanceStatus: cardooFindResponse.guarantee_issuance_status,
+        InvoiceState: cardooFindResponse.invoice_state,
       },
       200,
       "OTA_DepositFreeRes",
