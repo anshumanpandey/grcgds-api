@@ -389,11 +389,15 @@ export const sendInvtiationLink = async (p: SendInvtiationLinkParams) => {
   };
   const { data } = await Axios(axiosConfig);
 
-  await getDbFor().into("TrustpilotEmailedReview").insert({
-    branchLocation: p.branchLocation,
-    email: p.emailTo,
-    resNumber: p.referenceId,
-  });
+  await getDbFor()
+    .into("TrustpilotEmailedReview")
+    .insert({
+      branchLocation: p.branchLocation,
+      email: p.emailTo,
+      resNumber: p.referenceId,
+      requestBody: JSON.stringify(body),
+      responseBody: JSON.stringify(data),
+    });
 
   return data
 };
