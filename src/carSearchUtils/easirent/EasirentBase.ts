@@ -6,7 +6,7 @@ import { getPaypalCredentials } from "../../utils/getPaypalCredentials";
 import { saveServiceRequest } from "../../utils/saveServiceRequest";
 import { xmlToJson } from '../../utils/XmlConfig';
 
-export const EASIRENT_URL = 'https://easirent.com/broker/bookingclik/bookingclik.asp'
+export const EASIRENT_URL = "https://easirent.com/broker/hannk/LiveFeed.asp";
 const getDateTime = (fullDate: string) => {
     const [date, time] = fullDate.split('T')
     return [date, time.slice(0, 5)]
